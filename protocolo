@@ -1,0 +1,90 @@
+1. DISEÑO TEÓRICO
+
+        1.1 Tema
+
+Sistema de gestión de cobranzas para empresas.
+        1.2 Título
+
+Aplicación web y móvil para la gestión de cobranzas multiempresa.
+        1.3 Percepción del problema
+   Actualmente, muchas empresas que otorgan créditos o venden a plazos enfrentan dificultades para gestionar sus cobranzas de forma organizada. El uso de métodos manuales, planillas o sistemas poco integrados genera retrasos, errores en los registros y problemas para supervisar las gestiones de cobranzas en tiempo real.
+Entre los problemas más comunes que enfrentan se encuentran:
+    • Falta de un sistema centralizado para gestionar empresas y cobranzas.
+    • Dificultad para asignar y controlar tareas de cobradores.
+    • Comunicación deficiente y falta de seguimiento en tiempo real.
+    • Riesgo de pérdida de datos y errores por registros manuales.
+    • Ausencia de reportes actualizados para la toma de decisiones.
+    • Falta de una herramienta para supervisar el desempeño de los cobradores.
+1.3.1 Pregunta general de investigación
+     ¿Qué diseño de sistema informático resultará eficiente para la gestión de cobranzas multiempresa, optimizando la administración, seguimiento y supervisión de las gestiones en campo?
+
+1.3.2 Preguntas específicas de investigación
+    • ¿Cómo desarrollar un sistema web que permita la gestión centralizada de cobranzas para múltiples empresas?
+    • ¿De qué manera implementar una aplicación móvil que facilite la asignación, gestión y reporte de cobranzas en campo?
+    • ¿De qué forma integrar alertas y notificaciones para supervisores y cobradores sobre vencimientos y tareas pendientes?
+    • ¿Qué beneficios aporta automatizar el proceso de cobranzas?
+    • ¿Qué herramientas de geolocalización pueden implementarse para optimizar las rutas y zonas de cobertura de los cobradores?
+
+        1.4 Objetivos de investigación
+1.4.1 Objetivo general de investigación
+Desarrollar un sistema automatizado para la gestión eficiente de cobranzas, que permita administrar múltiples empresas, usuarios cobradores y supervisores, optimizando la asignación, seguimiento y reporte de cobranzas.
+1.4.2 Objetivos específicos de investigación
+    1. Desarrollar una aplicación móvil para cobradores que facilite la gestión en campo.
+    2. Automatizar la asignación y seguimiento de cobranzas para evitar duplicidades y cobranzas en vano.
+    3. Integrar un módulo de geolocalización para organizar zonas de cobranza y optimizar recorridos.
+    4. Implementar alertas automáticas para cobranzas vencidas o próximas a vencer.
+    5. Permitir a los cobradores registrar observaciones o comentarios sobre cada gestión en campo.
+    6. Implementar un módulo de control de acceso con roles diferenciados para administradores, supervisores y cobradores.
+        1.5 Justificación
+
+Hoy en día, el uso de tecnologías en las empresas es fundamental para optimizar procesos, reducir errores y mejorar la eficiencia operativa. En el caso de las empresas que otorgan créditos o venden a plazos, la gestión de cobranzas representa una actividad clave para la recuperación de capital y la sostenibilidad del negocio. Sin embargo, muchas de estas organizaciones aún gestionan sus cobranzas de manera manual o utilizando herramientas poco integradas, lo que genera complicaciones, retrasos y una limitada capacidad de control.
+Este proyecto propone el desarrollo de un sistema automatizado de cobranzas multiempresa que permita centralizar y agilizar todas las gestiones relacionadas, mejorando la organización y el seguimiento de los cobradores en campo. La herramienta contará con una plataforma web administrativa y una aplicación móvil para cobradores, facilitando así la asignación de tareas, el registro de cobranzas y la comunicación entre supervisores y cobradores de forma rápida y eficiente.
+Además, el sistema permitirá implementar notificaciones, reportes de gestión, alertas por cobranzas vencidas y módulos de geolocalización para organizar las zonas de cobertura, optimizando los recursos humanos y garantizando un control más riguroso de las operaciones.
+La utilización de esta solución tecnológica no solo reducirá la carga administrativa y los errores por registros manuales o duplicados, sino que también mejorará significativamente la transparencia y el control sobre las gestiones realizadas. Esto se traducirá en una mayor recuperación de deudas, una mejor toma de decisiones y una experiencia de trabajo más organizada para el personal operativo y administrativo. En consecuencia, el sistema aportará valor al negocio, fortalecerá su gestión financiera y contribuirá al crecimiento sostenido de las empresas usuarias.
+        1.6 Esquema del probable marco teórico
+1.6.1 Antecedentes
+En los últimos años, diferentes estudios y desarrollos tecnológicos han evidenciado la importancia de automatizar los procesos de cobranza en empresas de distintos sectores. Plataformas web y aplicaciones móviles especializadas han permitido reducir los niveles de morosidad, optimizar recursos humanos y mejorar la eficiencia operativa de las organizaciones.
+Por ejemplo, CobrosApp integra módulos móviles con geolocalización, asignación de cobranzas y generación de reportes en línea, facilitando el seguimiento de las gestiones realizadas en campo y centralizando la información para supervisores y administradores (CobrosApp, 2024). De manera similar, la solución Evidence de Ubiqo permite a los cobradores registrar su ubicación, adjuntar evidencias fotográficas de gestiones y reportar cobranzas desde sus dispositivos móviles, logrando una trazabilidad completa de las operaciones (Ubiqo.net, 2024).
+Además, estudios como el de InbuxWeb (2023) señalan que la automatización de los flujos de cobranza reduce significativamente los errores administrativos y mejora el control sobre las gestiones pendientes y vencidas, favoreciendo una recuperación de cartera más ágil y efectiva.
+
+1.6.2 Marco Conceptual
+Sistema de Gestión de Cobranzas: Plataforma digital que permite organizar, supervisar y controlar el proceso de recuperación de pagos de clientes de forma centralizada, mediante la asignación de tareas, seguimiento de gestiones y generación de reportes.
+Geolocalización: Tecnología utilizada para identificar la ubicación exacta de un cobrador o dispositivo móvil en tiempo real, facilitando la organización de zonas de cobertura y recorridos eficientes.
+Notificaciones Automáticas: Mensajes o alertas enviadas desde el sistema a usuarios específicos para informar sobre tareas pendientes, vencimientos, novedades o actualizaciones en las gestiones.
+Base de Datos Centralizada: Conjunto estructurado de información que permite almacenar y consultar de forma rápida y segura todos los registros de empresas, cobranzas, clientes, usuarios y gestiones realizadas.
+Aplicación Móvil: Software diseñado para dispositivos móviles que permite a los cobradores gestionar sus tareas en campo, consultar asignaciones, registrar pagos, adjuntar evidencias y recibir notificaciones en tiempo real.
+
+1.6.3 Marco Teórico
+    • Gestión de cobranzas en empresas de crédito y ventas a plazos.
+    • Uso de tecnología para optimizar procesos administrativos y de campo.
+    • Sistemas multiempresa y control de usuarios por roles.
+    • Aplicaciones móviles con geolocalización.
+1.6.4 Marco Referencial
+    • Oportunidades de negocio a través de aplicaciones para gestión de cobranzas.
+    • Gestión de cobranzas multiempresa a nivel regional y nacional.
+    • Mejoras a través de la digitalización en la gestión de cobranzas.
+
+2.  DISEÑO METODOLÓGICO
+
+        2.1 Área de investigación
+El presente proyecto se desarrollará en el área de las tecnologías de la información aplicadas a la gestión de cobranzas para empresas que otorgan créditos o venden productos a plazos. La investigación se centrará en el departamento de Paraguarí, donde se identificó la necesidad de modernizar y optimizar los procesos de cobranza en distintas empresas comerciales y financieras que operan en esta región.
+        2.2 Tipo y Nivel de investigación
+            ▪ Investigación de Nivel Experimental: Se aplicará una fase de prueba del sistema desarrollado en empresas seleccionadas para observar su funcionamiento y evaluar los efectos en la gestión de cobranzas.
+            ▪ Investigación descriptiva: Permitirá describir y caracterizar el estado actual de los procesos de cobranza en las empresas participantes, identificando problemas, oportunidades de mejora y requisitos funcionales.
+            ▪ Investigación cuantitativa: A través de encuestas y registros numéricos sobre gestiones realizadas, cobranzas efectivas, tiempos de recorrido y otros indicadores, se obtendrán datos medibles para evaluar los resultados.
+            ▪ Investigación cualitativa: Mediante entrevistas semiestructuradas y observación directa, se recogerán percepciones, opiniones y experiencias de los supervisores y cobradores, para complementar el análisis de la problemática y validar el funcionamiento del sistema.
+
+
+
+
+        2.3 Tipo de investigación según el tiempo
+La investigación será de tipo sincrónica transversal, ya que los datos se recopilarán en un periodo específico de tiempo para diagnosticar la situación actual y posteriormente realizar pruebas controladas del sistema desarrollado.
+        2.4 Población
+La población estará conformada por empresas que otorgan créditos o venden productos a plazos en el departamento de Paraguarí, así como por supervisores de cobranza y cobradores en campo que participan en la gestión de recuperación de deudas.
+        2.5 Muestra
+La muestra se seleccionará de forma no probabilística, utilizando el método de muestreo por conveniencia y accesibilidad. Se escogerán empresas y zonas de cobranza que permitan obtener información representativa sobre sus operaciones, procesos de cobranza y necesidades tecnológicas para la gestión de sus carteras.
+        2.6 Unidad de muestreo
+La unidad de muestreo estará conformada por los supervisores de cobranzas y cobradores en campo que trabajan en las empresas seleccionadas, quienes serán los usuarios directos de la plataforma web y la aplicación móvil.
+        2.7 Unidad de Análisis
+        La unidad de análisis estará constituida por los procesos de gestión de cobranzas de las empresas seleccionadas, específicamente en cuanto a la asignación de tareas, el seguimiento de cobranzas en campo, el registro de gestiones, el control de pagos y el desempeño de los cobradores.
+

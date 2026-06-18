@@ -1,0 +1,1477 @@
+# CobrApp — Manual de Usuario, Flujos de Proceso y Casos de Uso
+## Documentación Técnico-Funcional del Sistema
+
+---
+
+## ÍNDICE
+
+1. [Descripción General del Sistema](#1-descripción-general-del-sistema)
+2. [Arquitectura del Sistema](#2-arquitectura-del-sistema)
+3. [Roles y Permisos](#3-roles-y-permisos)
+4. [Módulo I — Registro e Inicialización de Empresa](#4-módulo-i--registro-e-inicialización-de-empresa)
+5. [Módulo II — Administración de Usuarios](#5-módulo-ii--administración-de-usuarios)
+6. [Módulo III — Gestión de Clientes y Créditos](#6-módulo-iii--gestión-de-clientes-y-créditos)
+7. [Módulo IV — Zonas Geográficas](#7-módulo-iv--zonas-geográficas)
+8. [Módulo V — Horarios y Descansos](#8-módulo-v--horarios-y-descansos)
+9. [Módulo VI — Asignaciones de Cobro](#9-módulo-vi--asignaciones-de-cobro)
+10. [Módulo VII — App Móvil del Cobrador](#10-módulo-vii--app-móvil-del-cobrador)
+11. [Módulo VIII — Caja Diaria (Arqueo)](#11-módulo-viii--caja-diaria-arqueo)
+12. [Módulo IX — Mensajería Interna](#12-módulo-ix--mensajería-interna)
+13. [Módulo X — Facturación](#13-módulo-x--facturación)
+14. [Módulo XI — Reportes y Panel de Control](#14-módulo-xi--reportes-y-panel-de-control)
+15. [Flujos de Proceso Principales](#15-flujos-de-proceso-principales)
+16. [Casos de Uso del Sistema](#16-casos-de-uso-del-sistema)
+17. [Orden de Carga Inicial Recomendado](#17-orden-de-carga-inicial-recomendado)
+18. [Diagrama de Base de Datos — Descripción de Entidades](#18-diagrama-de-base-de-datos--descripción-de-entidades)
+19. [Glosario de Términos](#19-glosario-de-términos)
+
+---
+
+## 1. Descripción General del Sistema
+
+**CobrApp** es un sistema integral de gestión de cobranzas a domicilio, diseñado para empresas financieras, cooperativas, prestamistas o cualquier organización que realice cobros periódicos de cuotas en campo.
+
+El sistema consta de tres componentes principales que funcionan de manera integrada:
+
+| Componente | Tecnología | Usuarios |
+|---|---|---|
+| Panel Web Administrativo | Next.js + React | Administradores, Supervisores |
+| API REST Backend | Node.js + Express | Consumido por web y móvil |
+| Aplicación Móvil | React Native (Expo) | Cobradores en campo |
+
+### Objetivo del Sistema
+
+Digitalizar el proceso de cobro de cuotas de créditos, permitiendo:
+- Seguimiento en tiempo real de los cobradores en campo
+- Registro de cobros con evidencia fotográfica y geolocalización
+- Control de caja diaria con arqueo automático
+- Comunicación interna entre supervisores y cobradores
+- Generación de comprobantes en PDF
+- Importación masiva de carteras de clientes desde Excel
+
+---
+
+## 2. Arquitectura del Sistema
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     PANEL WEB (Next.js)                     │
+│  Admin / Supervisor — Gestión completa del sistema          │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ HTTP REST (JWT)
+┌──────────────────────────▼──────────────────────────────────┐
+│                  API BACKEND (Node.js)                       │
+│  Autenticación JWT · Lógica de negocio · PDFKit             │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ MySQL Pool
+┌──────────────────────────▼──────────────────────────────────┐
+│                     BASE DE DATOS (MySQL)                    │
+│  35+ tablas · Relaciones completas · Auditoría               │
+└─────────────────────────────────────────────────────────────┘
+                           │ HTTP REST (JWT)
+┌──────────────────────────▼──────────────────────────────────┐
+│                APP MÓVIL (React Native / Expo)               │
+│  Cobrador — Agenda · Visitas · Caja · GPS · Mensajes        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Seguridad
+
+- Autenticación basada en **JSON Web Tokens (JWT)** con expiración configurable (por defecto 24h)
+- Contraseñas hasheadas con **bcrypt** (salt rounds configurables)
+- Separación estricta de datos por `empresa_id` — cada empresa solo ve sus propios datos
+- Control de acceso basado en roles (**RBAC**) en cada endpoint de la API
+- Flujo de cambio obligatorio de contraseña en el primer inicio de sesión (`debe_cambiar_password`)
+
+---
+
+## 3. Roles y Permisos
+
+El sistema define tres roles con permisos escalados:
+
+### 3.1 ADMIN (Soporte Técnico del Sistema)
+
+Rol de soporte y alta. Su responsabilidad es **crear empresas y designar a su supervisor**. No opera el sistema en el día a día ni hace configuraciones operativas: eso le corresponde al SUPERVISOR.
+
+| Capacidad | Detalle |
+|---|---|
+| Registrar empresas | Crear el registro inicial de una empresa en el sistema |
+| Crear usuario SUPERVISOR | Designar al responsable operativo de cada empresa |
+| Ver datos globales | Acceso de solo-lectura a datos de todas las empresas (soporte) |
+| Gestión básica de empresas | Editar datos de empresa, logo, activar/desactivar |
+
+> **Nota:** El ADMIN no configura medios de pago, zonas, horarios, descansos ni importa clientes. Toda la configuración operativa la realiza el SUPERVISOR dentro de su empresa.
+
+> El rol ADMIN se crea automáticamente al registrar la primera empresa del sistema (endpoint `/api/auth/register`).
+
+---
+
+### 3.2 SUPERVISOR (Responsable Operativo de la Empresa)
+
+Es el **rol central del sistema**. Opera dentro del ámbito de **su empresa** y es responsable de toda la configuración y operación diaria. El ADMIN le delega el control total de la empresa.
+
+| Capacidad | Detalle |
+|---|---|
+| Configurar medios de pago | Crear efectivo, transferencia, tarjeta, etc. |
+| Configurar tipos de descanso | Almuerzo, médico, personal, etc. |
+| Configurar horarios | Turnos de trabajo para cobradores |
+| Gestionar zonas geográficas | Crear zonas con polígonos y asignar cobradores |
+| Gestión de usuarios | Crear y administrar cobradores y supervisores de su empresa |
+| Importar cartera | Cargar clientes y créditos desde Excel |
+| Completar GPS de clientes | Agregar coordenadas a clientes sin ubicación |
+| Asignar cobranzas | Asignar cuotas específicas a cobradores |
+| Monitoreo | Ver estado de cobros, gestiones y rutas de cobradores |
+| Revisar rendiciones | Control de caja diaria de cada cobrador |
+| Mensajería | Comunicación directa con cobradores |
+| Ver reportes | Dashboard con métricas de su empresa |
+| Configurar facturación | Datos del emisor de facturas y timbrados |
+
+---
+
+### 3.3 COBRADOR
+
+Rol exclusivo para la **aplicación móvil**. Acceso limitado solo a sus propias asignaciones.
+
+| Capacidad | Detalle |
+|---|---|
+| Ver agenda | Lista de cuotas asignadas con filtros por estado |
+| Registrar cobros | Marcar cuota como cobrada con medio de pago |
+| Registrar visitas | Marcar ausente, reagendar, subir foto evidencia |
+| Caja diaria | Abrir, gestionar y cerrar su caja con saldo inicial |
+| Descansos | Iniciar y finalizar pausas (almuerzo, etc.) |
+| Mensajería | Chat con su supervisor |
+| Mapa de ruta | Visualizar clientes en mapa con GPS |
+| Descargar comprobante | Obtener PDF del comprobante de cobro |
+
+---
+
+## 4. Módulo I — Registro e Inicialización de Empresa
+
+### 4.1 Rol del ADMIN en la puesta en marcha
+
+El ADMIN actúa como **soporte de la plataforma**. Su participación en el proceso de alta de una empresa se limita a dos acciones concretas:
+
+1. **Crear la empresa** en el sistema
+2. **Crear el usuario SUPERVISOR** que quedará a cargo de esa empresa
+
+A partir de ahí, el SUPERVISOR toma el control total y realiza toda la configuración operativa.
+
+---
+
+### 4.2 Registro Inicial del Sistema (Una sola vez)
+
+La primera vez que se instala CobrApp, se registra la empresa inicial junto con el usuario ADMIN desde la pantalla de registro.
+
+**Panel Web → `/register`**
+
+**Datos requeridos:**
+- `nombreEmpresa` — Razón social de la empresa
+- `email` — Correo del administrador
+- `password` — Contraseña inicial
+
+**Proceso interno:**
+```
+1. Verificar que el email no exista en el sistema
+2. Crear registro en tabla "empresas" (razon_social, email)
+3. Crear rol ADMIN si no existe (INSERT ... ON DUPLICATE KEY)
+4. Hashear la contraseña con bcrypt
+5. Crear el usuario administrador ligado a la empresa
+6. Retornar empresa_id y usuario_id creados
+```
+
+> Para agregar más empresas al sistema, el ADMIN las crea desde **Panel Web → Empresas → Nueva Empresa**.
+
+---
+
+### 4.3 Alta de una Empresa por el ADMIN
+
+El ADMIN crea la empresa y la deja lista para que el SUPERVISOR tome el control:
+
+**Panel Web → Empresas → Nueva / Editar empresa**
+
+Datos que el ADMIN carga:
+- **Razón Social** — Nombre legal de la empresa
+- **RUC** — Número de identificación tributaria
+- **Teléfono** — Número de contacto
+- **Dirección** — Domicilio fiscal
+- **Logo** — Imagen de la empresa (máx. 2 MB)
+- **Actividad Económica** — Rubro de la empresa
+
+Luego crea el usuario SUPERVISOR para esa empresa y le entrega las credenciales. **El trabajo del ADMIN termina aquí.**
+
+> El logo aparece en los comprobantes PDF generados por el sistema.
+
+---
+
+### 4.4 Configuración Operativa — Responsabilidad del SUPERVISOR
+
+Una vez que el SUPERVISOR hace su primer login y cambia su contraseña, es él quien configura todo lo necesario para operar. Ver sección completa en el **Módulo II — Configuración por el Supervisor**.
+
+---
+
+## 5. Módulo II — Configuración por el Supervisor
+
+El SUPERVISOR es el **responsable operativo completo** de su empresa. Una vez que recibe sus credenciales del ADMIN, realiza todas las configuraciones en el siguiente orden recomendado antes de empezar a operar.
+
+---
+
+### 5.1 Configuración de Medios de Pago
+
+**Panel Web → Medios de Pago → Nuevo**
+
+El primer paso es configurar cómo los clientes pueden pagar sus cuotas. Debe crearse al menos un medio de pago antes de que los cobradores puedan registrar cobros.
+
+| Campo | Descripción |
+|---|---|
+| Nombre | Ej: "Efectivo", "Transferencia Bancaria", "Tarjeta" |
+| Requiere Comprobante | Si es `FALSE` → cuenta como efectivo en el arqueo de caja. Si es `TRUE` → pago digital/bancario, no afecta el arqueo de efectivo. |
+| Activo | Si está disponible para que los cobradores lo seleccionen |
+
+---
+
+### 5.2 Configuración de Tipos de Descanso
+
+**Panel Web → Descansos → Tipos de Descanso**
+
+Define las categorías de pausas que los cobradores pueden registrar desde la app.
+
+| Campo | Descripción |
+|---|---|
+| Nombre | Ej: "Almuerzo", "Médico", "Personal" |
+| Es Obligatorio | Si el sistema obliga a registrar ese descanso |
+| Hora Inicio | Hora en que inicia automáticamente (opcional) |
+| Hora Fin Auto | Hora en que el servidor lo finaliza automáticamente |
+
+---
+
+### 5.3 Configuración de Horarios
+
+**Panel Web → Horarios → Nuevo Horario**
+
+Define los turnos de trabajo para los cobradores.
+
+- Nombre del horario (ej: "Turno Mañana")
+- Hora de inicio y fin
+- Días de la semana activos
+
+---
+
+### 5.4 Configuración de Zonas Geográficas
+
+**Panel Web → Zonas → Nueva Zona**
+
+Divide el territorio de cobertura en sectores asignados a cada cobrador. Ver detalles completos en **Módulo IV**.
+
+---
+
+### 5.5 Crear Cobradores
+
+**Panel Web → Usuarios → Nuevo Usuario**
+
+**Quién puede crear usuarios:**
+- ADMIN → puede crear SUPERVISOR en cualquier empresa
+- SUPERVISOR → puede crear SUPERVISOR y COBRADOR **solo en su empresa**
+- COBRADOR → sin permisos para crear usuarios
+
+**Proceso:**
+```
+1. Completar formulario: nombre, apellido, cédula, teléfono, email, rol, empresa
+2. El sistema genera contraseña automática basada en nombre de empresa
+3. Se activa flag "debe_cambiar_password = TRUE"
+4. El usuario recibirá la contraseña generada
+5. En su primer login, será redirigido a /cambiar-password
+```
+
+**Datos del formulario:**
+| Campo | Obligatorio | Descripción |
+|---|---|---|
+| Nombre | Sí | Nombre del usuario |
+| Apellido | Sí | Apellido del usuario |
+| Cédula | No | Número de documento |
+| Teléfono | No | Número de contacto |
+| Email | Sí | Único en el sistema |
+| Rol | Sí | ADMIN / SUPERVISOR / COBRADOR |
+| Empresa | Sí (ADMIN) | A qué empresa pertenece |
+
+---
+
+### 5.2 Cambio de Contraseña Obligatorio
+
+Al primer login, si `debe_cambiar_password = TRUE`:
+
+```
+Login exitoso → Sistema detecta flag → Redirige a /cambiar-password
+→ Usuario ingresa nueva contraseña → Flag se desactiva → Acceso normal
+```
+
+---
+
+### 5.3 Editar / Desactivar Usuario
+
+**Panel Web → Usuarios → [Seleccionar usuario] → Editar**
+
+- Los campos editables son: nombre, apellido, cédula, teléfono, estado
+- Desactivar un usuario (`estado = FALSE`) bloquea su acceso sin eliminar datos
+- No se puede eliminar usuarios para preservar la integridad del historial
+
+---
+
+## 6. Módulo III — Gestión de Clientes y Créditos
+
+### 6.1 Importación Masiva desde Excel (Método Principal)
+
+La forma más eficiente de cargar la cartera de clientes es mediante importación Excel.
+
+**Panel Web → Importar → Subir archivo Excel**
+
+**Estructura del archivo Excel (columnas reconocidas):**
+
+| Columna | Alias aceptados | Obligatorio |
+|---|---|---|
+| Cédula/CI | `cedula`, `CI`, `ci`, `RUC`, `ruc` | **Sí** |
+| Nombre | `nombre`, `Nombre`, `NOMBRE` | **Sí** |
+| Apellido | `apellido`, `Apellido` | No |
+| Teléfono | `telefono`, `Telefono` | No |
+| Email | `email`, `Email` | No |
+| Dirección | `direccion`, `Direccion` | No |
+| Latitud | `latitud`, `Latitud`, `lat` | No* |
+| Longitud | `longitud`, `Longitud`, `lng` | No* |
+| URL Google Maps | `url_maps`, `Maps`, `URL_Maps` | No* |
+| Número Crédito | `numero_credito`, `nro_credito` | No |
+| Descripción Crédito | `descripcion` | No |
+| Precio Contado | `precio_contado` | No |
+| Entrega Inicial | `entrega_inicial` | No |
+| Monto Total | `monto_total` | No |
+| Cantidad Cuotas | `cantidad_cuotas` | No |
+| Monto Cuota | `monto_cuota` | No |
+| Día de Pago | `dia_pago` | No |
+| Tasa Interés | `tasa_interes` | No |
+| Periodicidad | `periodicidad` (MENSUAL/QUINCENAL/SEMANAL) | No |
+| Fecha Otorgamiento | `fecha_otorgamiento` | No |
+| Fecha Primera Cuota | `fecha_primera_cuota` | No |
+
+> *La ubicación puede ser coordenadas directas (`lat,lng`), coordenadas separadas, o URL de Google Maps (el sistema extrae las coordenadas automáticamente del enlace).
+
+**Proceso de importación:**
+```
+1. Subir archivo .xlsx o .xls (máximo 5 MB)
+2. El sistema lee fila por fila
+3. Por cada fila:
+   a. Verificar cédula (obligatoria)
+   b. Buscar cliente existente por cédula → crear o actualizar
+   c. Vincular cliente a la empresa (clientes_empresas)
+   d. Extraer coordenadas si existen
+   e. Si hay datos de crédito → crear crédito y cuotas automáticamente
+4. Retornar resumen: importados, actualizados, sin ubicación, créditos creados, errores
+```
+
+**Reglas de generación de cuotas:**
+- **MENSUAL**: avanza un mes por cuota
+- **QUINCENAL**: avanza 15 días por cuota
+- **SEMANAL**: avanza 7 días por cuota
+- Si se especifica `dia_pago` en periodicidad MENSUAL, cada cuota se ajusta a ese día del mes
+
+---
+
+### 6.2 Crear Cliente Individual
+
+**Panel Web → Clientes → Nuevo Cliente**
+
+Para agregar clientes uno a uno sin archivo Excel:
+
+Datos:
+- Cédula/RUC (identificador único global)
+- Nombre y Apellido
+- Teléfono, Email (opcionales)
+- Dirección y coordenadas GPS (opcionales)
+- Empresa a la que pertenece
+
+---
+
+### 6.3 Completar Ubicación de Clientes sin GPS
+
+**Panel Web → Clientes → Sin Ubicación**
+
+Lista todos los clientes importados que no tienen coordenadas. Permite:
+- Ingresar manualmente latitud/longitud
+- Pegar URL de Google Maps (el sistema extrae coordenadas)
+
+> La ubicación es fundamental para que el cobrador pueda visualizar al cliente en el mapa de ruta y calcular el orden óptimo de visitas.
+
+---
+
+### 6.4 Estructura de Crédito — Cuotas
+
+La jerarquía de datos financieros es:
+
+```
+Cliente
+ └── clientes_empresas (relación cliente-empresa)
+      └── créditos (un cliente puede tener múltiples créditos)
+           └── cuotas (cada crédito genera N cuotas)
+                └── asignaciones (cada cuota se asigna a un cobrador)
+                     └── visitas_cobro / gestiones (resultado de la visita)
+```
+
+**Estados de una cuota:**
+| Estado | Descripción |
+|---|---|
+| `PENDIENTE` | Cuota activa, fecha futura o de hoy |
+| `VENCIDA` | Fecha de vencimiento pasada, sin cobrar |
+| `PAGADO` | Cuota cobrada exitosamente |
+
+---
+
+## 7. Módulo IV — Zonas Geográficas
+
+### 7.1 Descripción
+
+Las zonas definen áreas geográficas poligonales en el mapa, utilizadas para:
+- Organizar la distribución de cobradores por sector
+- Visualizar cobertura territorial en el mapa administrativo
+- Auto-asignación de clientes a cobradores según su zona
+
+### 7.2 Crear una Zona
+
+**Panel Web → Zonas → Nueva Zona**
+
+1. **Asignar nombre** — Ej: "Zona Norte", "Barrio San Lorenzo"
+2. **Seleccionar cobrador** — Cobrador responsable de la zona
+3. **Dibujar polígono** — Usando el componente de mapa interactivo:
+   - Activar modo "Dibujo"
+   - Hacer clic en el mapa para agregar vértices (mínimo 3 puntos)
+   - Los marcadores son arrastrables para ajuste fino
+   - El polígono se cierra automáticamente al tener 3+ puntos
+4. **Color** — Color de identificación visual en el mapa
+5. **Descripción** — Descripción opcional de la zona
+6. **Guardar** — El polígono se almacena como JSON en la base de datos
+
+**Auto-asignación de zona:**
+El sistema utiliza algoritmo **Ray-Casting** (punto dentro de polígono) para detectar automáticamente a qué zona pertenece un cliente según sus coordenadas GPS.
+
+---
+
+## 8. Módulo V — Horarios y Descansos
+
+### 8.1 Horarios de Trabajo
+
+**Panel Web → Horarios → Nuevo Horario**
+
+Define los turnos de trabajo para los cobradores de la empresa.
+
+Datos:
+- Nombre del horario (ej: "Turno Mañana")
+- Hora de inicio y fin
+- Días de la semana activos
+- Asignación a cobradores
+
+---
+
+### 8.2 Tipos de Descanso
+
+**Panel Web → Descansos → Tipos de Descanso**
+
+Configura las categorías de pausas que los cobradores pueden registrar:
+
+| Campo | Descripción |
+|---|---|
+| Nombre | Ej: "Almuerzo", "Médico", "Personal" |
+| Es Obligatorio | Si el sistema forzará ese descanso |
+| Hora Inicio | Hora en que inicia automáticamente (opcional) |
+| Hora Fin Auto | Hora en que finaliza automáticamente (cron) |
+
+**Proceso de descanso del cobrador (App Móvil):**
+```
+1. Cobrador abre App → Pantalla Descanso
+2. Selecciona tipo de descanso
+3. Toca "Iniciar Descanso"
+   → Se registra hora_inicio_real en descansos_cobrador
+   → Estado "activo = TRUE"
+4. Cuando retorna: toca "Finalizar Descanso"
+   → Se registra hora_fin_real
+   → Estado "activo = FALSE"
+5. Si el tipo tiene hora_fin_auto:
+   → El cron del servidor finaliza el descanso automáticamente a esa hora
+```
+
+---
+
+## 9. Módulo VI — Asignaciones de Cobro
+
+### 9.1 Descripción
+
+La **asignación** es el vínculo entre una cuota de un cliente y un cobrador específico para un día determinado. Es el proceso central del sistema: sin asignaciones, el cobrador no tiene trabajo en su agenda.
+
+### 9.2 Crear Asignaciones
+
+**Panel Web → Cobranzas → Asignar**
+
+El supervisor o admin selecciona:
+1. **Cuota** — La cuota a cobrar (identificada por cliente, crédito, número de cuota)
+2. **Cobrador** — Quién realizará el cobro
+3. **Fecha Límite** — Fecha máxima para completar la visita
+
+**Estados de asignación:**
+| Estado | Descripción |
+|---|---|
+| `PENDIENTE` | Asignada, el cobrador aún no realizó la visita |
+| `COMPLETADO` | Cobrador registró resultado (cobrado, ausente o reagendado) |
+| `ANULADO` | Asignación cancelada por el supervisor |
+
+---
+
+### 9.3 Gestión y Seguimiento
+
+**Panel Web → Gestiones**
+
+Visualiza el historial de todas las visitas realizadas por los cobradores:
+- Resultado: cobrado / ausente / reagendado
+- Monto cobrado
+- Medio de pago utilizado
+- Foto de evidencia (si fue tomada)
+- Coordenadas GPS del cobrador al momento del cobro
+- Fecha y hora exacta de la visita
+
+---
+
+## 10. Módulo VII — App Móvil del Cobrador
+
+### 10.1 Login en la Aplicación
+
+1. Abrir la app CobrApp
+2. Ingresar email y contraseña
+3. Si es primer login → redirige a cambio de contraseña obligatorio
+4. Acceso al menú principal
+
+**Menú principal de la app:**
+- **Caja** — Gestión de caja diaria
+- **Agenda** — Lista de cuotas asignadas
+- **Mapa** — Visualización geográfica de clientes
+- **Descanso** — Control de pausas
+- **Mensajes** — Chat con supervisor
+- **Perfil** — Datos del usuario
+
+---
+
+### 10.2 Flujo Diario del Cobrador
+
+El flujo de trabajo estándar de un cobrador en campo es el siguiente:
+
+```
+INICIO DEL DÍA
+│
+├─► 1. ABRIR CAJA
+│      Ingresar saldo inicial en efectivo (el monto que trae)
+│      → Habilita el acceso a la agenda del día
+│
+├─► 2. REVISAR AGENDA
+│      Ver asignaciones: VENCIDAS | HOY | PRÓXIMAS
+│      Filtrar y ordenar por prioridad
+│
+├─► 3. PLANIFICAR RUTA
+│      Ver mapa con ubicaciones de clientes
+│      (Algoritmo TSP sugiere orden óptimo de visita)
+│
+├─► 4. REALIZAR VISITAS (repetir por cada cliente)
+│      │
+│      ├─► COBRADO → Ingresar monto + medio de pago + nro. comprobante (opcional)
+│      │             GPS capturado automáticamente
+│      │             → Cuota pasa a estado PAGADO
+│      │
+│      ├─► AUSENTE → Ingresar comentario + foto evidencia (opcional)
+│      │            GPS capturado automáticamente
+│      │            → Asignación queda PENDIENTE
+│      │
+│      └─► REAGENDADO → Ingresar nueva hora acordada
+│                       → Se envía notificación
+│
+├─► 5. GESTIONAR DESCANSOS (según necesidad)
+│      Iniciar y finalizar pausas durante el día
+│
+└─► FIN DEL DÍA — CERRAR CAJA
+       Contar el efectivo físico
+       Ingresar monto contado
+       El sistema calcula diferencia vs. saldo esperado
+       → Caja queda en estado CERRADO con registro de diferencia
+```
+
+---
+
+### 10.3 Pantalla de Agenda
+
+Organización de la agenda del cobrador:
+
+**Secciones:**
+- **VENCIDAS** (rojo) — Cuotas cuya fecha ya pasó sin cobrar
+- **HOY** (azul) — Cuotas con vencimiento el día actual
+- **PRÓXIMAS** (gris) — Cuotas de días futuros
+
+**Filtros disponibles:**
+- Todas | Solo Hoy | Solo Vencidas
+
+**Por cada item de agenda se muestra:**
+- Nombre y apellido del cliente
+- Número de cuota y monto
+- Estado de la cuota (badge de color)
+- Fecha de vencimiento
+- Dirección del cliente
+
+**Desde la agenda se puede:**
+- Tocar un item → ir a Pantalla de Visita
+- Ver mapa con todos los clientes marcados
+- Actualizar tirando hacia abajo (pull-to-refresh)
+
+---
+
+### 10.4 Pantalla de Visita
+
+Al seleccionar una asignación de la agenda:
+
+**Información del cliente visible:**
+- Nombre completo, cédula, teléfono
+- Monto de la cuota a cobrar
+- Botón para llamar al cliente directamente
+
+**Opciones de registro:**
+
+**A. Registrar Cobro**
+1. Confirmar o modificar el monto a cobrar
+2. Seleccionar medio de pago (lista configurable por empresa)
+3. Ingresar número de comprobante (si aplica)
+4. Tocar "Confirmar cobro"
+   - GPS se captura automáticamente
+   - Se genera registro en `visitas_cobro` con resultado = 'cobrado'
+   - Se actualiza estado de cuota a 'PAGADO'
+   - Disponible para descargar comprobante PDF
+
+**B. Registrar Ausente**
+1. Ingresar comentario (razón de ausencia)
+2. Opcionalmente tomar foto de evidencia (cámara del dispositivo)
+3. Tocar "Registrar ausente"
+   - GPS capturado
+   - Se registra visita con resultado = 'ausente'
+   - La asignación queda pendiente para nueva visita
+
+**C. Reagendar**
+1. Ingresar nueva hora acordada con el cliente
+2. Tocar "Reagendar"
+   - Se registra visita con resultado = 'reagendado'
+   - Se activa notificación push para la nueva hora
+
+---
+
+### 10.5 Comprobante de Cobro
+
+Después de registrar un cobro exitoso:
+
+1. El cobrador puede tocar "Ver Comprobante"
+2. La app descarga el PDF desde el servidor
+3. Se puede compartir via WhatsApp, email u otras apps instaladas
+4. El PDF incluye: datos de empresa, cliente, crédito, cuota, monto, medio de pago, fecha y hora
+
+---
+
+### 10.6 Mapa de Ruta
+
+**App → Mapa**
+
+- Muestra todos los clientes de la agenda del día en un mapa
+- Marcadores diferenciados por estado (cobrado, pendiente, vencido)
+- El cobrador puede tocar un marcador y navegar directamente al cliente
+- Se usa algoritmo de optimización de ruta (Traveling Salesman Problem simplificado) para sugerir el orden más eficiente
+
+---
+
+## 11. Módulo VIII — Caja Diaria (Arqueo)
+
+### 11.1 Descripción
+
+El módulo de caja controla el dinero en efectivo que maneja cada cobrador durante su jornada. Implementa el concepto de **arqueo de caja**, estándar contable para validar que el dinero en poder del cobrador coincide con lo registrado en el sistema.
+
+### 11.2 Flujo Completo de Caja
+
+```
+APERTURA DE CAJA
+├── Cobrador declara saldo inicial (efectivo que lleva)
+├── Sistema crea registro en "arqueos_caja" con estado = 'ABIERTO'
+└── Solo puede haber una caja abierta por cobrador
+
+DURANTE EL DÍA
+├── Cobros en efectivo → suman al saldo esperado
+├── Cobros con comprobante (transferencia, tarjeta) → registrados separadamente
+└── Gastos del cobrador → restan del saldo esperado (tabla "movimientos_caja")
+
+CIERRE DE CAJA
+├── Cobrador cuenta su efectivo físico
+├── Ingresa "saldo contado"
+├── Sistema calcula:
+│   saldo_esperado = saldo_inicial + cobros_efectivo - gastos
+│   diferencia = saldo_contado - saldo_esperado
+├── Si diferencia ≠ 0: queda registrada para revisión del supervisor
+└── Caja pasa a estado = 'CERRADO'
+```
+
+### 11.3 Medios de Pago
+
+**Panel Web → Medios de Pago → Nuevo**
+
+Los medios de pago son configurados por empresa. La clasificación clave es:
+
+- **`requiere_comprobante = FALSE`** → Se considera efectivo (suma al arqueo)
+- **`requiere_comprobante = TRUE`** → Pago bancario/digital (registrado, no suma al arqueo de efectivo)
+
+Ejemplos:
+| Medio | requiere_comprobante |
+|---|---|
+| Efectivo | FALSE |
+| Transferencia Bancaria | TRUE |
+| Tarjeta de Débito | TRUE |
+| Cheque | TRUE |
+
+---
+
+### 11.4 Registro de Gastos (Movimientos de Caja)
+
+Si el cobrador debe registrar un gasto durante el día (combustible, peaje, etc.):
+
+**App → Caja → Registrar Gasto**
+1. Ingresar concepto del gasto
+2. Ingresar monto
+3. El gasto se descuenta del saldo esperado al cierre
+
+---
+
+### 11.5 Rendiciones (Supervisión)
+
+**Panel Web → Cobranzas → Rendiciones**
+
+Los supervisores pueden ver las rendiciones de los cobradores:
+- Arqueo de caja (saldo inicial, esperado, contado, diferencia)
+- Cobros realizados en el período
+- Observaciones del cobrador
+
+---
+
+## 12. Módulo IX — Mensajería Interna
+
+### 12.1 Descripción
+
+Sistema de mensajería directa entre Supervisores y Cobradores de la misma empresa. El ADMIN no accede a mensajes internos.
+
+### 12.2 Características
+
+- Chat en tiempo real (polling o refresh manual)
+- Soporte para mensajes de texto
+- Soporte para envío de **imágenes** (almacenadas en `uploads/mensajes/`)
+- Contador de mensajes no leídos visible en el ícono de mensajería
+- Marca automática de leído al abrir conversación
+
+### 12.3 Flujo de Mensajería
+
+```
+Supervisor abre panel web → Mensajes → Lista de cobradores
+→ Selecciona cobrador → Escribe mensaje → Enviar
+→ Cobrador recibe en app → Ítem con badge (N no leídos)
+→ Cobrador responde desde app
+→ Supervisor ve respuesta en panel web
+```
+
+---
+
+## 13. Módulo X — Facturación
+
+### 13.1 Descripción
+
+Módulo de generación de facturas para las operaciones de cobro. Soporta tanto factura manual como factura electrónica (timbrado SET - SIFEN Paraguay).
+
+### 13.2 Configurar Facturación
+
+**Panel Web → Configuración → Factura**
+
+**Datos del Emisor (`facturas_emisor`):**
+- Razón Social, RUC, RUC-DV
+- Dirección, actividad económica
+
+**Timbrado (`facturas_timbrado`):**
+- Número de timbrado
+- Establecimiento y punto de emisión
+- Rango de numeración (desde/hasta)
+- Fecha de inicio y vencimiento
+- Indicador de factura electrónica
+
+### 13.3 Generación de Facturas
+
+**Panel Web → Facturas → Nueva Factura**
+
+Datos de la factura:
+- Cliente (vinculado al sistema)
+- Cuota o visita asociada
+- Condición de venta (contado/crédito)
+- Moneda
+- Montos: base, IVA 10%, IVA 5%, exento, CDC
+- Tipo de emisión
+- Datos de factura timbrada (número secuencial, número completo)
+
+La tabla `facturas_detalle` almacena el desglose por ítem y `facturas_pago` los medios de pago usados en la factura.
+
+---
+
+## 14. Módulo XI — Reportes y Panel de Control
+
+### 14.1 Dashboard — Métricas por Rol
+
+**Panel Web → Dashboard**
+
+El dashboard se adapta al rol del usuario autenticado:
+
+**Vista ADMIN:**
+| Métrica | Descripción |
+|---|---|
+| Total Empresas | Empresas activas en el sistema |
+| Total Clientes | Clientes activos en todas las empresas |
+| Total Usuarios | Usuarios activos |
+| Cuotas Pendientes | Cuotas sin cobrar |
+| Cuotas Vencidas | Cuotas en mora |
+| Cuotas Pagadas | Cuotas cobradas |
+| Monto Total Cobrado | Suma de todos los cobros del sistema |
+
+**Vista SUPERVISOR:**
+| Métrica | Descripción |
+|---|---|
+| Cobradores | Cantidad de cobradores en su empresa |
+| Clientes | Clientes activos de su empresa |
+| Asignaciones Totales | Total de asignaciones que creó |
+| Asignaciones Pendientes | Sin completar |
+| Asignaciones Completadas | Finalizadas |
+| Monto Cobrado | Total cobrado por sus cobradores |
+
+**Vista COBRADOR:**
+| Métrica | Descripción |
+|---|---|
+| Asignaciones Totales | Total de asignaciones recibidas |
+| Asignaciones Pendientes | Pendientes de visita |
+| Asignaciones Completadas | Completadas |
+| Cuotas Vencidas | En su cartera |
+| Monto Cobrado | Total que cobró personalmente |
+
+---
+
+### 14.2 Mapa Administrativo
+
+**Panel Web → Mapa**
+
+Vista geográfica de todos los clientes y cobradores en campo:
+- Clientes marcados con estado de su cuota más urgente
+- Zonas geográficas dibujadas en el mapa
+- Posibilidad de ver cobrador en tiempo real (según GPS de última visita)
+
+---
+
+## 15. Flujos de Proceso Principales
+
+### Flujo 1 — Alta de Nueva Empresa y Puesta en Marcha
+
+```
+[ADMIN — rol de soporte]
+  │
+  ├─► Crear empresa (razon_social, RUC, teléfono, dirección, logo)
+  └─► Crear usuario SUPERVISOR vinculado a esa empresa
+       └─► Entrega credenciales al SUPERVISOR
+            │
+            ▼
+[SUPERVISOR — toma el control total de la empresa]
+  │
+  ├─► Primer login → cambiar contraseña (obligatorio)
+  ├─► Configurar medios de pago (Efectivo, Transferencia, etc.)
+  ├─► Configurar tipos de descanso (Almuerzo, Médico, etc.)
+  ├─► Configurar horarios de trabajo
+  ├─► Crear zonas geográficas (dibujar polígonos en mapa)
+  ├─► Crear usuarios COBRADOR (uno o más)
+  ├─► Importar cartera de clientes y créditos desde Excel
+  ├─► Verificar clientes sin ubicación → completar GPS
+  ├─► Asignar zonas a cobradores
+  └─► Sistema listo para operar
+```
+
+---
+
+### Flujo 2 — Ciclo Diario de Operación
+
+```
+[SUPERVISOR — mañana]
+  │
+  ├─► Revisar cuotas pendientes y vencidas
+  ├─► Asignar cuotas a cobradores del día
+  └─► Verificar que cobradores estén activos
+
+[COBRADOR — durante el día]
+  │
+  ├─► Login en app
+  ├─► Abrir caja (declarar saldo inicial)
+  ├─► Revisar agenda del día
+  ├─► Ejecutar ruta de cobros:
+  │    ├─► Cobrado → registrar cobro + medio pago
+  │    ├─► Ausente → registrar con comentario/foto
+  │    └─► Reagendado → nueva hora
+  ├─► Gestionar descanso al mediodía
+  └─► Cerrar caja (contar efectivo + ingresar monto)
+
+[SUPERVISOR — tarde/noche]
+  │
+  ├─► Revisar rendiciones de cobradores
+  ├─► Ver gestiones del día (cobrados, ausentes)
+  ├─► Revisar diferencias de caja
+  └─► Planificar asignaciones del día siguiente
+```
+
+---
+
+### Flujo 3 — Cobro de Cuota (Detalle Técnico)
+
+```
+COBRADOR toca "Cobrar" en la agenda
+  │
+  ▼
+App solicita permisos GPS → captura coordenadas
+App carga medios de pago disponibles (GET /api/cobrador/medios-pago)
+  │
+  ▼
+COBRADOR ingresa:
+  - Monto cobrado (pre-cargado con el saldo de la cuota)
+  - Medio de pago (selector)
+  - Número de comprobante (si aplica)
+  │
+  ▼
+POST /api/cobrador/cobros
+  {
+    asignacion_id,
+    monto_cobrado,
+    medio_pago_id,
+    nro_comprobante,
+    latitud, longitud,
+    arqueo_id (caja activa)
+  }
+  │
+  ▼
+Backend valida:
+  ✓ Asignación existe y pertenece al cobrador
+  ✓ Caja está abierta (arqueo_id activo)
+  ✓ Monto > 0
+  │
+  ▼
+Transacción en BD:
+  1. INSERT visitas_cobro (resultado='cobrado', monto, coords, arqueo_id)
+  2. UPDATE cuotas SET estado='PAGADO', fecha_pago=NOW()
+  3. UPDATE asignaciones SET estado='COMPLETADO'
+  │
+  ▼
+Response: { visita_id, message: "Cobro registrado exitosamente" }
+  │
+  ▼
+App muestra confirmación + opción "Ver Comprobante"
+```
+
+---
+
+### Flujo 4 — Arqueo de Caja (Detalle Técnico)
+
+```
+Al cierre del día:
+
+saldo_inicial    = monto declarado al abrir caja
+cobros_efectivo  = SUM(monto_cobrado) WHERE medio_pago.requiere_comprobante = FALSE
+                   AND visita.resultado = 'cobrado'
+gastos           = SUM(movimientos_caja.monto) WHERE arqueo_id = caja_actual
+saldo_esperado   = saldo_inicial + cobros_efectivo - gastos
+saldo_contado    = monto físico declarado por cobrador al cierre
+diferencia       = saldo_contado - saldo_esperado
+
+Si diferencia = 0  → Caja cuadrada ✓
+Si diferencia > 0  → Sobrante (cobrador tiene más de lo esperado)
+Si diferencia < 0  → Faltante (cobrador tiene menos de lo esperado)
+```
+
+---
+
+### Flujo 5 — Importación de Cartera
+
+```
+ADMIN/SUPERVISOR prepara archivo Excel con:
+  - Datos de clientes (nombre, CI, teléfono, dirección, coordenadas)
+  - Datos de créditos (número, monto, cuotas, periodicidad)
+  │
+  ▼
+Panel Web → Importar → Subir archivo
+  │
+  ▼
+Backend por cada fila:
+  1. Validar CI/RUC (obligatorio)
+  2. Validar nombre (obligatorio)
+  3. Buscar cliente por CI → si no existe, crear en tabla "clientes"
+  4. Buscar relación cliente-empresa → si no existe, crear en "clientes_empresas"
+     Si existe → actualizar dirección/coordenadas
+  5. Extraer coordenadas (campo directo o URL Google Maps)
+  6. Si hay datos de crédito:
+     a. Crear registro en "creditos"
+     b. Generar N cuotas en "cuotas" con fechas calculadas
+  │
+  ▼
+Resultado:
+  - X clientes nuevos importados
+  - Y clientes actualizados
+  - Z sin ubicación (requieren completar GPS)
+  - W créditos creados
+  - Lista de errores por fila (si hubiera)
+```
+
+---
+
+## 16. Casos de Uso del Sistema
+
+### CU-01: Registrar Sistema y Crear Primer ADMIN
+
+**Actor:** Usuario fundador/instalador del sistema  
+**Precondición:** Instancia de CobrApp recién desplegada, email no registrado  
+**Flujo principal:**
+1. Ingresar a la URL del panel web
+2. Navegar a `/register`
+3. Completar nombre de empresa, email y contraseña
+4. El sistema crea la empresa, el rol ADMIN y el usuario administrador
+5. Redirige a `/login`
+6. Ingresar credenciales para primer acceso
+
+**Postcondición:** Sistema activo con ADMIN listo para crear empresas y supervisores
+
+---
+
+### CU-02: ADMIN Crea Empresa y Designa Supervisor
+
+**Actor:** ADMIN  
+**Precondición:** Usuario ADMIN autenticado  
+**Flujo principal:**
+1. Panel Web → Empresas → Nueva Empresa
+2. Completar datos: razón social, RUC, teléfono, dirección, logo
+3. Guardar empresa
+4. Panel Web → Usuarios → Nuevo Usuario
+5. Seleccionar rol SUPERVISOR, vincular a la empresa recién creada
+6. El sistema genera contraseña automática
+7. Entregar credenciales al supervisor
+
+**Postcondición:** Empresa creada con SUPERVISOR designado. El trabajo del ADMIN finaliza.
+
+---
+
+### CU-03: SUPERVISOR Configura la Empresa
+
+**Actor:** SUPERVISOR  
+**Precondición:** Credenciales recibidas del ADMIN  
+**Flujo principal:**
+1. Primer login → cambio de contraseña obligatorio
+2. Configurar medios de pago (Efectivo obligatorio, opcionales: Transferencia, Tarjeta)
+3. Configurar tipos de descanso (Almuerzo, etc.)
+4. Configurar horarios de trabajo
+5. Crear zonas geográficas con polígonos en el mapa
+6. Crear usuarios COBRADOR
+7. Importar cartera de clientes y créditos desde Excel
+8. Completar GPS de clientes sin ubicación
+
+**Postcondición:** Empresa completamente configurada y lista para operar
+
+---
+
+### CU-04-A: SUPERVISOR Crea Cobrador
+
+**Actor:** SUPERVISOR  
+**Precondición:** Empresa configurada, al menos un medio de pago creado  
+**Flujo principal:**
+1. Panel Web → Usuarios → Nuevo Usuario
+2. Completar datos del cobrador, seleccionar rol COBRADOR
+3. Copiar la contraseña generada automáticamente
+4. Entregar credenciales al cobrador
+5. El cobrador instala la app y hace login
+6. Completa cambio de contraseña obligatorio
+
+---
+
+### CU-04-B: Importar Cartera de Clientes
+
+**Actor:** SUPERVISOR  
+**Precondición:** Empresa configurada, usuario autenticado  
+**Flujo principal:**
+1. Preparar archivo Excel con columnas según plantilla
+2. Panel Web → Importar → Seleccionar empresa
+3. Subir archivo .xlsx
+4. Revisar resultado de importación
+5. Navegar a "Clientes sin ubicación" y completar GPS faltantes
+
+**Flujo alternativo:** Descargar plantilla de ejemplo desde el panel
+
+---
+
+### CU-05: Asignar Cuotas para el Día
+
+**Actor:** SUPERVISOR  
+**Precondición:** Cobradores creados, cuotas existentes en el sistema  
+**Flujo principal:**
+1. Panel Web → Cobranzas → Pendientes/Vencidas
+2. Filtrar cuotas por zona, cobrador o fecha
+3. Seleccionar cuotas a asignar
+4. Asignar a cobrador específico con fecha límite
+5. El cobrador verá las asignaciones en su agenda al siguiente login
+
+---
+
+### CU-06: Cobrador Realiza Cobro en Campo
+
+**Actor:** COBRADOR  
+**Precondición:** Caja abierta, asignaciones del día disponibles  
+**Flujo principal:**
+1. App → Agenda → Seleccionar asignación
+2. Pantalla Visita → Tocar "Cobrar"
+3. Confirmar monto, seleccionar medio de pago
+4. Tocar "Confirmar cobro"
+5. GPS se captura automáticamente
+6. Cuota pasa a estado PAGADO
+7. Opcionalmente descargar comprobante PDF
+
+**Flujo alternativo A (cliente ausente):**
+- Tocar "Ausente" → ingresar comentario → opcionalmente tomar foto → confirmar
+
+**Flujo alternativo B (reagendado):**
+- Tocar "Reagendar" → ingresar nueva hora acordada → confirmar
+
+---
+
+### CU-07: Cobrador Abre y Cierra Caja Diaria
+
+**Actor:** COBRADOR  
+**Precondición:** No tener caja abierta previamente  
+**Apertura:**
+1. App → Caja → Ingresar saldo inicial
+2. Confirmar apertura
+3. Sistema habilita agenda
+
+**Cierre:**
+1. App → Caja → Cerrar Caja
+2. Ingresar el monto físico contado
+3. Sistema muestra diferencia calculada
+4. Confirmar cierre
+
+---
+
+### CU-08: Supervisor Revisa Rendiciones del Día
+
+**Actor:** SUPERVISOR  
+**Precondición:** Cobradores con actividad del día  
+**Flujo principal:**
+1. Panel Web → Cobranzas → Rendiciones
+2. Filtrar por cobrador y fecha
+3. Ver arqueo: saldo inicial, cobros, gastos, diferencia
+4. Revisar gestiones: cobrados, ausentes, reagendados
+5. Ver fotos de evidencia si las hay
+6. Exportar reporte si necesario
+
+---
+
+### CU-09: Configurar Zona Geográfica
+
+**Actor:** ADMIN o SUPERVISOR  
+**Precondición:** Empresa activa  
+**Flujo principal:**
+1. Panel Web → Zonas → Nueva Zona
+2. Ingresar nombre y seleccionar cobrador responsable
+3. Activar modo "Dibujo" en el mapa
+4. Hacer clic en el mapa para definir los vértices del polígono
+5. Ajustar puntos arrastrando los marcadores
+6. Seleccionar color y agregar descripción
+7. Guardar zona
+
+---
+
+### CU-10: Comunicación Supervisor-Cobrador
+
+**Actor:** SUPERVISOR o COBRADOR  
+**Precondición:** Ambos en la misma empresa, activos  
+**Desde el panel (Supervisor):**
+1. Panel Web → Mensajes
+2. Lista de cobradores disponibles
+3. Seleccionar cobrador → escribir mensaje → enviar
+4. Soporte para adjuntar imagen
+
+**Desde la app (Cobrador):**
+1. App → Mensajes → Lista de conversaciones
+2. Seleccionar supervisor → escribir → enviar
+3. Badge con contador de no leídos en ícono de mensajes
+
+---
+
+### CU-11: Generar Comprobante de Cobro
+
+**Actor:** COBRADOR o SUPERVISOR  
+**Precondición:** Cobro exitosamente registrado  
+**Desde app (Cobrador):**
+1. Después de registrar cobro → tocar "Ver Comprobante"
+2. App descarga PDF del servidor
+3. Compartir via WhatsApp, email, etc.
+
+**Desde panel (Supervisor/Admin):**
+1. Panel Web → Gestiones → Seleccionar gestión
+2. Descargar comprobante PDF
+
+---
+
+## 17. Orden de Carga Inicial Recomendado
+
+Para una implementación correcta del sistema, seguir este orden estrictamente:
+
+```
+═══════════════════════════════════════════════
+  RESPONSABILIDAD DEL ADMIN (soporte/alta)
+═══════════════════════════════════════════════
+
+PASO 1 — Registro del sistema (una sola vez)
+   └─► Registrar empresa inicial y usuario ADMIN en /register
+
+PASO 2 — Crear empresa(s)
+   └─► Panel Web → Empresas → Nueva Empresa
+   └─► Completar: razón social, RUC, logo, dirección, actividad económica
+
+PASO 3 — Crear usuario SUPERVISOR
+   └─► Panel Web → Usuarios → Nuevo Usuario → rol SUPERVISOR
+   └─► Vincular a la empresa creada
+   └─► Entregar credenciales al supervisor
+   ★ A partir de aquí el ADMIN no necesita intervenir más ★
+
+═══════════════════════════════════════════════
+  RESPONSABILIDAD DEL SUPERVISOR (configuración y operación)
+═══════════════════════════════════════════════
+
+PASO 4 — Primer login del SUPERVISOR
+   └─► Cambiar contraseña obligatoria en /cambiar-password
+
+PASO 5 — Configurar medios de pago
+   └─► Crear al menos: "Efectivo" (requiere_comprobante = FALSE)
+   └─► Opcional: Transferencia, Tarjeta (requiere_comprobante = TRUE)
+
+PASO 6 — Configurar tipos de descanso
+   └─► Ej: Almuerzo (12:00 - 13:00, obligatorio)
+   └─► Ej: Médico, Personal (bajo demanda)
+
+PASO 7 — Configurar horarios de trabajo
+   └─► Ej: Turno Mañana (07:00 - 13:00), Turno Completo (07:00 - 17:00)
+
+PASO 8 — Crear zonas geográficas
+   └─► Dibujar polígonos de cobertura en el mapa
+   └─► Asignar cobrador responsable por zona
+
+PASO 9 — Crear cobradores
+   └─► Panel Web → Usuarios → Nuevo Usuario → rol COBRADOR
+   └─► Entregar credenciales a cada cobrador
+
+PASO 10 — Importar cartera de clientes y créditos
+    └─► Panel Web → Importar → Subir archivo Excel
+    └─► Revisar resultado: importados, actualizados, sin GPS, errores
+
+PASO 11 — Completar GPS de clientes sin ubicación
+    └─► Panel Web → Clientes → Sin Ubicación
+    └─► Ingresar coordenadas o pegar URL de Google Maps
+
+═══════════════════════════════════════════════
+  OPERACIÓN DIARIA (SUPERVISOR + COBRADORES)
+═══════════════════════════════════════════════
+
+PASO 12 — Asignar cuotas a cobradores (cada día)
+    └─► Panel Web → Cobranzas → Asignar
+    └─► Seleccionar cuotas del día por zona/cobrador
+
+PASO 13 — Operación en campo
+    └─► Cobradores operan desde la app móvil
+    └─► Supervisores monitorean desde el panel web
+```
+
+---
+
+## 18. Diagrama de Base de Datos — Descripción de Entidades
+
+### Entidades Centrales
+
+| Tabla | Descripción |
+|---|---|
+| `empresas` | Empresa que utiliza el sistema. Entidad raíz de todo el modelo de datos. |
+| `usuarios` | Personas con acceso al sistema. Vinculados a una empresa y un rol. |
+| `roles` | Definición de roles: ADMIN, SUPERVISOR, COBRADOR |
+| `clientes` | Personas físicas o jurídicas deudoras. Entidad global (independiente de empresa). |
+| `clientes_empresas` | Vinculación cliente-empresa con datos de ubicación y estado por empresa. |
+| `creditos` | Crédito otorgado a un cliente por una empresa. Contiene monto total, cuotas, tasa. |
+| `cuotas` | Cuotas individuales de un crédito. Estado: PENDIENTE / VENCIDA / PAGADO. |
+| `asignaciones` | Asignación de una cuota a un cobrador en una fecha. |
+| `visitas_cobro` | Resultado de una visita: cobrado, ausente o reagendado. |
+| `gestiones` | Registro consolidado de gestiones de cobro con monto y observaciones. |
+
+### Entidades de Control de Caja
+
+| Tabla | Descripción |
+|---|---|
+| `arqueos_caja` | Apertura y cierre de caja diaria de un cobrador. |
+| `movimientos_caja` | Gastos registrados durante el día por el cobrador. |
+| `rendiciones` | Resumen de rendición de cobros al supervisor. |
+| `medios_pago` | Catálogo de medios de pago configurados por empresa. |
+| `pagos` | Registro de pagos realizados a cuotas. |
+| `comprobantes` | Comprobantes de pago generados. |
+
+### Entidades de Organización
+
+| Tabla | Descripción |
+|---|---|
+| `zonas` | Zonas geográficas con polígono GeoJSON, color y cobrador asignado. |
+| `tipos_descanso` | Catálogo de tipos de pausas configurado por empresa. |
+| `descansos_cobrador` | Registro de cada pausa realizada por un cobrador. |
+| `horarios` | Horarios de trabajo asignados a cobradores. |
+
+### Entidades de Comunicación y Auditoría
+
+| Tabla | Descripción |
+|---|---|
+| `mensajes` | Mensajes de chat entre supervisores y cobradores. |
+| `notificaciones` | Notificaciones push del sistema para usuarios. |
+| `auditoria` | Log de cambios en tablas críticas del sistema. |
+
+### Entidades de Facturación
+
+| Tabla | Descripción |
+|---|---|
+| `facturas` | Cabecera de facturas emitidas. |
+| `facturas_detalle` | Líneas de detalle de cada factura. |
+| `facturas_pago` | Medios de pago usados en cada factura. |
+| `facturas_emisor` | Datos del emisor para facturación. |
+| `facturas_timbrado` | Configuración de timbrados habilitados. |
+
+---
+
+## 19. Glosario de Términos
+
+| Término | Definición |
+|---|---|
+| **Arqueo de Caja** | Proceso de verificación al final del día que confronta el dinero físico con el dinero registrado en el sistema. |
+| **Asignación** | Tarea asignada a un cobrador para visitar a un cliente y cobrar una cuota específica. |
+| **Cobrador** | Usuario que realiza visitas domiciliarias para cobrar cuotas de créditos. |
+| **Cuota** | Pago periódico de un crédito (mensual, quincenal o semanal). |
+| **Crédito** | Financiamiento otorgado a un cliente, dividido en cuotas periódicas. |
+| **Diferencia de Caja** | Resultado de restar el saldo contado físicamente menos el saldo esperado según el sistema. |
+| **Evidencia** | Fotografía tomada por el cobrador al visitar al cliente, usada como prueba de visita. |
+| **Gestión** | Registro del resultado de una visita de cobro (cobrado, ausente, reagendado). |
+| **GPS** | Coordenadas de latitud y longitud que ubican geográficamente a clientes y registran la posición del cobrador al momento del cobro. |
+| **Mora** | Estado de cuota vencida: fecha de vencimiento pasada y aún sin cobrar. |
+| **Polígono** | Área geográfica definida por una serie de vértices (puntos GPS) que delimita una zona de cobro. |
+| **Ray-Casting** | Algoritmo matemático utilizado para determinar si un punto GPS se encuentra dentro de un polígono geográfico. |
+| **Rendición** | Informe presentado por el cobrador al supervisor con el resultado de sus cobros del día y el estado de su caja. |
+| **Saldo Contado** | Monto de efectivo físicamente contado por el cobrador al cierre de caja. |
+| **Saldo Esperado** | Monto que debería tener el cobrador según el registro del sistema (saldo inicial + cobros efectivo - gastos). |
+| **Timbrado** | Autorización tributaria de la DNIT/SET de Paraguay para emitir facturas dentro de un rango numérico determinado. |
+| **TSP** | Traveling Salesman Problem — algoritmo de optimización de rutas para calcular el orden más eficiente de visitas. |
+| **Zona** | División geográfica del territorio de cobertura de la empresa, asignada a un cobrador específico. |
+
+---
+
+*Documento generado para CobrApp — Sistema de Gestión de Cobranzas*  
+*Versión: 11.0 | Fecha: Mayo 2026*
+
+---
+
+## 20. Prompt para Generación de Diagramas de Flujo en Lucid.ai
+
+Copiar y pegar el siguiente prompt en Lucid.ai para generar los diagramas de flujo del sistema:
+
+---
+
+```
+    Crea un conjunto profesional de diagramas de flujo y casos de uso para un sistema de gestión de cobranzas a domicilio llamado "CobrApp". El sistema tiene tres roles: ADMIN, SUPERVISOR y COBRADOR. Usa un estilo corporativo limpio con carriles diferenciados por rol. IMPORTANTE: todos los títulos, etiquetas, textos de decisiones, nombres de procesos y notas deben estar completamente en español.
+
+    Genera los siguientes diagramas:
+
+    ---
+
+    DIAGRAMA 1 — Flujo de Alta de Empresa y Puesta en Marcha (2 carriles: ADMIN | SUPERVISOR)
+    Muestra un diagrama de flujo con 2 carriles horizontales bien diferenciados.
+
+    Carril ADMIN (azul, parte superior):
+    INICIO → Crear empresa (razón social, RUC, logo, dirección) → Crear usuario SUPERVISOR vinculado a esa empresa → Entregar credenciales → [FIN DEL ROL ADMIN]
+
+    Carril SUPERVISOR (verde, parte inferior, recibe la flecha del ADMIN):
+    Primer login → Cambiar contraseña obligatoria → Configurar medios de pago (Efectivo mínimo obligatorio) → Configurar tipos de descanso → Configurar horarios de trabajo → Crear zonas geográficas (polígono en mapa) → Crear cobradores → Importar cartera Excel (clientes + créditos) → Completar GPS de clientes sin ubicación → Asignar zonas a cobradores → [FIN: Sistema listo para operar]
+
+    ---
+
+    DIAGRAMA 2 — Ciclo Diario de Operación (3 carriles: SUPERVISOR | COBRADOR | SISTEMA)
+    Carril SUPERVISOR: Mañana: Revisar cuotas pendientes y vencidas → Asignar cuotas a cobradores → Monitorear en tiempo real desde el panel. Tarde/Noche: Revisar rendiciones → Verificar diferencias de caja → Planificar asignaciones del día siguiente.
+    Carril COBRADOR: Iniciar sesión en app → Abrir caja (declarar saldo inicial) → Revisar agenda del día → Ejecutar ruta de cobros → [Decisión: ¿Cliente presente?] → SÍ: Registrar cobro + seleccionar medio de pago + captura GPS → NO: Registrar ausente + comentario + foto opcional → Descanso al mediodía (iniciar/finalizar) → Contar efectivo → Cerrar caja.
+    Carril SISTEMA: Validar token JWT → Actualizar estado de cuota (PENDIENTE/PAGADO/VENCIDA) → Calcular saldo esperado → Registrar coordenadas GPS → Generar comprobante PDF → Calcular diferencia de caja al cierre.
+
+    ---
+
+    DIAGRAMA 3 — Flujo Detallado de Visita de Cobro (Proceso individual)
+    INICIO → Cobrador selecciona asignación de la agenda → App solicita permiso GPS → GPS capturado → Cargar medios de pago desde API → Mostrar datos del cliente (nombre, cédula, teléfono, monto de cuota) → [Decisión: ¿Acción?] →
+    Rama A (COBRADO): Ingresar monto → Seleccionar medio de pago → Ingresar número de comprobante (opcional) → POST /api/cobrador/cobros → [Sistema: INSERTAR visitas_cobro + ACTUALIZAR cuotas estado=PAGADO + ACTUALIZAR asignaciones estado=COMPLETADO] → Mostrar confirmación → Opción: Descargar comprobante PDF → FIN
+    Rama B (AUSENTE): Ingresar comentario → Opcional: Tomar foto de evidencia → POST /api/cobrador/visitas → [Sistema: INSERTAR visitas_cobro resultado=ausente] → Asignación queda PENDIENTE → FIN
+    Rama C (REAGENDADO): Ingresar nueva hora acordada → POST /api/cobrador/visitas → [Sistema: INSERTAR + disparar notificación push] → FIN
+
+    ---
+
+    DIAGRAMA 4 — Flujo de Arqueo de Caja Diaria (Proceso individual)
+    INICIO → Cobrador abre CobrApp → [Decisión: ¿Existe caja abierta?] → SÍ: Ir a Agenda → NO: Pantalla Abrir Caja → Ingresar saldo inicial → Confirmar → [Sistema: INSERTAR arqueos_caja estado=ABIERTO] → Jornada laboral → [Durante el día: cobros en efectivo suman al saldo; cobros con comprobante se registran por separado; gastos se restan] → Fin del día: Cerrar Caja → Ingresar monto contado físicamente → [Sistema calcula: saldo_esperado = saldo_inicial + cobros_efectivo - gastos; diferencia = saldo_contado - saldo_esperado] → [Decisión: ¿diferencia = 0?] → SÍ: "Caja cuadrada ✓" → NO: Registrar diferencia para revisión del supervisor → Estado = CERRADO → FIN
+
+    ---
+
+    DIAGRAMA 5 — Flujo de Importación de Cartera Excel (Proceso individual)
+    INICIO → Admin/Supervisor prepara archivo Excel (datos de clientes + créditos) → Subir archivo .xlsx (máx. 5 MB) → [Sistema lee fila por fila] → [Decisión: ¿Campo CI/RUC presente?] → NO: Registrar error, saltar fila → SÍ → [Decisión: ¿Cliente existe por CI?] → NO: CREAR cliente en tabla "clientes" → SÍ: Obtener cliente_id existente → [Decisión: ¿Relación cliente-empresa existe?] → NO: INSERTAR clientes_empresas → SÍ: ACTUALIZAR dirección/coordenadas → [Decisión: ¿Coordenadas GPS disponibles?] → NO: Incrementar contador "sin_ubicacion" → SÍ: Guardar latitud/longitud → [Decisión: ¿Hay datos de crédito?] → SÍ: INSERTAR crédito → Generar N cuotas con fechas calculadas (MENSUAL/QUINCENAL/SEMANAL) → NO: Omitir creación de crédito → [¿Más filas?] → SÍ: Siguiente fila → NO: Retornar resumen (importados, actualizados, sin_ubicacion, créditos_creados, errores) → FIN
+
+    ---
+
+    DIAGRAMA 6 — Diagrama de Casos de Uso (estilo UML)
+    Dibuja un diagrama UML de Casos de Uso con:
+    Rectángulo de límite del sistema con etiqueta "Sistema CobrApp"
+    Tres actores fuera del rectángulo: ADMIN (izquierda), SUPERVISOR (centro-izquierda), COBRADOR (derecha, con ícono de celular)
+
+    Casos de uso del ADMIN (pocos, son de soporte): Registrar Sistema, Crear Empresa, Crear Usuario SUPERVISOR, Ver Datos Globales (solo lectura)
+
+    Casos de uso del SUPERVISOR (rol central, la mayoría de los casos): Cambiar Contraseña Inicial, Configurar Medios de Pago, Configurar Tipos de Descanso, Configurar Horarios, Crear Zonas Geográficas, Crear Cobradores, Importar Cartera Excel, Completar GPS de Clientes, Asignar Cuotas a Cobradores, Monitorear Cobros, Revisar Rendiciones Diarias, Enviar Mensajes a Cobradores, Ver Panel de su Empresa, Configurar Facturación y Timbrado
+
+    Casos de uso del COBRADOR: Iniciar Sesión en App, Abrir/Cerrar Caja Diaria, Ver Agenda del Día, Registrar Cobro (COBRADO), Registrar Ausencia (AUSENTE), Reagendar Visita, Tomar Foto de Evidencia, Ver Mapa de Ruta, Chat con Supervisor, Descargar Comprobante PDF
+
+    Mostrar relaciones <<incluye>>:
+    - "Registrar Cobro" <<incluye>> "Capturar GPS"
+    - "Registrar Cobro" <<incluye>> "Seleccionar Medio de Pago"
+    - "Registrar Ausencia" <<incluye>> "Capturar GPS"
+    - "Abrir Caja Diaria" <<incluye>> "Declarar Saldo Inicial"
+
+    ---
+
+    DIAGRAMA 7 — Modelo Entidad-Relación Simplificado (ERD)
+    Muestra las entidades principales como rectángulos con campos clave y relaciones:
+    empresas (id, razon_social, ruc) ──1──< usuarios (id, nombre, rol_id, empresa_id)
+    empresas ──1──< clientes_empresas >──1── clientes (id, cedula, nombre)
+    clientes_empresas ──1──< creditos (id, numero_credito, monto_total, cantidad_cuotas)
+    creditos ──1──< cuotas (id, numero_cuota, monto_cuota, fecha_vencimiento, estado)
+    cuotas ──1──< asignaciones (id, cuota_id, usuario_id, fecha_limite, estado)
+    asignaciones ──1──< visitas_cobro (id, resultado, monto_cobrado, latitud, longitud, arqueo_id)
+    usuarios ──1──< arqueos_caja (id, cobrador_id, saldo_inicial, saldo_esperado, saldo_contado, diferencia, estado)
+    arqueos_caja ──1──< movimientos_caja (id, concepto, monto)
+    empresas ──1──< zonas (id, nombre, poligono, cobrador_id, color)
+    empresas ──1──< medios_pago (id, nombre, requiere_comprobante)
+    usuarios ──1──< mensajes >──1── usuarios (emisor_id → receptor_id)
+
+    ---
+
+    Instrucciones de estilo:
+    - Usar azul cielo (#0EA5E9) para elementos del ADMIN
+    - Usar verde esmeralda (#10B981) para elementos del SUPERVISOR
+    - Usar ámbar/naranja (#F59E0B) para elementos del COBRADOR
+    - Usar rojo (#EF4444) para estados de error o cuotas vencidas
+    - Usar gris (#64748B) para cajas de procesos del sistema/backend
+    - Rombos de decisión en amarillo
+    - Inicio/Fin en rectángulos redondeados
+    - Flechas con etiquetas claras
+    - Agregar bloque de título a cada diagrama con: nombre del diagrama, Sistema: CobrApp, Versión: 11.0, Fecha: Mayo 2026
+    - Tipografía: Inter o similar sans-serif limpia
+    - TODO el texto en español, incluyendo títulos, etiquetas, decisiones y notas
+    ```
