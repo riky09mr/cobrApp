@@ -1,8 +1,11 @@
 const pool = require('../config/db');
+const { registrarAuditoriaSegura } = require('../services/cobranzas/auditoriaService');
+
+const getIpCliente = (req) => req.ip || req.headers['x-forwarded-for'] || null;
 
 const ROL = { SUPERVISOR: 'SUPERVISOR', COBRADOR: 'COBRADOR' };
 
-// GET /api/mensajes  lista de contactos con último mensaje y no-leídos
+// GET /api/mensajes  lista de contactos con ï¿½ltimo mensaje y no-leï¿½dos
 const getConversaciones = async (req, res, next) => {
   try {
     const { id: userId, rol, empresaId } = req.user;
@@ -27,7 +30,7 @@ const getConversaciones = async (req, res, next) => {
     const ultimoMensajeMap = {};  // contacto_id â†’ { contenido, created_at }
     const noLeidosMap = {};       // contacto_id â†’ count
 
-    // 2. Enriquecer con datos de mensajes (falla silenciosamente si la tabla no existe aún)
+    // 2. Enriquecer con datos de mensajes (falla silenciosamente si la tabla no existe aï¿½n)
     try {
       const [msgs] = await pool.query(
         `SELECT
@@ -56,7 +59,7 @@ const getConversaciones = async (req, res, next) => {
         noLeidosMap[row.emisor_id] = row.total;
       }
     } catch {
-      // La tabla mensajes aún no existe  los contactos igual aparecen, sin preview
+      // La tabla mensajes aï¿½n no existe  los contactos igual aparecen, sin preview
     }
 
     // 3. Combinar y ordenar: primero los que tienen mensajes recientes, luego por nombre
@@ -82,14 +85,14 @@ const getConversaciones = async (req, res, next) => {
   }
 };
 
-// GET /api/mensajes/:usuarioId  mensajes de la conversación (y marca como leídos)
+// GET /api/mensajes/:usuarioId  mensajes de la conversaciï¿½n (y marca como leï¿½dos)
 const getConversacion = async (req, res, next) => {
   try {
     const { id: userId, rol, empresaId } = req.user;
     if (rol === 'ADMIN') return res.status(403).json({ message: 'Sin permisos' });
 
     const otroId = parseInt(req.params.usuarioId, 10);
-    if (isNaN(otroId)) return res.status(400).json({ message: 'ID inválido' });
+    if (isNaN(otroId)) return res.status(400).json({ message: 'ID invï¿½lido' });
 
     // Verificar que el otro usuario pertenece a la misma empresa
     const [[otro]] = await pool.query(
@@ -98,7 +101,7 @@ const getConversacion = async (req, res, next) => {
     );
     if (!otro) return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    // Marcar como leídos los mensajes recibidos de ese usuario
+    // Marcar como leï¿½dos los mensajes recibidos de ese usuario
     await pool.query(
       'UPDATE mensajes SET leido = 1 WHERE emisor_id = ? AND receptor_id = ? AND leido = 0',
       [otroId, userId]
@@ -148,7 +151,7 @@ const enviarMensaje = async (req, res, next) => {
 
     const rolEsperado = rol === ROL.SUPERVISOR ? ROL.COBRADOR : ROL.SUPERVISOR;
     if (receptor.rol !== rolEsperado) {
-      return res.status(403).json({ message: `Solo podés enviar mensajes a usuarios con rol ${rolEsperado}` });
+      return res.status(403).json({ message: `Solo podï¿½s enviar mensajes a usuarios con rol ${rolEsperado}` });
     }
 
     const [result] = await pool.query(
@@ -156,13 +159,32 @@ const enviarMensaje = async (req, res, next) => {
       [empresaId, userId, receptor_id, contenido?.trim() ?? '', imagenUrl]
     );
 
+    // AuditorÃ­a: envÃ­o de mensaje (con o sin imagen adjunta)
+    await registrarAuditoriaSegura({
+      empresaId,
+      usuarioId: userId,
+      ip: getIpCliente(req),
+      accion: 'INSERT',
+      tabla: 'mensajes',
+      registroId: result.insertId,
+      despues: {
+        emisor_id: userId,
+        receptor_id,
+        tiene_imagen: !!imagenUrl,
+        imagen_url: imagenUrl,
+      },
+      observaciones: imagenUrl
+        ? 'EnvÃ­o de mensaje con imagen adjunta'
+        : 'EnvÃ­o de mensaje',
+    });
+
     return res.status(201).json({ message: 'Mensaje enviado', data: { id: result.insertId, imagen_url: imagenUrl } });
   } catch (error) {
     return next(error);
   }
 };
 
-// GET /api/mensajes/no-leidos  cantidad de mensajes no leídos (para badge)
+// GET /api/mensajes/no-leidos  cantidad de mensajes no leï¿½dos (para badge)
 const getNoLeidos = async (req, res, next) => {
   try {
     const { id: userId, rol } = req.user;

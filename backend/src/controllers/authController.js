@@ -1,10 +1,13 @@
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { registrarAuditoriaSegura } = require('../services/cobranzas/auditoriaService');
 
 const BCRYPT_SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS || 10);
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
+
+const getIpCliente = (req) => req.ip || req.headers['x-forwarded-for'] || null;
 
 const register = async (req, res, next) => {
   try {
@@ -108,6 +111,18 @@ const login = async (req, res, next) => {
     );
 
     const debeCambiarPassword = user.debe_cambiar_password === 1 || user.debe_cambiar_password === true;
+
+    // Auditoría: LOGIN exitoso (fire-and-forget, nunca interrumpe el flujo)
+    await registrarAuditoriaSegura({
+      empresaId: user.empresa_id,
+      usuarioId: user.id,
+      ip: getIpCliente(req),
+      accion: 'LOGIN',
+      tabla: 'usuarios',
+      registroId: user.id,
+      despues: { email: user.email, rol: user.rol },
+      observaciones: 'Inicio de sesión exitoso',
+    });
 
     return res.json({
       message: 'Login exitoso',

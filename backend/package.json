@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "migrate:cobranzas:v12": "node scripts/applyMigrationV12.js",
+    "backfill:cobranzas:v12": "node scripts/backfillCobranzasV12.js --commit",
+    "backfill:cobranzas:v12:dry": "node scripts/backfillCobranzasV12.js"
   },
   "keywords": [],
   "author": "",

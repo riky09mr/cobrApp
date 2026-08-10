@@ -1,0 +1,166 @@
+🔰  FICHA DE CLIENTE
+
+Datos Personales
+Nombre: Rivaldo Andres
+Apellido: Zarate
+CI:  6218617
+Fecha de Nac.: 09/08/2001
+Estado Civil (Real): Soltero
+Profesión: 
+Celular:  0991630725
+Correo electrónico: zaraniegoandres@gmail.com
+Dirección particular: José Asunción Flores c/ radio operadores del chaco
+Barrio:  mburicao
+Ciudad: Asuncion
+Casa propia: no
+
+Datos Laborales
+Nombre de la Empresa:  Voicenter
+Dirección:
+Barrio:  La encarnacion
+Ciudad: Asuncion
+Telefono:  0214160000
+Cargo: Analista de Desarrollo 
+Antiguedad: 1 año 2 meses 
+
+Tres Referencias Personales
+
+# Nombre apellido: Sofia Sanguina
+- Cel.: 0984876274
+
+# Nombre apellido: Denilzon Zarate
+- Cel.: 0974250948
+
+# Nombre apellido: Nilda Lezcano
+- Cel.: 0976326195
+
+
+
+
+🔰  FICHA DE CLIENTE
+
+Datos Personales
+Nombre: Petrona
+Apellido: Samaniego
+CI:  678221
+Fecha de Nac.: 19/05/1968
+Estado Civil (Real): Casada
+Profesión: Comerciante
+Celular:  0993374725
+Correo electrónico: petrosama19@gmail.com
+Dirección particular: 14 de mayo c/ cristobal colon
+Barrio:  Sagrado Corazon de jesus
+Ciudad: San Roque Gonzalez de Santa Cruz
+Casa propia: Si 
+
+Datos Laborales
+Nombre de la Empresa:   Alquiler DR
+Dirección: 14 de mayo c/ cristobal colon
+Barrio:  Sagrado Corazon de jesus
+Ciudad:San Roque Gonzalez de Santa Cruz
+Telefono:  0983227072
+Cargo: Propietaria
+Antiguedad: 10 años
+
+Tres Referencias Personales
+
+# Nombre apellido: Blanca Benitez
+- Cel.: 0991195228
+
+# Nombre apellido: Sofia Sanguina
+- Cel.: 0984876274
+
+# Nombre apellido: Nilda Lezcano
+- Cel.: 0976326195
+
+🔰   FICHA DE CLIENTE
+
+*DATOS PERSONALES DEL TITULAR*
+Nombre y Apellido: Rivaldo Zarate
+CI/Ruc : 6218617
+Fecha de Nac.: 09/08/2001
+Estado Civil (Real): soltero
+Celular:0991630725
+E-mail:zaraniegoandres@gmail.com
+Dirección particular: José Asunción Flores c/ radio operadores del chaco
+Barrio: mburicao
+Ciudad: Asuncion
+Vivienda: Propia ( ) Alquilada (x) 
+Familiar ( ) 
+
+*ACTIVIDAD LABORAL DEL TITULAR*
+
+Profesion: DesarrolladorFullstack
+Nombre de la Empresa: voicenter
+Antiguedad: 14 meses
+Banco de Cobro: Itau
+Sueldo: 5.500.000 gs 
+Rubro: tegnologia
+Email: infocomercial@voicenter.com.py
+Ciudad Laboral: Asuncion
+Barrio Laboral: La encarnacion
+Dirección:  Av. Mariscal lopez e/ iturbe
+Num Tel: 021 416 0000
+Ruc: 80030641-4
+Tipo de Actividad:contact center
+
+*REFERENCIAS PERSONALES DEL TITULAR* 
+
+# Nombre apellido: Sofia Sanguina
+- Cel.: 0984876274
+Relación con el titular: Novia
+
+ Nombre apellido: Nilda Lezcano
+- Cel.: 0976326195
+Relación con el titular:  Cuñada
+
+*REFERENCIAS COMERCIALES Y FINANCIERAS* 
+
+Nombre de Comercio: Rodan inmobiliaria
+Número:0981427029
+Año de compra: 2025
+
+Nombre de Comercio:Ueno Bank 
+Número: 021 618 8000
+Año de compra: 2025
+
+Nombre de Comercio:
+Número:
+Año de compra: 
+
+Nombre de Comercio:
+Número:
+Año de compra:
+
+
+¿Qué quedaría por mejorar (funcionalmente)?
+Prioridad para tesis, sin tocar seguridad:
+
+Estabilidad del flujo de agenda del cobrador
+
+Corregir la consulta de agenda dañada/duplicada.
+Validar que siempre devuelva pendientes correctos por fecha.
+Configuración funcional por entorno
+
+Quitar URLs hardcodeadas (localhost/IP) y usar config por ambiente.
+Mejora despliegue y pruebas reales (dev/test/prod).
+Calidad funcional del frontend
+
+Resolver errores de lint y dependencias de hooks.
+Reduce bugs de UI/estado y mejora mantenibilidad.
+Manejo de errores visible para operación
+
+Evitar catch silenciosos.
+Mostrar mensajes funcionales al usuario (sin “colgar” pantallas).
+Consistencia de reglas de negocio
+
+Unificar estados de asignación/cuota/cobro entre web-mobile-backend.
+Evitar desalineaciones (ej. cobro registrado pero panel no refleja).
+Reportes y analítica para tesis
+
+KPIs: cobros por día, efectividad por cobrador, tasa de visita exitosa, tiempos de gestión.
+Esto da valor académico fuerte.
+Trazabilidad operativa
+
+Historial de acciones clave (asignado, visitado, reagendado, cobrado).
+Sirve para auditoría funcional y análisis de procesos.

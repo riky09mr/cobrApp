@@ -1,0 +1,99 @@
+Error: Table 'cobrapp.excepciones_horario' doesn't exist
+    at PromisePool.query (C:\laragon\www\cobrApp\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at getExcepciones (C:\laragon\www\cobrApp\backend\src\controllers\horariosController.js:100:31)
+    at Layer.handleRequest (C:\laragon\www\cobrApp\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\laragon\www\cobrApp\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\laragon\www\cobrApp\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\laragon\www\cobrApp\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\laragon\www\cobrApp\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\laragon\www\cobrApp\backend\node_modules\router\index.js:295:15
+    at param (C:\laragon\www\cobrApp\backend\node_modules\router\index.js:600:14)
+    at param (C:\laragon\www\cobrApp\backend\node_modules\router\index.js:610:14) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: 'SELECT id, fecha, tipo, hora_inicio, hora_fin, motivo\n' +
+    '       FROM excepciones_horario\n' +
+    "       WHERE cobrador_id = '7' AND empresa_id = 2\n" +
+    '       ORDER BY fecha ASC',
+  sqlState: '42S02',
+  sqlMessage: "Table 'cobrapp.excepciones_horario' doesn't exist"
+}
+Error: Table 'cobrapp.horarios_cobrador' doesn't exist
+    at PromisePool.query (C:\laragon\www\cobrApp\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at getHorarios (C:\laragon\www\cobrApp\backend\src\controllers\horariosController.js:18:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: 'SELECT id, dia_semana, hora_inicio, hora_fin, activo\n' +
+    '       FROM horarios_cobrador\n' +
+    "       WHERE cobrador_id = '7' AND empresa_id = 2\n" +
+    '       ORDER BY dia_semana ASC',
+  sqlState: '42S02',
+  sqlMessage: "Table 'cobrapp.horarios_cobrador' doesn't exist"
+}
+Error: Table 'cobrapp.horarios_cobrador' doesn't exist
+    at PromisePool.query (C:\laragon\www\cobrApp\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at getHorarios (C:\laragon\www\cobrApp\backend\src\controllers\horariosController.js:18:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: 'SELECT id, dia_semana, hora_inicio, hora_fin, activo\n' +
+    '       FROM horarios_cobrador\n' +
+    "       WHERE cobrador_id = '5' AND empresa_id = 2\n" +
+    '       ORDER BY dia_semana ASC',
+  sqlState: '42S02',
+  sqlMessage: "Table 'cobrapp.horarios_cobrador' doesn't exist"
+}
+Error: Table 'cobrapp.excepciones_horario' doesn't exist
+    at PromisePool.query (C:\laragon\www\cobrApp\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at getExcepciones (C:\laragon\www\cobrApp\backend\src\controllers\horariosController.js:100:31)
+    at Layer.handleRequest (C:\laragon\www\cobrApp\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\laragon\www\cobrApp\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\laragon\www\cobrApp\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\laragon\www\cobrApp\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\laragon\www\cobrApp\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\laragon\www\cobrApp\backend\node_modules\router\index.js:295:15
+    at param (C:\laragon\www\cobrApp\backend\node_modules\router\index.js:600:14)
+    at param (C:\laragon\www\cobrApp\backend\node_modules\router\index.js:610:14) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: 'SELECT id, fecha, tipo, hora_inicio, hora_fin, motivo\n' +
+    '       FROM excepciones_horario\n' +
+    "       WHERE cobrador_id = '5' AND empresa_id = 2\n" +
+    '       ORDER BY fecha ASC',
+  sqlState: '42S02',
+  sqlMessage: "Table 'cobrapp.excepciones_horario' doesn't exist"
+}
+Error: Table 'cobrapp.excepciones_horario' doesn't exist
+    at PromisePool.query (C:\laragon\www\cobrApp\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at getExcepciones (C:\laragon\www\cobrApp\backend\src\controllers\horariosController.js:100:31)
+    at Layer.handleRequest (C:\laragon\www\cobrApp\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\laragon\www\cobrApp\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\laragon\www\cobrApp\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\laragon\www\cobrApp\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\laragon\www\cobrApp\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\laragon\www\cobrApp\backend\node_modules\router\index.js:295:15
+    at param (C:\laragon\www\cobrApp\backend\node_modules\router\index.js:600:14)
+    at param (C:\laragon\www\cobrApp\backend\node_modules\router\index.js:610:14) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: 'SELECT id, fecha, tipo, hora_inicio, hora_fin, motivo\n' +
+    '       FROM excepciones_horario\n' +
+    "       WHERE cobrador_id = '7' AND empresa_id = 2\n" +
+    '       ORDER BY fecha ASC',
+  sqlState: '42S02',
+  sqlMessage: "Table 'cobrapp.excepciones_horario' doesn't exist"
+}
+Error: Table 'cobrapp.horarios_cobrador' doesn't exist
+    at PromisePool.query (C:\laragon\www\cobrApp\backend\node_modules\mysql2\lib\promise\pool.js:36:22)
+    at getHorarios (C:\laragon\www\cobrApp\backend\src\controllers\horariosController.js:18:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  code: 'ER_NO_SUCH_TABLE',
+  errno: 1146,
+  sql: 'SELECT id, dia_semana, hora_inicio, hora_fin, activo\n' +
+    '       FROM horarios_cobrador\n' +
+    "       WHERE cobrador_id = '7' AND empresa_id = 2\n" +
+    '       ORDER BY dia_semana ASC',
+  sqlState: '42S02',
+  sqlMessage: "Table 'cobrapp.horarios_cobrador' doesn't exist"
+}

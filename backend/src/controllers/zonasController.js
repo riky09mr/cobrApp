@@ -1,5 +1,35 @@
 const pool = require('../config/db');
 
+async function existeZonaActivaConNombre(empresaId, nombre, excludeId = null) {
+  const sql =
+    `SELECT id
+     FROM zonas
+     WHERE empresa_id = ?
+       AND estado = 1
+       AND LOWER(TRIM(nombre)) = LOWER(TRIM(?))` +
+    (excludeId ? ' AND id <> ?' : '') +
+    ' LIMIT 1';
+
+  const params = excludeId ? [empresaId, nombre, excludeId] : [empresaId, nombre];
+  const [rows] = await pool.query(sql, params);
+  return rows.length > 0;
+}
+
+async function existeZonaActivaConCobrador(empresaId, cobradorId, excludeId = null) {
+  const sql =
+    `SELECT id
+     FROM zonas
+     WHERE empresa_id = ?
+       AND estado = 1
+       AND cobrador_id = ?` +
+    (excludeId ? ' AND id <> ?' : '') +
+    ' LIMIT 1';
+
+  const params = excludeId ? [empresaId, cobradorId, excludeId] : [empresaId, cobradorId];
+  const [rows] = await pool.query(sql, params);
+  return rows.length > 0;
+}
+
 // Ray-casting point-in-polygon
 function pointInPolygon(lat, lng, polygon) {
   let inside = false;
@@ -42,18 +72,28 @@ const createZona = async (req, res, next) => {
     const { empresaId, rol } = req.user;
     const { nombre, descripcion, color, cobrador_id, poligono, empresa_id } = req.body;
 
-    if (!nombre) return res.status(400).json({ message: 'El nombre es obligatorio' });
+    const nombreNormalizado = typeof nombre === 'string' ? nombre.trim() : '';
+    if (!nombreNormalizado) return res.status(400).json({ message: 'El nombre es obligatorio' });
 
     const empId = rol === 'ADMIN' ? (empresa_id || empresaId) : empresaId;
+    const cobradorId = cobrador_id || null;
+
+    if (await existeZonaActivaConNombre(empId, nombreNormalizado)) {
+      return res.status(409).json({ message: 'Ya existe una zona activa con ese nombre' });
+    }
+
+    if (cobradorId && (await existeZonaActivaConCobrador(empId, cobradorId))) {
+      return res.status(409).json({ message: 'Ese cobrador ya esta asignado a otra zona activa' });
+    }
 
     const [result] = await pool.query(
       'INSERT INTO zonas (empresa_id, nombre, descripcion, color, cobrador_id, poligono) VALUES (?, ?, ?, ?, ?, ?)',
       [
         empId,
-        nombre,
+        nombreNormalizado,
         descripcion || null,
         color || '#3B82F6',
-        cobrador_id || null,
+        cobradorId,
         poligono ? JSON.stringify(poligono) : null,
       ]
     );
@@ -70,10 +110,31 @@ const updateZona = async (req, res, next) => {
     const { empresaId, rol } = req.user;
     const { nombre, descripcion, color, cobrador_id, poligono, estado } = req.body;
 
-    const [[zona]] = await pool.query('SELECT empresa_id FROM zonas WHERE id = ?', [id]);
+    const [[zona]] = await pool.query(
+      'SELECT empresa_id, nombre, cobrador_id, estado FROM zonas WHERE id = ?',
+      [id]
+    );
     if (!zona) return res.status(404).json({ message: 'Zona no encontrada' });
     if (rol !== 'ADMIN' && zona.empresa_id !== empresaId)
       return res.status(403).json({ message: 'Sin permisos' });
+
+    const nombreFinal = typeof nombre === 'string' ? nombre.trim() : (zona.nombre || '').trim();
+    const cobradorFinal = cobrador_id !== undefined ? (cobrador_id || null) : zona.cobrador_id;
+    const estadoFinal = estado !== undefined ? Number(estado) : Number(zona.estado);
+
+    if (estadoFinal === 1) {
+      if (!nombreFinal) {
+        return res.status(400).json({ message: 'El nombre es obligatorio' });
+      }
+
+      if (await existeZonaActivaConNombre(zona.empresa_id, nombreFinal, Number(id))) {
+        return res.status(409).json({ message: 'Ya existe una zona activa con ese nombre' });
+      }
+
+      if (cobradorFinal && (await existeZonaActivaConCobrador(zona.empresa_id, cobradorFinal, Number(id)))) {
+        return res.status(409).json({ message: 'Ese cobrador ya esta asignado a otra zona activa' });
+      }
+    }
 
     await pool.query(
       `UPDATE zonas SET
@@ -85,10 +146,10 @@ const updateZona = async (req, res, next) => {
         estado      = COALESCE(?, estado)
        WHERE id = ?`,
       [
-        nombre || null,
+        nombreFinal || null,
         descripcion !== undefined ? descripcion : null,
         color || null,
-        cobrador_id !== undefined ? cobrador_id : null,
+        cobrador_id !== undefined ? cobradorFinal : null,
         poligono ? JSON.stringify(poligono) : null,
         estado !== undefined ? estado : null,
         id,
@@ -128,7 +189,7 @@ const autoAsignar = async (req, res, next) => {
 
     const empId = rol === 'ADMIN' ? (req.body.empresa_id || empresaId) : empresaId;
 
-    // 1. Zonas activas con cobrador y polígono definidos
+    // 1. Zonas activas con cobrador y polï¿½gono definidos
     const [zonas] = await pool.query(
       `SELECT id, cobrador_id, poligono
        FROM zonas
@@ -139,7 +200,7 @@ const autoAsignar = async (req, res, next) => {
     if (zonas.length === 0) {
       return res.json({
         data: { asignadas: 0, clientesUbicados: 0 },
-        message: 'No hay zonas con cobrador y polígono configurados',
+        message: 'No hay zonas con cobrador y polï¿½gono configurados',
       });
     }
 

@@ -11,8 +11,15 @@ const horariosRoutes = require('./routes/horariosRoutes');
 const mensajesRoutes = require('./routes/mensajesRoutes');
 const mediosPagoRoutes = require('./routes/mediosPagoRoutes');
 const arqueosRoutes = require('./routes/arqueosRoutes');
+const cobranzasConfigRoutes = require('./routes/cobranzasConfigRoutes');
+const interesesConfigRoutes = require('./routes/interesesConfigRoutes');
+const reportesRoutes = require('./routes/reportesRoutes');
+const pushRoutes = require('./routes/pushRoutes');
 const cron = require('node-cron');
 const { activarAlmuerzosAutomaticos } = require('./services/descansoCron');
+const { sincronizarTodasEmpresas } = require('./services/cobranzas/feriadosAnualService');
+const { recalcularInteresesTodasEmpresas } = require('./services/cobranzas/interesCron');
+const { enviarAlertasVencimiento } = require('./services/pushCron');
 
 const app = express();
 
@@ -35,6 +42,10 @@ app.use('/api/supervisor/horarios', horariosRoutes);
 app.use('/api/mensajes', mensajesRoutes);
 app.use('/api/medios-pago', mediosPagoRoutes);
 app.use('/api/arqueos', arqueosRoutes);
+app.use('/api/configuracion/cobranzas', cobranzasConfigRoutes);
+app.use('/api/configuracion/intereses', interesesConfigRoutes);
+app.use('/api/reportes', reportesRoutes);
+app.use('/api/push', pushRoutes);
 
 app.use((error, req, res, next) => {
     console.error(error);
@@ -53,4 +64,22 @@ app.listen(PORT, () => {
 // ── Cron: activar descanso de almuerzo automáticamente a las 14:30 ──
 cron.schedule('30 14 * * *', () => {
     activarAlmuerzosAutomaticos().catch(console.error);
+}, { timezone: 'America/Asuncion' });
+
+// ── Cron: al comenzar cada año, los feriados vuelven a sus fechas
+//    originales y Semana Santa se recalcula (Computus). 1 de enero 05:00 ──
+cron.schedule('0 5 1 1 *', () => {
+    sincronizarTodasEmpresas().catch(console.error);
+}, { timezone: 'America/Asuncion' });
+
+// ── Cron: recálculo diario de intereses por mora de todas las empresas
+//    con generar_interes = 1. Todos los días 02:00 AM ──
+cron.schedule('0 2 * * *', () => {
+    recalcularInteresesTodasEmpresas().catch(console.error);
+}, { timezone: 'America/Asuncion' });
+
+// ── Cron: alertas push de cobranzas vencidas o próximas a vencer.
+//    Todos los días 07:00 AM ──
+cron.schedule('0 7 * * *', () => {
+    enviarAlertasVencimiento().catch(console.error);
 }, { timezone: 'America/Asuncion' });

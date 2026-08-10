@@ -1,5 +1,8 @@
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
+const { registrarAuditoriaSegura } = require('../services/cobranzas/auditoriaService');
+
+const getIpCliente = (req) => req.ip || req.headers['x-forwarded-for'] || null;
 
 const BCRYPT_SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10);
 
@@ -14,7 +17,7 @@ const createUsuario = async (req, res, next) => {
   try {
     let { nombre, apellido, cedula, telefono, email, password, rol_id, empresa_id } = req.body;
 
-    // Validar campos requeridos básicos
+    // Validar campos requeridos bï¿½sicos
     if (!nombre || !apellido || !email || !rol_id) {
       return res.status(400).json({
         message: 'Campos requeridos: nombre, apellido, email, rol_id',
@@ -43,15 +46,15 @@ const createUsuario = async (req, res, next) => {
       nombreRolActual = usuarioActual.rol;
     } 
     else {
-      return res.status(403).json({ message: 'Información de rol no disponible. Por favor, inicie sesión nuevamente.' });
+      return res.status(403).json({ message: 'Informaciï¿½n de rol no disponible. Por favor, inicie sesiï¿½n nuevamente.' });
     }
 
-    // Validar permisos según el rol
+    // Validar permisos segï¿½n el rol
     if (nombreRolActual === ROLES.COBRADOR) {
       return res.status(403).json({ message: 'No tienes permisos para crear usuarios' });
     }
 
-    // Si es SUPERVISOR, usar automáticamente su empresa_id
+    // Si es SUPERVISOR, usar automï¿½ticamente su empresa_id
     if (nombreRolActual === ROLES.SUPERVISOR) {
       empresa_id = usuarioActual.empresaId;
     } else if (!empresa_id) {
@@ -66,7 +69,7 @@ const createUsuario = async (req, res, next) => {
     );
 
     if (!rolNuevo) {
-      return res.status(400).json({ message: 'Rol seleccionado no válido' });
+      return res.status(400).json({ message: 'Rol seleccionado no vï¿½lido' });
     }
 
     const nombreRolNuevo = rolNuevo.nombre;
@@ -80,17 +83,17 @@ const createUsuario = async (req, res, next) => {
       }
     }
 
-    // Validar que el email no esté repetido
+    // Validar que el email no estï¿½ repetido
     const [[emailExistente]] = await pool.query(
       'SELECT id FROM usuarios WHERE email = ?',
       [email]
     );
 
     if (emailExistente) {
-      return res.status(409).json({ message: 'El email ya está registrado' });
+      return res.status(409).json({ message: 'El email ya estï¿½ registrado' });
     }
 
-    // Obtener información de la empresa para generar contraseña automática
+    // Obtener informaciï¿½n de la empresa para generar contraseï¿½a automï¿½tica
     const [[empresa]] = await pool.query(
       'SELECT razon_social FROM empresas WHERE id = ?',
       [empresa_id]
@@ -100,7 +103,7 @@ const createUsuario = async (req, res, next) => {
       return res.status(400).json({ message: 'Empresa no encontrada' });
     }
 
-    // Generar contraseña automática: nombreEmpresa + año actual
+    // Generar contraseï¿½a automï¿½tica: nombreEmpresa + aï¿½o actual
     const currentYear = new Date().getFullYear();
     const razonSocialLimpia = empresa.razon_social
       .toLowerCase()
@@ -108,11 +111,11 @@ const createUsuario = async (req, res, next) => {
       .replace(/[^a-z0-9]/g, '');
     const passwordAutomatica = `${razonSocialLimpia}${currentYear}`;
 
-    // Encriptar la contraseña (usar la automática)
+    // Encriptar la contraseï¿½a (usar la automï¿½tica)
     const hashedPassword = await bcrypt.hash(passwordAutomatica, BCRYPT_SALT_ROUNDS);
 
     // Insertar el usuario con debe_cambiar_password = TRUE (si el campo existe)
-    // Intentar primero con el campo, si falla, insertar sin él
+    // Intentar primero con el campo, si falla, insertar sin ï¿½l
     let result;
     try {
       [result] = await pool.query(
@@ -128,6 +131,26 @@ const createUsuario = async (req, res, next) => {
         [empresa_id, rol_id, nombre, apellido, cedula || null, telefono || null, email, hashedPassword]
       );
     }
+
+    // AuditorÃ­a: creaciÃ³n de usuario
+    await registrarAuditoriaSegura({
+      empresaId: usuarioActual.empresaId || empresa_id,
+      usuarioId: usuarioActual.id,
+      ip: getIpCliente(req),
+      accion: 'INSERT',
+      tabla: 'usuarios',
+      registroId: result.insertId,
+      despues: {
+        nombre,
+        apellido,
+        email,
+        cedula: cedula || null,
+        telefono: telefono || null,
+        rol: nombreRolNuevo,
+        empresa_id,
+      },
+      observaciones: 'CreaciÃ³n de usuario',
+    });
 
     return res.status(201).json({
       message: 'Usuario creado exitosamente',
@@ -155,10 +178,10 @@ const cambiarPassword = async (req, res, next) => {
     }
 
     if (passwordNueva.length < 6) {
-      return res.status(400).json({ message: 'La nueva contraseña debe tener al menos 6 caracteres' });
+      return res.status(400).json({ message: 'La nueva contraseï¿½a debe tener al menos 6 caracteres' });
     }
 
-    // Obtener contraseña actual del usuario
+    // Obtener contraseï¿½a actual del usuario
     const [[usuario]] = await pool.query(
       'SELECT password FROM usuarios WHERE id = ?',
       [usuarioId]
@@ -168,17 +191,17 @@ const cambiarPassword = async (req, res, next) => {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    // Verificar contraseña actual
+    // Verificar contraseï¿½a actual
     const isValid = await bcrypt.compare(passwordActual, usuario.password);
 
     if (!isValid) {
-      return res.status(401).json({ message: 'Contraseña actual incorrecta' });
+      return res.status(401).json({ message: 'Contraseï¿½a actual incorrecta' });
     }
 
-    // Encriptar nueva contraseña
+    // Encriptar nueva contraseï¿½a
     const hashedPassword = await bcrypt.hash(passwordNueva, BCRYPT_SALT_ROUNDS);
 
-    // Actualizar contraseña y marcar debe_cambiar_password como FALSE (si el campo existe)
+    // Actualizar contraseï¿½a y marcar debe_cambiar_password como FALSE (si el campo existe)
     try {
       await pool.query(
         'UPDATE usuarios SET password = ?, debe_cambiar_password = FALSE WHERE id = ?',
@@ -192,7 +215,19 @@ const cambiarPassword = async (req, res, next) => {
       );
     }
 
-    return res.json({ message: 'Contraseña actualizada exitosamente' });
+    // AuditorÃ­a: cambio de contraseÃ±a
+    await registrarAuditoriaSegura({
+      empresaId: req.user.empresaId,
+      usuarioId,
+      ip: getIpCliente(req),
+      accion: 'UPDATE',
+      tabla: 'usuarios',
+      registroId: usuarioId,
+      despues: { password: '***' },
+      observaciones: 'Cambio de contraseÃ±a',
+    });
+
+    return res.json({ message: 'Contraseï¿½a actualizada exitosamente' });
   } catch (error) {
     return next(error);
   }
@@ -203,7 +238,7 @@ const updateUsuario = async (req, res, next) => {
     const { id } = req.params;
     let { nombre, apellido, cedula, telefono, email, rol_id, empresa_id, resetPassword } = req.body;
 
-    // Validar campos requeridos básicos
+    // Validar campos requeridos bï¿½sicos
     if (!nombre || !apellido || !email || !rol_id) {
       return res.status(400).json({
         message: 'Campos requeridos: nombre, apellido, email, rol_id',
@@ -228,10 +263,10 @@ const updateUsuario = async (req, res, next) => {
     } else if (usuarioActual.rol) {
       nombreRolActual = usuarioActual.rol;
     } else {
-      return res.status(403).json({ message: 'Información de rol no disponible. Por favor, inicie sesión nuevamente.' });
+      return res.status(403).json({ message: 'Informaciï¿½n de rol no disponible. Por favor, inicie sesiï¿½n nuevamente.' });
     }
 
-    // Validar permisos según el rol
+    // Validar permisos segï¿½n el rol
     if (nombreRolActual === ROLES.COBRADOR) {
       return res.status(403).json({ message: 'No tienes permisos para editar usuarios' });
     }
@@ -260,7 +295,7 @@ const updateUsuario = async (req, res, next) => {
       // Forzar que la empresa_id no cambie
       empresa_id = usuarioAEditar.empresa_id;
     } else if (!empresa_id) {
-      // Si es ADMIN y no envía empresa_id, mantener la actual
+      // Si es ADMIN y no envï¿½a empresa_id, mantener la actual
       empresa_id = usuarioAEditar.empresa_id;
     }
 
@@ -271,7 +306,7 @@ const updateUsuario = async (req, res, next) => {
     );
 
     if (!rolNuevo) {
-      return res.status(400).json({ message: 'Rol seleccionado no válido' });
+      return res.status(400).json({ message: 'Rol seleccionado no vï¿½lido' });
     }
 
     const nombreRolNuevo = rolNuevo.nombre;
@@ -285,14 +320,14 @@ const updateUsuario = async (req, res, next) => {
       }
     }
 
-    // Validar que el email no esté repetido (excepto si es el mismo email del usuario que se está editando)
+    // Validar que el email no estï¿½ repetido (excepto si es el mismo email del usuario que se estï¿½ editando)
     const [[emailExistente]] = await pool.query(
       'SELECT id FROM usuarios WHERE email = ? AND id != ?',
       [email, id]
     );
 
     if (emailExistente) {
-      return res.status(409).json({ message: 'El email ya está registrado' });
+      return res.status(409).json({ message: 'El email ya estï¿½ registrado' });
     }
 
     // Validar que la empresa exista
@@ -313,7 +348,36 @@ const updateUsuario = async (req, res, next) => {
       [empresa_id, rol_id, nombre, apellido, cedula || null, telefono || null, email, id]
     );
 
-    // Restablecer contraseña si se solicitó
+    // AuditorÃ­a: ediciÃ³n de usuario (datos antes / despuÃ©s)
+    await registrarAuditoriaSegura({
+      empresaId: usuarioActual.empresaId || empresa_id,
+      usuarioId: usuarioActual.id,
+      ip: getIpCliente(req),
+      accion: 'UPDATE',
+      tabla: 'usuarios',
+      registroId: parseInt(id, 10),
+      antes: {
+        nombre: usuarioAEditar.nombre,
+        apellido: usuarioAEditar.apellido,
+        email: usuarioAEditar.email,
+        cedula: usuarioAEditar.cedula,
+        telefono: usuarioAEditar.telefono,
+        rol: usuarioAEditar.rol_nombre,
+        empresa_id: usuarioAEditar.empresa_id,
+      },
+      despues: {
+        nombre,
+        apellido,
+        email,
+        cedula: cedula || null,
+        telefono: telefono || null,
+        rol: nombreRolNuevo,
+        empresa_id,
+      },
+      observaciones: resetPassword ? 'EdiciÃ³n de usuario y restablecimiento de contraseÃ±a' : 'EdiciÃ³n de usuario',
+    });
+
+    // Restablecer contraseï¿½a si se solicitï¿½
     let passwordTemporal = null;
     if (resetPassword) {
       const [[emp]] = await pool.query('SELECT razon_social FROM empresas WHERE id = ?', [empresa_id]);
@@ -328,7 +392,7 @@ const updateUsuario = async (req, res, next) => {
     }
 
     return res.json({
-      message: resetPassword ? 'Usuario actualizado y contraseña restablecida' : 'Usuario actualizado exitosamente',
+      message: resetPassword ? 'Usuario actualizado y contraseï¿½a restablecida' : 'Usuario actualizado exitosamente',
       data: {
         id: parseInt(id),
         nombre,
@@ -338,6 +402,48 @@ const updateUsuario = async (req, res, next) => {
         ...(passwordTemporal ? { passwordTemporal } : {}),
       },
     });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const updateEstadoUsuario = async (req, res, next) => {
+  try {
+    const { rol, id: usuarioActualId } = req.user;
+    if (rol !== ROLES.ADMIN) {
+      return res.status(403).json({ message: 'Solo ADMIN puede cambiar estado de usuarios' });
+    }
+
+    const id = parseInt(req.params.id, 10);
+    const { estado } = req.body;
+
+    if (typeof estado !== 'boolean') {
+      return res.status(400).json({ message: 'El estado debe ser booleano' });
+    }
+
+    if (id === usuarioActualId) {
+      return res.status(400).json({ message: 'No puedes inactivar tu propio usuario' });
+    }
+
+    const [result] = await pool.query('UPDATE usuarios SET estado = ? WHERE id = ?', [estado, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // AuditorÃ­a: cambio de estado del usuario
+    await registrarAuditoriaSegura({
+      empresaId: req.user.empresaId,
+      usuarioId: usuarioActualId,
+      ip: getIpCliente(req),
+      accion: 'UPDATE',
+      tabla: 'usuarios',
+      registroId: id,
+      despues: { estado },
+      observaciones: estado ? 'Usuario activado' : 'Usuario inactivado',
+    });
+
+    return res.json({ message: estado ? 'Usuario activado' : 'Usuario inactivado' });
   } catch (error) {
     return next(error);
   }
@@ -375,7 +481,7 @@ const updatePropioUsuario = async (req, res, next) => {
       [email.trim(), userId]
     );
     if (emailExistente) {
-      return res.status(409).json({ message: 'El email ya está registrado' });
+      return res.status(409).json({ message: 'El email ya estï¿½ registrado' });
     }
 
     await pool.query(
@@ -396,6 +502,7 @@ module.exports = {
   createUsuario,
   cambiarPassword,
   updateUsuario,
+  updateEstadoUsuario,
   getPropioUsuario,
   updatePropioUsuario,
 };

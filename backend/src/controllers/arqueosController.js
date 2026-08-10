@@ -1,9 +1,13 @@
 const pool = require('../config/db');
+const { toMysqlLocal } = require('../services/cobranzas/time');
+const { registrarAuditoriaSegura } = require('../services/cobranzas/auditoriaService');
+const {
+  abrirCajaV12IfConfigured,
+  registrarGastoV12IfPresent,
+  cerrarCajaV12IfPresent,
+} = require('../services/cobranzas/cajaLifecycleService');
 
-const toMysqlLocal = (isoOrMs) =>
-  new Date(isoOrMs || Date.now())
-    .toLocaleString('sv-SE', { timeZone: 'America/Asuncion' })
-    .replace('T', ' ');
+const getIpCliente = (req) => req.ip || req.headers['x-forwarded-for'] || null;
 
 // ─────────────────────────────────────────────────────────────
 // POST /api/cobrador/caja/abrir
@@ -11,11 +15,13 @@ const toMysqlLocal = (isoOrMs) =>
 // No puede haber otra caja ABIERTA al mismo tiempo.
 // ─────────────────────────────────────────────────────────────
 const abrirCaja = async (req, res, next) => {
+  const conn = await pool.getConnection();
+  let transactionStarted = false;
   try {
     const { id: cobradorId, empresaId } = req.user;
-    const { saldo_inicial = 0 } = req.body;
+    const { saldo_inicial = 0, latitud, longitud } = req.body;
 
-    const [[cajaAbierta]] = await pool.query(
+    const [[cajaAbierta]] = await conn.query(
       `SELECT id FROM arqueos_caja WHERE cobrador_id = ? AND estado = 'ABIERTO' LIMIT 1`,
       [cobradorId]
     );
@@ -26,14 +32,54 @@ const abrirCaja = async (req, res, next) => {
       });
     }
 
-    const [result] = await pool.query(
+    await conn.beginTransaction();
+    transactionStarted = true;
+
+    const [result] = await conn.query(
       `INSERT INTO arqueos_caja (empresa_id, cobrador_id, fecha_apertura, saldo_inicial, estado)
        VALUES (?, ?, ?, ?, 'ABIERTO')`,
       [empresaId, cobradorId, toMysqlLocal(), Number(saldo_inicial)]
     );
-    return res.status(201).json({ message: 'Caja abierta exitosamente', arqueo_id: result.insertId });
+
+    const cajaV12 = await abrirCajaV12IfConfigured(conn, {
+      cobradorId,
+      empresaId,
+      saldoInicial: saldo_inicial,
+      ip: req.ip,
+      latitud,
+      longitud,
+    });
+
+    await conn.commit();
+
+    // Auditoría: apertura de caja (fire-and-forget, fuera de la transacción)
+    await registrarAuditoriaSegura({
+      empresaId,
+      usuarioId: cobradorId,
+      ip: getIpCliente(req),
+      accion: 'APERTURAR',
+      tabla: 'arqueos_caja',
+      registroId: result.insertId,
+      despues: { saldo_inicial: Number(saldo_inicial), estado: 'ABIERTO' },
+      observaciones: 'Apertura de caja',
+    });
+
+    return res.status(201).json({
+      message: 'Caja abierta exitosamente',
+      arqueo_id: result.insertId,
+      caja_id: cajaV12?.cajaId || null,
+      caja_apertura_id: cajaV12?.cajaAperturaId || null,
+    });
   } catch (error) {
+    if (transactionStarted) {
+      await conn.rollback();
+    }
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
     return next(error);
+  } finally {
+    conn.release();
   }
 };
 
@@ -99,8 +145,9 @@ const getCajaActiva = async (req, res, next) => {
 // ─────────────────────────────────────────────────────────────
 const cerrarCaja = async (req, res, next) => {
   const conn = await pool.getConnection();
+  let transactionStarted = false;
   try {
-    const { id: cobradorId } = req.user;
+    const { id: cobradorId, empresaId } = req.user;
     const { saldo_contado, observacion } = req.body;
 
     if (saldo_contado === undefined || saldo_contado === null) {
@@ -135,6 +182,9 @@ const cerrarCaja = async (req, res, next) => {
 
     const diferencia = Number(saldo_contado) - saldo_esperado;
 
+    await conn.beginTransaction();
+    transactionStarted = true;
+
     await conn.query(
       `UPDATE arqueos_caja
        SET estado = 'CERRADO', fecha_cierre = ?, saldo_esperado = ?,
@@ -143,14 +193,49 @@ const cerrarCaja = async (req, res, next) => {
       [toMysqlLocal(), saldo_esperado, Number(saldo_contado), diferencia, observacion || null, arqueo.id]
     );
 
+    const cierreV12 = await cerrarCajaV12IfPresent(conn, {
+      cobradorId,
+      saldoContado: saldo_contado,
+      observacion,
+      empresaId,
+    });
+
+    await conn.commit();
+
+    // Auditoría: cierre de caja
+    await registrarAuditoriaSegura({
+      empresaId,
+      usuarioId: cobradorId,
+      ip: getIpCliente(req),
+      accion: 'CERRAR',
+      tabla: 'arqueos_caja',
+      registroId: arqueo.id,
+      antes: { estado: 'ABIERTO' },
+      despues: {
+        estado: 'CERRADO',
+        saldo_esperado,
+        saldo_contado: Number(saldo_contado),
+        diferencia,
+      },
+      observaciones: observacion || 'Cierre de caja',
+    });
+
     return res.json({
       message: 'Caja cerrada exitosamente',
       arqueo_id:      arqueo.id,
       saldo_esperado,
       saldo_contado:  Number(saldo_contado),
       diferencia,
+      cierre_caja_id: cierreV12?.cierreId || null,
+      caja_apertura_id: cierreV12?.cajaAperturaId || null,
     });
   } catch (error) {
+    if (transactionStarted) {
+      await conn.rollback();
+    }
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
     return next(error);
   } finally {
     conn.release();
@@ -163,8 +248,10 @@ const cerrarCaja = async (req, res, next) => {
 // Body: { concepto, monto }
 // ─────────────────────────────────────────────────────────────
 const registrarGasto = async (req, res, next) => {
+  const conn = await pool.getConnection();
+  let transactionStarted = false;
   try {
-    const { id: cobradorId } = req.user;
+    const { id: cobradorId, empresaId } = req.user;
     const { id: arqueoId } = req.params;
     const { concepto, monto } = req.body;
 
@@ -172,19 +259,44 @@ const registrarGasto = async (req, res, next) => {
       return res.status(400).json({ message: 'concepto y monto son requeridos' });
     }
 
-    const [[arqueo]] = await pool.query(
+    const [[arqueo]] = await conn.query(
       `SELECT id FROM arqueos_caja WHERE id = ? AND cobrador_id = ? AND estado = 'ABIERTO'`,
       [arqueoId, cobradorId]
     );
     if (!arqueo) return res.status(404).json({ message: 'Caja no encontrada o ya cerrada' });
 
-    const [result] = await pool.query(
+    await conn.beginTransaction();
+    transactionStarted = true;
+
+    const [result] = await conn.query(
       `INSERT INTO movimientos_caja (arqueo_id, concepto, monto, fecha_hora) VALUES (?, ?, ?, ?)`,
       [arqueoId, concepto, Number(monto), toMysqlLocal()]
     );
-    return res.status(201).json({ message: 'Gasto registrado', id: result.insertId });
+
+    const movimientoV12 = await registrarGastoV12IfPresent(conn, {
+      cobradorId,
+      concepto,
+      monto,
+      empresaId,
+    });
+
+    await conn.commit();
+
+    return res.status(201).json({
+      message: 'Gasto registrado',
+      id: result.insertId,
+      caja_movimiento_id: movimientoV12?.movimientoId || null,
+    });
   } catch (error) {
+    if (transactionStarted) {
+      await conn.rollback();
+    }
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
     return next(error);
+  } finally {
+    conn.release();
   }
 };
 
@@ -340,6 +452,23 @@ const confirmarRendicion = async (req, res, next) => {
        VALUES (?, ?, ?, ?, ?)`,
       [id, supervisorId, Number(monto_recibido), estado, observacion || null]
     );
+
+    // Auditoría: rendición confirmada
+    await registrarAuditoriaSegura({
+      empresaId: arqueo.empresa_id,
+      usuarioId: supervisorId,
+      ip: getIpCliente(req),
+      accion: 'INSERT',
+      tabla: 'rendiciones',
+      registroId: result.insertId,
+      despues: {
+        arqueo_id: id,
+        monto_recibido: Number(monto_recibido),
+        estado,
+        diferencia,
+      },
+      observaciones: 'Rendición de arqueo',
+    });
 
     return res.status(201).json({
       message: 'Rendición confirmada',

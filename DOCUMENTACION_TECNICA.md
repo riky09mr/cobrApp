@@ -85,12 +85,17 @@ cobrApp sigue una arquitectura de **cliente-servidor en tres capas**, con separa
 │                  BACKEND — API REST                      │
 │                  Node.js + Express.js                    │
 │                                                          │
-│   ┌──────────────┐  ┌───────────────┐  ┌─────────────┐  │
-│   │  Auth Module │  │ Panel Module  │  │ Notif Module│  │
-│   │  JWT + bcrypt│  │ CRUD + Reports│  │ Cron + Email│  │
-│   └──────────────┘  └───────────────┘  └─────────────┘  │
+│   ┌──────────────────────────────────────────────────┐   │
+│   │  Auth Module (JWT + bcrypt)                      │   │
+│   │  Panel Module (CRUD + Reportes)                  │   │
+│   │  Cobranzas V12 (dominio): Caja, Recibos,         │   │
+│   │    Numeradores, Intereses, Feriados (Computus)   │   │
+│   │  Cron: descansos (14:30) · feriados anuales      │   │
+│   │    (1° enero · zona America/Asuncion)            │   │
+│   └──────────────────────────────────────────────────┘   │
 │                                                          │
-│   Middleware: authenticateToken, roleCheck, rateLimit    │
+│   Middleware: authenticateToken + control de rol por     │
+│   ruta (soloGestor / soloCobrador en cada router)        │
 └────────────────────────┬────────────────────────────────┘
                          │
                          ▼
@@ -98,21 +103,48 @@ cobrApp sigue una arquitectura de **cliente-servidor en tres capas**, con separa
 │              BASE DE DATOS — MySQL                       │
 │                                                          │
 │   empresas → usuarios → roles                           │
-│   clientes → creditos → cuotas                          │
-│   asignaciones → gestiones → pagos                      │
-│   notificaciones → zonas → coordenadas                  │
+│   clientes → clientes_empresas → creditos → cuotas      │
+│   asignaciones → visitas_cobro (gestión en campo)      │
+│   zonas → clientes_empresas (latitud/longitud)          │
+│   módulos V12: caja_aperturas, recibos, caja_movimientos│
 └─────────────────────────────────────────────────────────┘
 ```
 
 ### 2.1 Patrón arquitectónico
 
-El backend implementa el patrón **MVC (Modelo - Vista - Controlador)** adaptado a APIs REST:
+El backend implementa una **API REST por capas simplificada**, combinando dos patrones
+de Martin Fowler (en *Patterns of Enterprise Application Architecture*):
 
-- **Modelo:** Las tablas de MySQL gestionadas a través del pool de conexiones.
-- **Controlador:** Archivos en `controllers/` que contienen la lógica de negocio.
-- **Vista:** No aplica en el backend (la vista es el frontend).
-- **Rutas:** Archivos en `routes/` que mapean URLs a controladores.
-- **Middlewares:** Funciones intermedias para autenticación y validación.
+- **Transaction Script** como patrón dominante: la mayor parte de los módulos
+  (autenticación, empresas, clientes, usuarios, zonas, mensajes, reportes) organiza
+  la lógica de negocio en **controladores con acceso directo a datos**, donde cada
+  operación del sistema se implementa como un *script*: el controlador recibe la
+  petición, ejecuta las consultas SQL parametrizadas sobre el pool de MySQL2 y
+  devuelve el resultado. Esta elección es apropiada para la complejidad actual del
+  dominio: operaciones mayoritariamente CRUD con reglas de negocio simples, donde
+  un modelo de dominio completo (Domain Model) añadiría fricción sin beneficio.
+- **Service Layer parcial** para el módulo de cobranzas (V12): las reglas de negocio
+  complejas (apertura/cierre de caja, generación de recibos con numeradores,
+  cálculo de intereses por mora, feriados anuales con algoritmo de Computus) están
+  encapsuladas en una capa de servicios de dominio dentro de `services/cobranzas/`,
+  reutilizable por los controladores de panel, cobrador y configuración.
+
+La estructura por capas es:
+
+- **Controladores** (`controllers/`): orquestan la petición HTTP, validan la entrada
+  y ejecutan consultas parametrizadas directas (Transaction Script) o delegan en la
+  capa de servicios (módulo cobranzas).
+- **Servicios de dominio** (`services/cobranzas/`): encapsulan las reglas de negocio
+  del módulo de cobranzas V12 (caja, recibos, numeradores, intereses, feriados).
+- **Rutas** (`routes/`): mapean URLs a controladores y aplican los middlewares de
+  autenticación y de control de rol.
+- **Middlewares** (`middlewares/` + helpers por ruta): `authenticateToken` para
+  validar el JWT y control de rol por ruta (`soloGestor` / `soloCobrador`).
+
+> **Nota sobre `models/`:** el directorio `backend/src/models/` existe pero no se
+> utiliza. En lugar de un modelo de dominio, el acceso a datos se realiza mediante
+> el pool de conexiones de MySQL2 directamente desde los controladores, en línea
+> con el patrón Transaction Script descrito arriba.
 
 ### 2.2 Comunicación entre capas
 
@@ -129,15 +161,17 @@ El backend implementa el patrón **MVC (Modelo - Vista - Controlador)** adaptado
 | Tecnología | Versión | Uso |
 |---|---|---|
 | **Node.js** | 18+ | Runtime de JavaScript en el servidor |
-| **Express.js** | 4.x | Framework para construir la API REST |
-| **MySQL2** | 3.x | Driver para conectar con MySQL usando Promises |
-| **bcryptjs** | 2.x | Encriptación de contraseñas con salt rounds |
-| **jsonwebtoken** | 9.x | Generación y verificación de tokens JWT |
-| **dotenv** | 16.x | Manejo de variables de entorno desde `.env` |
+| **Express.js** | 5.x (5.2.1) | Framework para construir la API REST |
+| **MySQL2** | 3.x (3.15.3) | Driver para conectar con MySQL usando Promises |
+| **bcryptjs** | 3.x (3.0.2) | Encriptación de contraseñas con salt rounds |
+| **jsonwebtoken** | 9.x (9.0.2) | Generación y verificación de tokens JWT |
+| **dotenv** | 17.x (17.3.1) | Manejo de variables de entorno desde `.env` |
 | **cors** | 2.x | Middleware para habilitar Cross-Origin Resource Sharing |
 | **morgan** | 1.x | Logger de peticiones HTTP en desarrollo |
 | **multer** | 2.x | Middleware para recibir archivos subidos (`multipart/form-data`) |
 | **xlsx** | 0.18.x | Lectura y escritura de archivos Excel (.xlsx) |
+| **node-cron** | 4.x | Tareas programadas: activación automática de descansos (14:30) y sincronización anual de feriados (1° de enero), zona `America/Asuncion` |
+| **pdfkit** | 0.18.x | Generación de documentos PDF (recibos y comprobantes) |
 
 ### 3.2 Frontend Web
 
@@ -187,33 +221,71 @@ cobrApp/
 ├── backend/                    # API REST (Node.js + Express)
 │   ├── .env                    # Variables de entorno (NO subir a Git)
 │   ├── package.json
+│   ├── scripts/                # Scripts de aplicación de migraciones y backfills
+│   │   ├── applyMigrationV6.js
+│   │   ├── applyMigrationV12.js
+│   │   ├── applyMigrationV13.js
+│   │   ├── applyMigrationV14.js
+│   │   ├── applyMigrationV15.js
+│   │   ├── backfillCobranzasV12.js
+│   │   └── fixFeriadosFijos.js
 │   └── src/
-│       ├── app.js              # Punto de entrada del servidor
+│       ├── app.js              # Punto de entrada del servidor (monta rutas y crons)
 │       ├── config/
 │       │   └── db.js           # Configuración del pool de MySQL
-│       ├── controllers/        # Lógica de negocio
+│       ├── controllers/        # Lógica de negocio (Transaction Script)
 │       │   ├── authController.js
 │       │   ├── clientesController.js   # CRUD + importación Excel
 │       │   ├── cobradorController.js   # Agenda, visitas y gestiones (móvil)
 │       │   ├── descansosController.js  # Gestión de descansos de cobradores
 │       │   ├── horariosController.js   # Horarios laborales
 │       │   ├── mensajesController.js   # Chat interno
-│       │   ├── panelController.js      # Dashboard y cobranzas
+│       │   ├── panelController.js      # Dashboard, cobranzas y PDFs (pdfkit)
 │       │   ├── usuariosController.js   # ABM de usuarios
-│       │   └── zonasController.js      # Zonas geográficas
+│       │   ├── zonasController.js      # Zonas geográficas
+│       │   ├── empresasController.js   # ABM de empresas
+│       │   ├── arqueosController.js    # Arqueos y rendiciones de caja
+│       │   ├── mediosPagoController.js # Medios de pago (efectivo, transferencia…)
+│       │   ├── cobranzasConfigController.js  # Timbrados, cajas, numeradores (V12)
+│       │   ├── interesesConfigController.js  # Configuración de intereses por mora
+│       │   ├── reportesCarteraController.js  # Reporte de cartera vencida
+│       │   ├── reportesCobradorController.js # Reporte de eficiencia de cobradores
+│       │   ├── reportesPeriodoController.js  # Reporte de cobranza por período
+│       │   └── reportesKpisController.js     # 6 KPIs del marco teórico (morosidad,
+│       │                                     #  efectividad, rotación, cobertura,
+│       │                                     #  costo por gestión, reagendamiento)
 │       ├── middlewares/
-│       │   └── authMiddleware.js       # Verificación de JWT
-│       ├── models/             # (Reservado)
+│       │   └── authMiddleware.js       # Verificación de JWT (authenticateToken)
+│       ├── models/             # (Directorio vacío — no utilizado; el acceso a
+│       │                       #  datos se hace directo desde los controladores)
 │       ├── routes/
 │       │   ├── authRoutes.js
 │       │   ├── cobradorRoutes.js       # Rutas exclusivas de la app móvil
 │       │   ├── descansosRoutes.js
-│       │   ├── horariosRoutes.js
-│       │   └── panelRoutes.js          # Rutas del panel web
+│       │   ├── horariosRoutes.js       # Montadas en /api/supervisor/horarios
+│       │   ├── panelRoutes.js          # Rutas del panel web
+│       │   ├── arqueosRoutes.js        # /api/arqueos
+│       │   ├── mediosPagoRoutes.js     # /api/medios-pago
+│       │   ├── mensajesRoutes.js       # /api/mensajes
+│       │   ├── cobranzasConfigRoutes.js# /api/configuracion/cobranzas
+│       │   ├── interesesConfigRoutes.js# /api/configuracion/intereses
+│       │   └── reportesRoutes.js       # /api/reportes
 │       ├── services/
-│       │   └── descansoCron.js         # Cron job para gestión de descansos
+│       │   ├── descansoCron.js         # Cron: activación automática de descansos
+│       │   └── cobranzas/              # Service Layer del módulo de cobranzas (V12)
+│       │       ├── cajaService.js          # Apertura/cierre de caja
+│       │       ├── cajaLifecycleService.js # Ciclo de vida de la caja del cobrador
+│       │       ├── reciboService.js        # Generación de recibos
+│       │       ├── numeradorService.js     # Numeradores secuenciales por empresa
+│       │       ├── interesService.js       # Cálculo de intereses por mora
+│       │       ├── feriadosAnualService.js # Sincronización anual de feriados
+│       │       ├── computus.js             # Algoritmo de Computus (Pascua)
+│       │       ├── schemaSupport.js        # Utilidades de esquema
+│       │       ├── serviceError.js         # Errores tipados del servicio
+│       │       └── time.js                 # Utilidades de fecha/hora
 │       └── uploads/
-│           └── evidencias/             # Fotos de comprobantes subidas desde móvil
+│           ├── evidencias/             # Fotos de comprobantes subidas desde móvil
+│           └── mensajes/               # Imágenes adjuntas del chat interno
 │
 ├── web/                        # Panel administrativo (Next.js)
 │   ├── package.json
@@ -239,15 +311,23 @@ cobrApp/
 │       │   ├── importar/page.tsx       # Importación masiva desde Excel
 │       │   ├── usuarios/page.tsx
 │       │   ├── perfil/page.tsx
-│       │   └── cambiar-password/page.tsx
+│       │   ├── cambiar-password/page.tsx
+│       │   ├── facturas/page.tsx       # Facturas y timbrado (configuración)
+│       │   ├── medios-pago/page.tsx    # Medios de pago
+│       │   ├── configuracion-cobranzas/page.tsx  # Timbrados, cajas, numeradores
+│       │   ├── configuracion-intereses/page.tsx  # Intereses por mora
+│       │   └── reportes/               # Reportes del panel
+│       │       ├── cobrador/page.tsx   # Eficiencia de cobradores
+│       │       ├── cartera/page.tsx    # Cartera vencida
+│       │       └── periodo/page.tsx    # Cobranza por período
 │       ├── components/
 │       │   ├── PanelShell.tsx          # Layout del panel (sidebar + header)
 │       │   ├── MapaVisitas.tsx         # Mapa Leaflet de gestiones
 │       │   └── MapPolygonPicker.tsx    # Selector de polígono para zonas
 │       ├── hooks/
 │       │   ├── useAuth.ts              # Hook de protección de rutas
-│       │   └── useInactivityLogout.ts  # Cierre de sesión por inactividad
-│       ├── layouts/            # (Reservado)
+│       │   └── useInactivityLogout.ts  # Cierre de sesión por inactividad (60 min)
+│       ├── layouts/            # (Directorio vacío — reservado)
 │       └── services/
 │           └── api.ts          # Instancia Axios + tipos + funciones API
 │
@@ -262,14 +342,17 @@ cobrApp/
 │       │   ├── descansosApi.ts     # Descansos
 │       │   └── mensajesApi.ts      # Chat interno
 │       ├── context/
-│       │   └── AuthContext.tsx     # Contexto de autenticación global
+│       │   ├── AuthContext.tsx     # Contexto de autenticación global
+│       │   └── MensajesContext.tsx # Contexto global del chat (no leídos, refresco)
 │       ├── screens/
 │       │   ├── LoginScreen.tsx
 │       │   ├── AgendaScreen.tsx    # Lista de visitas del día
 │       │   ├── MapaRutaScreen.tsx  # Mapa con ruta TSP optimizada
 │       │   ├── VisitaScreen.tsx    # Registro de gestión con GPS y foto
+│       │   ├── CajaScreen.tsx      # Apertura/cierre de caja, arqueo y gastos
 │       │   ├── MensajesScreen.tsx  # Chat con supervisores
-│       │   └── DescansoScreen.tsx  # Solicitud y estado de descansos
+│       │   ├── DescansoScreen.tsx  # Solicitud y estado de descansos
+│       │   └── PerfilScreen.tsx    # Perfil del cobrador
 │       └── utils/
 │           ├── tsp.ts              # Algoritmo Nearest Neighbor TSP
 │           └── notifications.ts   # Configuración de push notifications
@@ -281,11 +364,31 @@ cobrApp/
 │   ├── migracion_v4_cobrador.sql
 │   ├── migracion_v5_descansos.sql
 │   ├── migracion_v6_horarios.sql
-│   └── migracion_v7_mensajes.sql
+│   ├── migracion_v7_mensajes.sql
+│   ├── migracion_v8_mensajes_imagen.sql
+│   ├── migracion_v9_facturas_config.sql
+│   ├── migracion_v10_anulaciones.sql
+│   ├── migracion_v10_empresa_logo.sql
+│   ├── migracion_v11_arqueos_caja.sql
+│   ├── migracion_v12_cobranzas_erp_multientidad.sql
+│   ├── migracion_v13_intereses_config_empresa.sql
+│   ├── migracion_v14_feriados_origen.sql
+│   └── migracion_v15_feriados_anuales.sql
 │
 ├── ANALISIS_ESTADO_SISTEMA.md
 ├── DOCUMENTACION_TECNICA.md
-└── Protocolo_Rivaldo_Zarate.docx
+├── MARCO_TEORICO_TESIS.md
+├── MODULO_USUARIOS_README.md
+├── REDISENO_MODULO_COBRANZAS_V12.md
+├── SETUP.md
+├── esquema_bd.sql              # Esquema de referencia (vacío / en construcción)
+├── cobraapp.png                # Imagen de marca
+├── login-bg.png                # Imagen de fondo del login
+├── ej/                         # Ejemplos y pruebas locales
+├── funcionamiento/             # Documentación de funcionamiento
+├── protocolo/                  # Documentación del protocolo de investigación
+├── reporte/                    # Documentación del reporte de tesis
+└── Protocolo_Rivaldo_Zarate (1).docx
 ```
 
 ---
@@ -315,6 +418,34 @@ empresas (1) ──────── (N) tipos_descanso
 tipos_descanso (1) ── (N) descansos_cobrador ──── (N) usuarios (cobrador)
 usuarios (1) ──────── (N) horarios_cobrador
 usuarios (N) ──────── (N) mensajes [emisor / receptor]
+empresas (1) ──────── (1) empresas_intereses_config
+empresas (1) ──────── (N) empresas_feriados
+creditos (1) ──────── (N) cuotas [interes_acumulado, dias_retraso]
+
+-- Módulo V11 – Arqueos de caja y medios de pago
+empresas (1) ──────── (N) medios_pago
+empresas (1) ──────── (N) arqueos_caja ──────── (N) usuarios (cobrador)
+arqueos_caja (1) ──── (N) movimientos_caja
+arqueos_caja (1) ──── (1) rendiciones ──────── (N) usuarios (supervisor)
+visitas_cobro (N) ──── (1) arqueos_caja
+visitas_cobro (N) ──── (1) medios_pago
+
+-- Módulo V12 – Rediseño ERP de cobranzas multientidad
+empresas (1) ──────── (N) timbrados
+timbrados (1) ──────── (N) establecimientos
+establecimientos (1) ── (N) puntos_expedicion
+puntos_expedicion (1) ─ (N) cajas
+cajas (1) ──────────── (N) caja_cambios
+cajas (1) ──────────── (N) caja_aperturas ──── (N) usuarios (cobrador)
+puntos_expedicion (1) ─ (N) numeradores
+cajas (1) ──────────── (N) recibos ──────────── (N) clientes
+recibos (1) ────────── (1) visitas_cobro
+recibos (1) ────────── (N) recibo_detalles ──── (N) cuotas
+cajas (1) ──────────── (N) caja_movimientos
+cajas (1) ──────────── (N) arqueos
+cajas (1) ──────────── (N) cierres_caja
+caja_aperturas (1) ─── (1) cierres_caja
+auditoria [transversal: empresa_id, usuario_id, tabla_afectada]
 ```
 
 ### 5.3 Descripción de tablas
@@ -522,6 +653,80 @@ Chat interno entre supervisores y cobradores de la misma empresa.
 | `leido` | TINYINT(1) DEFAULT 0 | 0 = no leído, 1 = leído |
 | `created_at` | DATETIME DEFAULT NOW() | Fecha y hora de envío |
 
+#### `empresas_intereses_config`
+Configuración de intereses por mora de cada empresa (una fila por empresa). Permite que cada empresa decida de forma independiente si genera intereses, cuántos días de gracia otorga, el porcentaje diario y cómo se cuentan los días.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `empresa_id` | BIGINT PK | Empresa a la que pertenece la configuración |
+| `generar_interes` | TINYINT(1) DEFAULT 0 | 1 = la empresa genera interés por mora |
+| `dias_gracia` | INT DEFAULT 0 | Días de luz: días posteriores al vencimiento sin interés |
+| `porcentaje_interes_diario` | DECIMAL(6,4) DEFAULT 0 | % de interés por día de retraso, sobre el saldo de la cuota |
+| `contar_domingos` | TINYINT(1) DEFAULT 0 | 1 = los domingos cuentan como días de retraso |
+| `contar_feriados` | TINYINT(1) DEFAULT 0 | 1 = los feriados cuentan como días de retraso |
+| `created_by` | BIGINT FK | Usuario que creó la configuración |
+| `updated_by` | BIGINT FK | Último usuario que la modificó |
+| `created_at` | DATETIME DEFAULT NOW() | Fecha de creación |
+| `updated_at` | DATETIME DEFAULT NOW() ON UPDATE NOW() | Última actualización |
+
+#### `empresas_feriados`
+Feriados locales registrados por empresa. Se excluyen del conteo de días de retraso cuando `contar_feriados = 0`.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id` | BIGINT PK AUTO_INCREMENT | Identificador único |
+| `empresa_id` | BIGINT FK | Empresa dueña del feriado |
+| `fecha` | DATE NOT NULL | Fecha del feriado |
+| `descripcion` | VARCHAR(120) | Nombre o descripción del feriado |
+| `origen` | VARCHAR(50) DEFAULT 'MANUAL' | Origen del feriado: `MANUAL`, `jueves_santo`, `viernes_santo`, `traslado_heroes`, `traslado_paz_chaco`, `traslado_fundacion_asuncion` (columna añadida en la migración V14) |
+| `created_by` | BIGINT FK | Usuario que lo registró |
+| `deleted_at` | DATETIME | Soft delete: NULL = vigente |
+| `created_at` | DATETIME DEFAULT NOW() | Fecha de registro |
+| `updated_at` | DATETIME DEFAULT NOW() ON UPDATE NOW() | Última actualización |
+
+> Restricción: `UNIQUE (empresa_id, fecha)` — no se puede duplicar un feriado para la misma empresa.
+
+**Feriados móviles y algoritmo Computus** (servicio `backend/src/services/cobranzas/computus.js`):
+- **Semana Santa:** `easterSunday(year)` implementa el algoritmo de **Computus gregoriano de Meeus/Jones/Butcher** para calcular el Domingo de Resurrección de cualquier año. De ahí se derivan `jueves_santo` (Pascua − 3), `viernes_santo` (Pascua − 2), `sabado_santo` (Pascua − 1) y `domingo_resurreccion` (Pascua). Jueves y Viernes Santo son **inamovibles** (no se trasladan).
+- **Traslados Ley 6631/2020:** `aplicarTraslado(fecha)` mueve los feriados trasladables al lunes más próximo: martes → lunes anterior; miércoles/jueves → lunes siguiente; lunes/viernes/sábado/domingo quedan igual. Se aplica a los feriados nacionales trasladables: **Día de los Héroes (1 de marzo)**, **Paz del Chaco (12 de junio)** y **Fundación de Asunción (15 de agosto)**.
+- `feriadosMoviblesParaguay(year)` devuelve los 5 feriados generables automáticamente para un año: jueves_santo, viernes_santo y los 3 traslados.
+
+#### Columnas añadidas a `cuotas` (V13)
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `interes_acumulado` | DECIMAL(12,2) DEFAULT 0 | Interés acumulado calculado sobre la cuota vencida |
+| `dias_retraso` | INT DEFAULT 0 | Días efectivos de retraso usados para el último cálculo |
+
+#### Tablas del módulo de caja y medios de pago (V11)
+
+| Tabla | Descripción |
+|---|---|
+| `medios_pago` | Catálogo de medios de pago por empresa (efectivo, transferencia, cheque). `requiere_comprobante` obliga a registrar `nro_comprobante` al cobrar |
+| `arqueos_caja` | Caja diaria del cobrador: saldo inicial, saldo esperado, saldo contado y diferencia; un cobrador solo puede tener una caja `ABIERTO` a la vez |
+| `movimientos_caja` | Gastos del cobrador durante la jornada (combustible, etc.); reducen el saldo esperado en efectivo |
+| `rendiciones` | Confirmación del supervisor de la recepción del dinero: estado `CUADRADO` / `SOBRANTE` / `FALTANTE` |
+
+#### Tablas del rediseño ERP multientidad (V12)
+
+| Tabla | Descripción |
+|---|---|
+| `timbrados` | Timbrados fiscales por empresa con vigencia (`VIGENTE`, `VENCIDO`, etc.) y soporte electrónico |
+| `establecimientos` | Establecimientos fiscales de la empresa (código de 3 dígitos) |
+| `puntos_expedicion` | Puntos de expedición por establecimiento y timbrado |
+| `cajas` | Caja operativa vinculada a un punto de expedición, con saldo actual y cobrador asignado |
+| `caja_cambios` | Historial de cambios estructurales sobre la caja (cambio de cobrador, punto, timbrado, bloqueos) |
+| `caja_aperturas` | Aperturas diarias de caja por cobrador, con GPS e IP de origen |
+| `numeradores` | Secuencias fiscales por punto de expedición y tipo de documento (reemplaza `MAX()+1`) |
+| `recibos` | Recibos fiscales y operativos emitidos por cobranzas (con `cdc`, `hash_documento`, estado `EMITIDO`/`ANULADO`/`REVERSADO`) |
+| `recibo_detalles` | Conceptos cobrados por recibo, referenciando cuotas y créditos |
+| `caja_movimientos` | Libro mayor de caja con trazabilidad de saldos (nunca se modifica el saldo manualmente) |
+| `arqueos` | Arqueos históricos no eliminables, con saldo de sistema vs declarado |
+| `cierres_caja` | Resultado consolidado del cierre de una apertura (uno por apertura, UNIQUE) |
+| `auditoria` | Bitácora transversal: acciones (`INSERT`, `UPDATE`, `DELETE`, `APERTURAR`, `CERRAR`, `LOGIN`, etc.) con `datos_antes`/`datos_despues` en JSON |
+
+> Nota: el rediseño V12 convive con el esquema legacy — las tablas `facturas_*` (V9) y `arqueos_caja` (V11) se mantienen operativas y se conectan al nuevo flujo mediante columnas puente (`legacy_arqueo_caja_id`, `facturas_timbrado_legacy_id`, `visita_cobro_id`, `factura_legacy_id`).
+
 ---
 
 ## 6. Backend — API REST
@@ -618,19 +823,175 @@ Response (200):
 |---|---|---|---|
 | `GET` | `/api/dashboard/summary` | Todos | Métricas generales del sistema |
 | `GET` | `/api/empresas` | Todos | Lista de empresas |
+| `POST` | `/api/empresas` | ADMIN, SUPERVISOR | Crear empresa |
+| `PATCH` | `/api/empresas/:id/estado` | ADMIN, SUPERVISOR | Activar/desactivar empresa |
 | `GET` | `/api/clientes` | Todos | Lista de clientes |
+| `POST` | `/api/clientes` | ADMIN, SUPERVISOR | Crear cliente manualmente |
+| `PUT` | `/api/clientes/:id` | ADMIN, SUPERVISOR | Actualizar cliente |
+| `PATCH` | `/api/clientes/:id/ubicacion` | Todos | Actualizar coordenadas GPS del cliente |
+| `GET` | `/api/clientes/sin-ubicacion` | Todos | Clientes sin coordenadas registradas |
 | `GET` | `/api/cobranzas` | Todos | Lista de cuotas |
+| `PATCH` | `/api/cobranzas/:id/cobrar` | Todos | Registrar cobro de una cuota |
+| `PATCH` | `/api/cobranzas/:id/fecha` | Todos | Actualizar fecha de vencimiento |
+| `GET` | `/api/gestiones` | Todos | Historial de visitas de cobro (fuente: visitas_cobro) |
 | `GET` | `/api/usuarios` | Todos | Lista de usuarios |
+| `GET` | `/api/usuarios/cobradores` | Todos | Lista de usuarios con rol COBRADOR |
+| `GET` | `/api/usuarios/me` | Todos | Datos del usuario autenticado |
+| `PUT` | `/api/usuarios/me` | Todos | Actualizar datos propios |
 | `GET` | `/api/roles` | Todos | Lista de roles disponibles |
 | `POST` | `/api/usuarios` | ADMIN, SUPERVISOR | Crear nuevo usuario |
 | `PUT` | `/api/usuarios/:id` | ADMIN, SUPERVISOR | Actualizar usuario existente |
+| `PATCH` | `/api/usuarios/:id/estado` | ADMIN, SUPERVISOR | Activar/desactivar usuario |
 | `POST` | `/api/cambiar-password` | Todos | Cambiar contraseña propia |
+| `GET` | `/api/zonas` | Todos | Lista de zonas |
+| `POST` | `/api/zonas` | ADMIN, SUPERVISOR | Crear zona |
+| `PUT` | `/api/zonas/:id` | ADMIN, SUPERVISOR | Actualizar zona |
+| `DELETE` | `/api/zonas/:id` | ADMIN, SUPERVISOR | Eliminar zona |
+| `POST` | `/api/zonas/auto-asignar` | ADMIN, SUPERVISOR | Asignación automática de clientes a zonas |
 | `POST` | `/api/clientes/importar` | ADMIN, SUPERVISOR | Importar clientes y créditos desde archivo Excel |
 | `GET` | `/api/clientes/plantilla` | No | Descargar plantilla Excel de ejemplo |
+| `GET` | `/api/facturas-config` | ADMIN | Configuración de facturación de todas las empresas |
+| `GET` | `/api/facturas-config/:empresaId` | ADMIN, SUPERVISOR | Configuración de facturación de una empresa |
+| `PUT` | `/api/facturas-config/:empresaId` | ADMIN, SUPERVISOR | Guardar configuración de facturación |
+| `GET` | `/api/facturas-timbrado/:empresaId/historial` | ADMIN, SUPERVISOR | Historial de timbrados de una empresa |
 | `GET` | `/api/mensajes` | SUPERVISOR, COBRADOR | Lista de conversaciones con último mensaje y no leídos |
 | `GET` | `/api/mensajes/no-leidos` | SUPERVISOR, COBRADOR | Contador total de mensajes no leídos |
 | `GET` | `/api/mensajes/:usuarioId` | SUPERVISOR, COBRADOR | Historial de mensajes con un usuario específico |
 | `POST` | `/api/mensajes` | SUPERVISOR, COBRADOR | Enviar un mensaje a otro usuario |
+
+#### Cobrador móvil — `/api/cobrador` (requieren Bearer Token + rol COBRADOR)
+
+| Método | Endpoint | Roles permitidos | Descripción |
+|---|---|---|---|
+| `GET` | `/api/cobrador/agenda` | COBRADOR | Agenda de visitas del día |
+| `POST` | `/api/cobrador/cobros` | COBRADOR | Registrar cobro desde el móvil |
+| `POST` | `/api/cobrador/visitas` | COBRADOR | Registrar visita/gestión en campo |
+| `POST` | `/api/cobrador/visitas/:id/foto` | COBRADOR | Subir foto de comprobante (jpeg/png/webp) |
+| `POST` | `/api/cobrador/caja/abrir` | COBRADOR | Abrir caja diaria |
+| `GET` | `/api/cobrador/caja/activa` | COBRADOR | Consultar caja activa del cobrador |
+| `POST` | `/api/cobrador/caja/cerrar` | COBRADOR | Cerrar caja diaria |
+| `POST` | `/api/cobrador/caja/:id/gastos` | COBRADOR | Registrar gasto en caja |
+| `GET` | `/api/cobrador/descansos/activo` | COBRADOR | Estado del descanso activo |
+| `POST` | `/api/cobrador/descansos/iniciar` | COBRADOR | Iniciar descanso |
+| `POST` | `/api/cobrador/descansos/finalizar` | COBRADOR | Finalizar descanso |
+
+#### Arqueos — `/api/arqueos` (requieren Bearer Token)
+
+| Método | Endpoint | Roles permitidos | Descripción |
+|---|---|---|---|
+| `GET` | `/api/arqueos` | ADMIN, SUPERVISOR | Lista de arqueos de caja |
+| `GET` | `/api/arqueos/:id` | Todos | Detalle de un arqueo (el cobrador ve el suyo) |
+| `POST` | `/api/arqueos/:id/rendicion` | ADMIN, SUPERVISOR | Confirmar rendición del arqueo |
+
+#### Medios de pago — `/api/medios-pago` (requieren Bearer Token)
+
+| Método | Endpoint | Roles permitidos | Descripción |
+|---|---|---|---|
+| `GET` | `/api/medios-pago` | Todos | Lista de medios de pago |
+| `POST` | `/api/medios-pago` | ADMIN, SUPERVISOR | Crear medio de pago |
+| `PUT` | `/api/medios-pago/:id` | ADMIN, SUPERVISOR | Actualizar medio de pago |
+
+#### Configuración de cobranzas — `/api/configuracion/cobranzas` (requieren Bearer Token)
+
+| Método | Endpoint | Roles permitidos | Descripción |
+|---|---|---|---|
+| `GET` | `/api/configuracion/cobranzas/timbrados` | ADMIN, SUPERVISOR | Lista de timbrados |
+| `POST` | `/api/configuracion/cobranzas/timbrados` | ADMIN, SUPERVISOR | Crear timbrado |
+| `PUT` | `/api/configuracion/cobranzas/timbrados/:id` | ADMIN, SUPERVISOR | Actualizar timbrado |
+| `GET` | `/api/configuracion/cobranzas/establecimientos` | ADMIN, SUPERVISOR | Lista de establecimientos |
+| `POST` | `/api/configuracion/cobranzas/establecimientos` | ADMIN, SUPERVISOR | Crear establecimiento |
+| `PUT` | `/api/configuracion/cobranzas/establecimientos/:id` | ADMIN, SUPERVISOR | Actualizar establecimiento |
+| `GET` | `/api/configuracion/cobranzas/puntos-expedicion` | ADMIN, SUPERVISOR | Lista de puntos de expedición |
+| `POST` | `/api/configuracion/cobranzas/puntos-expedicion` | ADMIN, SUPERVISOR | Crear punto de expedición |
+| `PUT` | `/api/configuracion/cobranzas/puntos-expedicion/:id` | ADMIN, SUPERVISOR | Actualizar punto de expedición |
+| `GET` | `/api/configuracion/cobranzas/cajas` | ADMIN, SUPERVISOR | Lista de cajas |
+| `POST` | `/api/configuracion/cobranzas/cajas` | ADMIN, SUPERVISOR | Crear caja |
+| `PUT` | `/api/configuracion/cobranzas/cajas/:id` | ADMIN, SUPERVISOR | Actualizar caja |
+| `GET` | `/api/configuracion/cobranzas/numeradores` | ADMIN, SUPERVISOR | Lista de numeradores |
+| `POST` | `/api/configuracion/cobranzas/numeradores` | ADMIN, SUPERVISOR | Crear numerador |
+| `PUT` | `/api/configuracion/cobranzas/numeradores/:id` | ADMIN, SUPERVISOR | Actualizar numerador |
+
+#### Reportes — `/api/reportes` (requieren Bearer Token)
+
+| Método | Endpoint | Roles permitidos | Descripción |
+|---|---|---|---|
+| `GET` | `/api/reportes/cobrador/eficiencia` | Todos | Reporte de eficiencia de cobradores |
+| `GET` | `/api/reportes/cartera/vencida` | Todos | Reporte de cartera vencida |
+| `GET` | `/api/reportes/periodo/cobranza` | Todos | Reporte de cobranza por período |
+| `GET` | `/api/reportes/kpis/rotacion` | Todos | KPI rotación de cartera: `monto_cobrado`, `cartera_vigente`, `rotacion_cartera`, `rotacion_anualizada`, `dias_promedio_cobro` |
+| `GET` | `/api/reportes/kpis/cobertura` | Todos | KPI cobertura de cobro: `total_asignaciones`, `asignaciones_con_visita`, `total_visitas`, `cobertura_cobro` |
+| `GET` | `/api/reportes/kpis/reagendamiento` | Todos | KPI tasa de reagendamiento: `total_visitas`, `visitas_reagendadas`, `visitas_cobradas`, `visitas_ausentes`, `tasa_reagendamiento` |
+| `GET` | `/api/reportes/kpis/costo` | Todos | KPI costo por gestión: `total_gestiones`, `costo_operativo`, `costo_por_gestion`. Requiere `?costo_operativo=N` |
+| `GET` | `/api/reportes/kpis/resumen` | Todos | Los 6 KPIs del marco teórico en una sola respuesta: `{periodo, kpis}` |
+
+**Parámetros comunes de KPIs** (query string): `empresa_id` (solo ADMIN), `cobrador_id`, `fecha_desde`, `fecha_hasta` (formato `YYYY-MM-DD`; por defecto: inicio del año actual a la fecha actual, hora local `America/Asuncion`). El rol COBRADOR solo ve sus propios datos y no puede filtrar por `cobrador_id` distinto al suyo.
+
+**KPIs incluidos en `/kpis/resumen`** (marco teórico, Cárdenas 2021 §2.4): `indice_morosidad`, `efectividad_cobro`, `rotacion_cartera`, `cobertura_cobro`, `costo_gestion`, `tasa_reagendamiento`. El KPI `costo_gestion` devuelve `valor: null` y `disponible: false` si no se pasa `costo_operativo`.
+
+#### Intereses por mora — `/api/configuracion/intereses` (requieren Bearer Token)
+
+| Método | Endpoint | Roles | Descripción |
+|---|---|---|---|
+| `GET` | `/api/configuracion/intereses` | ADMIN, SUPERVISOR | Configuración de intereses y feriados de la empresa (`?empresa_id=` solo ADMIN) |
+| `PUT` | `/api/configuracion/intereses` | ADMIN, SUPERVISOR | Guarda la configuración (generar_interes, dias_gracia, porcentaje_interes_diario, contar_domingos, contar_feriados) |
+| `POST` | `/api/configuracion/intereses/feriados` | ADMIN, SUPERVISOR | Registra un feriado local (`fecha` + `descripcion` opcional) |
+| `PUT` | `/api/configuracion/intereses/feriados/:id` | ADMIN, SUPERVISOR | Actualiza `fecha` y/o `descripcion` de un feriado (400 si el formato de fecha es inválido, 404 si no existe, 409 si la fecha ya está registrada) |
+| `DELETE` | `/api/configuracion/intereses/feriados/:id` | ADMIN, SUPERVISOR | Elimina (soft delete) un feriado |
+| `POST` | `/api/configuracion/intereses/feriados/generar` | ADMIN, SUPERVISOR | Genera automáticamente los feriados móviles de un año (Semana Santa con Computus + traslados Ley 6631/2020). Body: `{ anio, empresa_id? }` |
+| `POST` | `/api/configuracion/intereses/recalcular` | ADMIN, SUPERVISOR | Recalcula intereses de todas las cuotas vencidas de la empresa (opcional `fecha_corte`) |
+
+**GET /api/configuracion/intereses** (respuesta)
+
+```json
+{
+  "data": {
+    "config": {
+      "empresa_id": 1,
+      "generar_interes": 1,
+      "dias_gracia": 7,
+      "porcentaje_interes_diario": "0.1000",
+      "contar_domingos": 0,
+      "contar_feriados": 0
+    },
+    "feriados": [
+      { "id": 1, "empresa_id": 1, "fecha": "2026-12-08", "descripcion": "Día de la Virgen de Caacupé", "origen": "MANUAL" }
+    ]
+  }
+}
+```
+
+**POST /api/configuracion/intereses/feriados/generar**
+
+Request:
+```json
+{ "anio": 2027, "empresa_id": 1 }
+```
+
+Response (201):
+```json
+{
+  "message": "Feriados móviles del 2027 generados",
+  "data": {
+    "anio": 2027,
+    "generados": 5,
+    "feriados": [
+      { "id": 101, "fecha": "2027-03-01", "descripcion": "Día de los Héroes (trasladado)", "origen": "traslado_heroes" },
+      { "id": 102, "fecha": "2027-03-25", "descripcion": "Jueves Santo", "origen": "jueves_santo" },
+      { "id": 103, "fecha": "2027-03-26", "descripcion": "Viernes Santo", "origen": "viernes_santo" },
+      { "id": 104, "fecha": "2027-06-14", "descripcion": "Paz del Chaco (trasladado)", "origen": "traslado_paz_chaco" },
+      { "id": 105, "fecha": "2027-08-15", "descripcion": "Fundación de Asunción", "origen": "traslado_fundacion_asuncion" }
+    ]
+  }
+}
+```
+
+El endpoint elimina (soft delete) los feriados móviles existentes del año y los regenera con las fechas calculadas. Si un feriado ya existe para la misma fecha, se restaura/actualiza (UPSERT) en lugar de duplicarlo. Errores: `400` si `anio` no es un entero entre 2000 y 2100.
+
+**Reglas de cálculo** (servicio `interesService.js`):
+- `inicio = fecha_vencimiento + dias_gracia + 1` (primer día que corre interés).
+- `dias_efectivos` = cantidad de días entre `inicio` y la fecha de corte (hoy por defecto), **excluyendo domingos** si `contar_domingos = 0` y **excluyendo feriados** registrados si `contar_feriados = 0`.
+- `interes_acumulado = saldo_cuota × (porcentaje_interes_diario / 100) × dias_efectivos` (redondeado a 2 decimales).
+- Si la empresa tiene `generar_interes = 0`, el recálculo pone `interes_acumulado = 0` y `dias_retraso = 0` en las cuotas pendientes/vencidas.
 
 **POST /api/usuarios**
 
@@ -672,21 +1033,25 @@ Request:
 
 ### 6.4 Endpoints planificados (pendientes)
 
+> Los endpoints de creación de empresas, clientes, gestión de cobranzas y reportes ya
+> están implementados (ver sección 6.3). Los siguientes quedan pendientes de desarrollo:
+
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `POST` | `/api/empresas` | Crear empresa |
-| `PUT` | `/api/empresas/:id` | Actualizar empresa |
-| `POST` | `/api/clientes` | Crear cliente |
-| `PUT` | `/api/clientes/:id` | Actualizar cliente |
+| `PUT` | `/api/empresas/:id` | Actualizar datos de la empresa (el código existe comentado) |
 | `POST` | `/api/creditos` | Crear crédito y generar cuotas automáticamente |
 | `GET` | `/api/creditos/:id` | Ver detalle de un crédito y sus cuotas |
 | `POST` | `/api/asignaciones` | Asignar cuota(s) a un cobrador |
 | `GET` | `/api/asignaciones` | Listar asignaciones (filtrado por cobrador/supervisor) |
-| `POST` | `/api/gestiones` | Registrar una gestión de cobro |
-| `GET` | `/api/gestiones` | Listar historial de gestiones |
-| `POST` | `/api/pagos` | Registrar un pago |
-| `GET` | `/api/reportes/cobranzas` | Reporte de cobranzas por periodo |
-| `GET` | `/api/reportes/cobradores` | Reporte de desempeño por cobrador |
+| `POST` | `/api/visitas` | Registrar una visita de cobro manualmente desde el panel (pendiente) |
+| `POST` | `/api/pagos` | Registrar un pago manual |
+
+> Nota: las visitas de cobro se registran desde la app móvil vía
+> `POST /api/cobrador/visitas` (implementado) y desde el panel vía `registrarCobro`
+> (que escribe en `visitas_cobro`). El registro manual dedicado (`POST /api/visitas`)
+> sigue pendiente. La generación de comprobantes PDF
+> (`GET /api/visitas/:id/comprobante` y `GET /api/cobros/:id/comprobante`) también
+> está pendiente, aunque pdfkit ya está integrado en el backend.
 
 ---
 
@@ -711,7 +1076,21 @@ El panel web está construido con **Next.js 15** usando el **App Router**, lo qu
 | `/empresas` | `empresas/page.tsx` | Gestión de empresas | Sí |
 | `/clientes` | `clientes/page.tsx` | Gestión de clientes | Sí |
 | `/cobranzas` | `cobranzas/page.tsx` | Gestión de cobranzas | Sí |
+| `/gestiones` | `gestiones/page.tsx` | Historial de gestiones/visitas de cobro | Sí |
+| `/horarios` | `horarios/page.tsx` | Gestión de horarios de cobradores | Sí |
+| `/descansos` | `descansos/page.tsx` | Gestión de descansos de cobradores | Sí |
+| `/zonas` | `zonas/page.tsx` | Gestión de zonas geográficas | Sí |
+| `/facturas` | `facturas/page.tsx` | Configuración de facturación y timbrados | Sí |
+| `/medios-pago` | `medios-pago/page.tsx` | Gestión de medios de pago | Sí |
+| `/configuracion-cobranzas` | `configuracion-cobranzas/page.tsx` | Timbrados, cajas y numeradores (V12) | Sí |
+| `/configuracion-intereses` | `configuracion-intereses/page.tsx` | Intereses por mora y feriados | Sí |
+| `/reportes` | `reportes/page.tsx` | Reportes (cobrador, cartera, período, KPIs) | Sí |
+| `/reportes/cobrador` | `reportes/cobrador/page.tsx` | Eficiencia de cobradores | Sí |
+| `/reportes/cartera` | `reportes/cartera/page.tsx` | Cartera vencida | Sí |
+| `/reportes/periodo` | `reportes/periodo/page.tsx` | Cobranza por período | Sí |
+| `/reportes/kpis` | `reportes/kpis/page.tsx` | Los 6 KPIs del marco teórico con exportación CSV | Sí |
 | `/usuarios` | `usuarios/page.tsx` | Gestión de usuarios | Sí |
+| `/perfil` | `perfil/page.tsx` | Perfil del usuario autenticado | Sí |
 | `/cambiar-password` | `cambiar-password/page.tsx` | Cambio obligatorio de contraseña | Sí |
 | `/importar` | `importar/page.tsx` | Importación masiva de clientes y créditos desde Excel | Sí |
 | `/mensajes` | `mensajes/page.tsx` | Chat interno entre supervisores y cobradores | Sí |
@@ -772,7 +1151,7 @@ Al hacer logout (manual o por inactividad), las tres claves se eliminan y se red
 
 ### 8.1 Estado actual
 
-La aplicación móvil está **parcialmente implementada**. La carpeta `mobile/` contiene código funcional con las pantallas principales del cobrador: login, agenda, mapa de ruta, gestión de visitas y mensajería.
+La aplicación móvil está **parcialmente implementada**. La carpeta `mobile/` contiene código funcional con las pantallas principales del cobrador: login, agenda, mapa de ruta, gestión de visitas, mensajería, caja (apertura/cierre), descansos y perfil.
 
 ### 8.2 Tecnología utilizada
 
@@ -796,8 +1175,10 @@ La aplicación móvil está **parcialmente implementada**. La carpeta `mobile/` 
 | **Agenda del día** | `AgendaScreen.tsx` | Implementado |
 | **Mapa de ruta** | `MapaRutaScreen.tsx` | Implementado |
 | **Registrar visita** | `VisitaScreen.tsx` | Implementado |
+| **Caja** | `CajaScreen.tsx` | Implementado (apertura/cierre de caja, arqueo y gastos) |
 | **Mensajería** | `MensajesScreen.tsx` | Implementado |
 | **Descansos** | `DescansoScreen.tsx` | Implementado |
+| **Perfil** | `PerfilScreen.tsx` | Implementado |
 
 ### 8.4 Flujo del cobrador en la app móvil
 
@@ -913,19 +1294,32 @@ Al hacer login:
 
 Gestiona las empresas clientes del sistema. En arquitectura multiempresa, cada empresa es un "tenant" con sus propios clientes, créditos y usuarios.
 
+**Parcialmente implementado.**
+
+**Funcionalidades implementadas:**
+- Registro de empresa junto con su usuario ADMIN inicial (`POST /api/auth/register` o página `/register`).
+- Listado de empresas (`GET /api/empresas`).
+- Activación/desactivación de empresas (`PATCH /api/empresas/:id/estado`).
+- Visualización de métricas por empresa (desde el dashboard).
+
 **Funcionalidades planificadas:**
-- Registro de empresa (nombre, RUC, dirección, teléfono, email).
-- Activación/desactivación de empresas.
-- Visualización de métricas por empresa.
+- Edición de datos de la empresa (nombre, RUC, dirección, teléfono, email) — `PUT /api/empresas/:id` (el código existe comentado en `panelRoutes.js`).
 
 ### 10.2 Módulo de Clientes
 
 Gestiona los deudores de cada empresa.
 
+**Parcialmente implementado.**
+
+**Funcionalidades implementadas:**
+- Registro con datos personales y de contacto (`POST /api/clientes` o desde la página `/clientes`).
+- Actualización de cliente (`PUT /api/clientes/:id`).
+- Registro de ubicación GPS (`PATCH /api/clientes/:id/ubicacion`).
+- Importación masiva desde Excel (ver 10.2.1).
+- Estado del cliente (activo/inactivo).
+
 **Funcionalidades planificadas:**
-- Registro con datos personales y de contacto.
-- Historial de créditos por cliente.
-- Estado del cliente (activo/inactivo/moroso).
+- Historial de créditos por cliente en una vista dedicada.
 
 ### 10.2.1 Módulo de Importación (Excel)
 
@@ -971,14 +1365,22 @@ Vincula cobradores con cuotas específicas.
 - Reasignación en caso de ausencia del cobrador.
 - Vista de carga de trabajo por cobrador.
 
-### 10.5 Módulo de Gestiones
+### 10.5 Módulo de Gestiones (Visitas de Cobro)
 
-Historial de actividad de los cobradores en campo.
+Historial de actividad de los cobradores en campo. La fuente de verdad única es la
+tabla `visitas_cobro` (migración v17/v18: se eliminó la duplicación con la tabla
+`gestiones`, que ya no existe).
+
+**Implementado.**
+
+**Funcionalidades implementadas:**
+- Registro de cada intento de cobro desde la app móvil con resultado (`cobrado`/`ausente`/`reagendado`), observación, GPS y foto opcional (`POST /api/cobrador/visitas` + `POST /api/cobrador/visitas/:id/foto`).
+- Registro de cobros desde el panel web (`registrarCobro` escribe en `visitas_cobro`).
+- Listado del historial de visitas (`GET /api/gestiones`, consulta `visitas_cobro`) y vista web en `/gestiones`.
 
 **Funcionalidades planificadas:**
-- Registro de cada intento de cobro con resultado, observación y GPS.
-- Adjuntar foto de comprobante.
-- Línea de tiempo de gestiones por cuota.
+- Registro manual de visitas desde el panel web (`POST /api/visitas`).
+- Línea de tiempo de visitas por cuota.
 
 ### 10.6 Módulo de Mensajería
 
@@ -1033,12 +1435,53 @@ Organización geográfica del trabajo de cobranza. El sistema usa dos implementa
 
 Información para la toma de decisiones.
 
+**Parcialmente implementado.**
+
+**Reportes implementados:**
+- Eficiencia de cobradores (`GET /api/reportes/cobrador/eficiencia`, página `/reportes/cobrador`): cuotas asignadas vs cobradas por cobrador.
+- Cartera vencida (`GET /api/reportes/cartera/vencida`, página `/reportes/cartera`): antigüedad de saldos con DATEDIFF.
+- Cobranza por período (`GET /api/reportes/periodo/cobranza`, página `/reportes/periodo`): agrupación diaria, semanal y mensual con DATE_FORMAT.
+
 **Reportes planificados:**
-- Cobranzas del período (diario, semanal, mensual).
-- Índice de morosidad por empresa.
-- Desempeño de cobradores (cuotas asignadas vs cobradas).
-- Cuotas por vencer (próximos 7, 15, 30 días).
+- Rendimiento por empresa.
+- Gestión de cartera.
+- Visitas por cobrador.
+- Morosidad por cliente.
+- Cobradores del día.
+- Ranking de cobradores.
 - Exportación a PDF y Excel.
+
+### 10.9 Módulo de Intereses por Mora
+
+Permite que **cada empresa** decida de forma independiente si genera intereses por mora, después de cuántos días de retraso empiezan a correr, qué porcentaje diario aplica y cómo se cuentan los días (domingos y feriados).
+
+**Configuración por empresa** (tabla `empresas_intereses_config`, una fila por empresa):
+
+| Campo | Descripción |
+|---|---|
+| `generar_interes` | Activa/desactiva el cálculo de intereses para la empresa |
+| `dias_gracia` | Días de luz: cantidad de días posteriores al vencimiento sin interés |
+| `porcentaje_interes_diario` | Porcentaje de interés por día de retraso, aplicado sobre el saldo de la cuota |
+| `contar_domingos` | Si los domingos cuentan como días de retraso |
+| `contar_feriados` | Si los feriados cuentan como días de retraso |
+
+**Feriados locales** (tabla `empresas_feriados`): cada empresa registra sus propios feriados (ej: feriados paraguayos). No se puede duplicar la misma fecha para la misma empresa (UNIQUE `empresa_id` + `fecha`). Se excluyen del conteo cuando `contar_feriados = 0`.
+
+**Reglas de cálculo** (`backend/src/services/cobranzas/interesService.js`):
+
+1. **Inicio del cómputo:** `inicio = fecha_vencimiento + dias_gracia + 1`. Durante los días de luz no se acumula interés.
+2. **Días efectivos de retraso:** se cuentan los días entre `inicio` y la fecha de corte (por defecto hoy), recorriendo día por día:
+   - Se **excluyen los domingos** si `contar_domingos = 0`.
+   - Se **excluyen los feriados** registrados de la empresa si `contar_feriados = 0`.
+3. **Interés acumulado:** `interes_acumulado = saldo_cuota × (porcentaje_interes_diario / 100) × dias_efectivos`, redondeado a 2 decimales.
+4. **Desactivación:** si `generar_interes = 0`, al recalcular se resetean `interes_acumulado = 0` y `dias_retraso = 0` en las cuotas pendientes/vencidas de la empresa.
+
+El resultado del cálculo se persiste en las columnas `interes_acumulado` y `dias_retraso` de la tabla `cuotas`.
+
+**Archivos del módulo:**
+- Backend: `backend/src/services/cobranzas/interesService.js` (cálculo), `backend/src/controllers/interesesConfigController.js` (API), `backend/src/routes/interesesConfigRoutes.js` (rutas).
+- Migración: `backend/scripts/applyMigrationV13.js` (crea tablas y columnas).
+- Frontend: `web/src/app/configuracion-intereses/page.tsx` (pantalla de configuración) y `web/src/components/PanelShell.tsx` (acceso desde el menú para ADMIN y SUPERVISOR).
 
 ---
 
@@ -1089,27 +1532,34 @@ JWT_EXPIRES_IN=24h
    → Redirige al login
 ```
 
-### 12.2 Flujo de asignación y cobro (planificado)
+### 12.2 Flujo de cobro en campo (implementado) y asignación (planificado)
 
+**Asignación de cuotas a cobradores (planificado):**
 ```
 SUPERVISOR (web):
 1. Ingresa al módulo de Cobranzas
 2. Filtra cuotas pendientes o vencidas
 3. Selecciona cuota(s) y asigna a un cobrador
 4. El sistema registra la asignación y notifica al cobrador
+```
 
+**Cobro en campo (implementado en la app móvil):**
+```
 COBRADOR (móvil):
-5. Recibe notificación push de nueva asignación
-6. Abre la app y ve la cuota en "Mis asignaciones"
-7. Va a la dirección del cliente
-8. Registra la gestión:
+1. Abre la app y consulta su agenda del día (GET /api/cobrador/agenda)
+2. Apertura la caja diaria (POST /api/cobrador/caja/abrir)
+3. Va a la dirección del cliente
+4. Registra la gestión (POST /api/cobrador/visitas):
    → Resultado, observación, GPS automático
-9. Si cobró: registra monto y método de pago
-10. El sistema actualiza el estado de la cuota a PAGADA
+5. Si cobró: registra monto y medio de pago (POST /api/cobrador/cobros)
+   → Opcionalmente adjunta foto del comprobante (POST /api/cobrador/visitas/:id/foto)
+6. Puede registrar gastos de la jornada (POST /api/cobrador/caja/:id/gastos)
+7. Al finalizar, cierra la caja (POST /api/cobrador/caja/cerrar)
 
 SUPERVISOR (web):
-11. Ve en tiempo real el estado de las asignaciones
-12. Genera reporte al final del día
+8. Ve las visitas del día en el mapa (/mapa) y en /gestiones
+9. Confirma la rendición del arqueo (POST /api/arqueos/:id/rendicion)
+10. Genera reportes (eficiencia, cartera vencida, cobranza por período)
 ```
 
 ### 12.3 Flujo de cambio de contraseña obligatorio
@@ -1200,12 +1650,39 @@ npm install
 # En DBeaver, phpMyAdmin o MySQL Workbench:
 CREATE DATABASE cobrApp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-# 5. Ejecutar los scripts SQL de la carpeta /database/
+# 5. Ejecutar las migraciones en orden
+#    Scripts SQL de la carpeta /database/ (en orden de versión):
+#    - migracion_v2.sql
+#    - migracion_v3_clientes_global.sql
+#    - migracion_v4_cobrador.sql
+#    - migracion_v5_descansos.sql
+#    - migracion_v6_horarios.sql
+#    - migracion_v7_mensajes.sql
+#    - migracion_v8_mensajes_imagen.sql
+#    - migracion_v9_facturas_config.sql
+#    - migracion_v10_anulaciones.sql
+#    - migracion_v10_empresa_logo.sql
+#    - migracion_v11_arqueos_caja.sql
+#    - migracion_v12_cobranzas_erp_multientidad.sql
+#    - migracion_v13_intereses_config_empresa.sql
+#    - migracion_v14_feriados_origen.sql
+#    - migracion_v15_feriados_anuales.sql
+#    - agregar_campo_debe_cambiar_password.sql
+#
+#    Alternativa: scripts Node.js en backend/scripts/ (aplican las migraciones v6 a v15):
+#      node scripts/applyMigrationV6.js
+#      node scripts/applyMigrationV12.js
+#      node scripts/applyMigrationV13.js
+#      node scripts/applyMigrationV14.js
+#      node scripts/applyMigrationV15.js
+#      node scripts/fixFeriadosFijos.js
+#      node scripts/backfillCobranzasV12.js          # con --commit para confirmar
 
 # 6. Iniciar el servidor
+npm run dev
+# (equivalente a: nodemon src/app.js)
+# O en producción:
 node src/app.js
-# o con nodemon para desarrollo:
-npx nodemon src/app.js
 ```
 
 ### 14.3 Configuración del Frontend Web

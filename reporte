@@ -1,0 +1,3 @@
+Sistemas de Procesamiento de Transacciones (TPS): Registran las transacciones diarias del negocio. En CobrApp, el registro de cobros y la gestión de visitas constituyen TPS.
+Sistemas de Información Gerencial (MIS): Proveen reportes resumidos para la toma de decisiones. El dashboard y los reportes de cobranzas de CobrApp pertenecen a esta categoría.
+Sistemas de Soporte a Decisiones (DSS): Ayudan en decisiones semiestructuradas mediante análisis de datos. Los reportes de desempeño de cobradores y análisis de morosidad son ejemplos de DSS.
