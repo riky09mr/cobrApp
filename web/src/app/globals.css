@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+:root {
+  --background: #dae7fc;   /* slate-800: fondo uniforme azul grisáceo oscuro */
+  --foreground: #f1f5f9;   /* slate-100: texto claro de alto contraste */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 18px;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+/* ── Formularios: texto visible sobre fondo claro ───────────── */
+/* Los inputs/selects/textareas tienen fondo claro por defecto,
+   por lo que deben usar texto oscuro en lugar de heredar el
+   color claro del body. */
+input,
+select,
+textarea {
+  color: #0f172a;          /* slate-900: texto oscuro legible */
+  background-color: #ffffff;
+  caret-color: #ffffff;    /* cursor visible */
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;          /* slate-400: placeholder gris legible */
+  opacity: 1;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  color: #64748b;          /* slate-500 */
+  background-color: #f1f5f9;
+}
+
+/* ── Moto Login Animations ──────────────────────────────────── */
+@keyframes moto-ride {
+  from { left: -25%; }
+  to   { left: 110%; }
+}
+
+@keyframes moto-crash {
+  0%   { left: -25%; transform: rotate(0deg)  translateY(0px);  }
+  34%  { left: 31%;  transform: rotate(0deg)  translateY(0px);  }
+  39%  { left: 36%;  transform: rotate(0deg)  translateY(0px);  }
+  43%  { left: 23%;  transform: rotate(-6deg) translateY(0px);  }
+  47%  { left: 33%;  transform: rotate(5deg)  translateY(0px);  }
+  51%  { left: 26%;  transform: rotate(-7deg) translateY(0px);  }
+  55%  { left: 29%;  transform: rotate(2deg)  translateY(0px);  }
+  60%  { left: 28%;  transform: rotate(0deg)  translateY(0px);  }
+  72%  { left: 28%;  transform: rotate(0deg)  translateY(0px);  }
+  86%  { left: 28%;  transform: rotate(38deg) translateY(8px);  }
+  100% { left: 28%;  transform: rotate(48deg) translateY(14px); }
+}
+
+.moto-ride {
+  animation: moto-ride 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.moto-crash {
+  animation: moto-crash 3s ease-out both;
+}
