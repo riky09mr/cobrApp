@@ -1,0 +1,556 @@
+# Capítulo III: Marco Metodológico
+
+## 1. Enfoque de Investigación
+
+El presente trabajo de investigación adopta un **enfoque mixto**, combinando elementos cuantitativos y cualitativos que se complementan para abordar la complejidad del problema de investigación (Hernández, Fernández & Baptista, 2018).
+
+### 1.1 Componente Cuantitativo
+
+El componente cuantitativo se manifiesta en la recolección y análisis de datos numéricos relacionados con:
+
+- **Indicadores de gestión de cobranzas:** Montos recuperados, tasas de morosidad, promedios de cobro por cobrador, cantidad de gestiones realizadas en un período determinado.
+- **Métricas de rendimiento del sistema:** Tiempos de respuesta de la API, consumo de recursos del servidor, cantidad de transacciones procesadas concurrentemente.
+- **Encuestas estructuradas:** Aplicación de cuestionarios a usuarios del sistema para medir niveles de satisfacción, usabilidad y percepción de utilidad mediante escalas Likert.
+
+El uso de métodos cuantitativos permite establecer relaciones causa-efecto entre las variables del estudio y generalizar los hallazgos a contextos similares (Creswell & Creswell, 2018). En el caso de cobrApp, estos métodos facilitan la evaluación objetiva del impacto del sistema en la eficiencia operativa de las empresas de cobranzas.
+
+### 1.2 Componente Cualitativo
+
+El componente cualitativo se enfoca en la comprensión profunda de los procesos y experiencias de los actores involucrados en la gestión de cobranzas:
+
+- **Entrevistas semiestructuradas:** Realizadas a administradores de empresas de cobranzas, supervisores y cobradores para comprender sus flujos de trabajo, necesidades no cubiertas y expectativas respecto al sistema.
+- **Observación directa:** Registro de las prácticas actuales de gestión de cobranzas en empresas del sector, identificando puntos de dolor y oportunidades de mejora.
+- **Análisis documental:** Revisión de registros, planillas y reportes existentes en las empresas para comprender el estado actual de sus procesos.
+
+La combinación de ambos enfoques responde al principio de **triangulación metodológica**, que permite contrastar y validar los hallazgos desde múltiples perspectivas, aumentando la validez y confiabilidad de los resultados (Denzin, 2017).
+
+---
+
+## 2. Tipo de Investigación
+
+### 2.1 Investigación Aplicada
+
+Esta investigación se clasifica como **investigación aplicada**, también llamada tecnológica o práctica, ya que tiene como objetivo la solución de un problema concreto del mundo real: la ineficiencia en la gestión de cobranzas debido a la falta de herramientas digitales integradas y multiempresa (Lozada, 2014).
+
+A diferencia de la investigación básica, que busca generar conocimiento por sí mismo, la investigación aplicada en el ámbito de la ingeniería informática se orienta a la creación de productos tecnológicos que resuelvan necesidades específicas de la sociedad o la industria. En este caso, el producto es cobrApp: un sistema de gestión de cobranzas multiempresa.
+
+### 2.2 Investigación Descriptiva
+
+Se emplea la **investigación descriptiva** para caracterizar el estado actual de la gestión de cobranzas en las empresas objeto de estudio. Según Hernández, Fernández y Baptista (2018), los estudios descriptivos buscan especificar propiedades, características y rasgos importantes de cualquier fenómeno que se analice.
+
+En este contexto, la investigación descriptiva permite:
+
+- Describir los procesos manuales o semiautomatizados que utilizan actualmente las empresas de cobranzas en Paraguay.
+- Identificar las funcionalidades mínimas que debe tener un sistema de gestión de cobranzas para ser viable en el mercado local.
+- Caracterizar el perfil tecnológico de los cobradores de campo (acceso a internet, tipo de dispositivo móvil, familiaridad con aplicaciones).
+
+### 2.3 Investigación Correlacional
+
+Se incluye un **componente correlacional** para analizar la relación entre la implementación del sistema y las variables de eficiencia operativa. Específicamente, se busca determinar si existe una correlación positiva entre el uso de cobrApp y:
+
+- La reducción de la morosidad en las carteras gestionadas.
+- El aumento en la cantidad de gestiones de cobro realizadas por cobrador por día.
+- La mejora en la precisión de los reportes de cierre y rendición de cuentas.
+
+### 2.4 Investigación Documental y de Campo
+
+La investigación se sustenta en dos fuentes principales de información:
+
+| Tipo | Descripción | Instrumentos |
+|---|---|---|
+| **Documental** | Revisión de literatura académica, manuales técnicos, documentación de frameworks y normativas legales aplicables | Fichas bibliográficas, matrices de análisis documental |
+| **De campo** | Recolección de datos directamente de la realidad de las empresas de cobranzas | Entrevistas, encuestas, observación directa |
+
+---
+
+## 3. Diseño de Investigación
+
+### 3.1 Diseño No Experimental
+
+El diseño de esta investigación es **no experimental**, ya que no se manipulan deliberadamente las variables independientes. En lugar de crear situaciones controladas en laboratorio, se observan los fenómenos en su contexto natural y se analizan los datos tal como se presentan en la realidad (Kerlinger & Lee, 2002).
+
+La justificación de este diseño radica en la naturaleza del objeto de estudio: un sistema de software que se desarrolla para ser implementado en entornos productivos reales, donde la manipulación artificial de variables no sería ética ni práctica.
+
+### 3.2 Diseño Transaccional o Transversal
+
+El estudio es de tipo **transaccional (transversal)**, ya que la recolección de datos se realiza en un momento único del tiempo. Esto permite:
+
+- Obtener una "fotografía" del estado actual de la gestión de cobranzas antes de la implementación del sistema.
+- Evaluar el impacto inicial del sistema después de su puesta en producción.
+- Comparar los indicadores pre y post implementación en un período definido.
+
+### 3.3 Diseño de Investigación-Acción en el Desarrollo de Software
+
+Para el proceso de desarrollo del sistema propiamente dicho, se adopta un enfoque de **investigación-acción** (Avison et al., 2018), donde el investigador no es un observador externo sino un participante activo en la construcción de la solución. Este diseño se caracteriza por:
+
+1. **Ciclos iterativos:** Planificación, acción, observación y reflexión se repiten en cada sprint de desarrollo.
+2. **Participación colaborativa:** Los usuarios finales (administradores, supervisores, cobradores) participan activamente en la validación de cada incremento del producto.
+3. **Generación de conocimiento:** Cada ciclo produce aprendizaje tanto sobre el dominio del problema como sobre la efectividad de las soluciones implementadas.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│              CICLO DE INVESTIGACIÓN-ACCIÓN                │
+│                                                          │
+│   ┌─────────┐    ┌─────────┐    ┌─────────┐             │
+│   │ PLANIFICAR│──▶│  ACTUAR  │──▶│ OBSERVAR │             │
+│   └─────────┘    └─────────┘    └─────────┘             │
+│        │                                  │              │
+│        └──────────────────────────────────┘              │
+│                        │                                 │
+│                   ┌────┴────┐                            │
+│                   │ REFLEXIONAR│                          │
+│                   └─────────┘                            │
+│                        │                                 │
+│                        ▼                                 │
+│               Siguiente ciclo                            │
+└──────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 4. Metodología de Desarrollo de Software
+
+### 4.1 Metodología Ágil: Scrum
+
+El desarrollo de cobrApp se rige por la metodología **Scrum**, un marco de trabajo ágil que permite la entrega incremental de funcionalidades con alta adaptabilidad a los cambios (Schwaber & Sutherland, 2020). Scrum fue seleccionado por las siguientes razones:
+
+1. **Requisitos evolutivos:** Las necesidades de las empresas de cobranzas pueden cambiar durante el desarrollo. Scrum permite adaptarse rápidamente sin perder el rumbo del proyecto.
+2. **Entregas tempranas:** Cada sprint produce un incremento de software funcional que puede ser probado por los usuarios finales.
+3. **Transparencia:** Los roles definidos (Product Owner, Scrum Master, Development Team) y las ceremonias (Daily, Sprint Review, Retrospective) garantizan visibilidad total del progreso.
+4. **Mejora continua:** Las retrospectivas permiten identificar oportunidades de mejora en cada ciclo.
+
+#### Roles Asignados
+
+| Rol Scrum | Persona/Equipo | Responsabilidades |
+|---|---|---|
+| **Product Owner** | Tutor/Autor del proyecto | Define prioridades del backlog, valida funcionalidades, representa al cliente |
+| **Scrum Master** | Autor del proyecto | Facilita el proceso, elimina impedimentos, asegura que Scrum se cumpla |
+| **Development Team** | Autor del proyecto | Diseña, desarrolla, prueba y despliega el software |
+
+#### Estructura de los Sprints
+
+Cada sprint tiene una duración de **2 semanas** (10 días hábiles) y sigue la siguiente estructura:
+
+| Día | Actividad | Artefactos generados |
+|---|---|---|
+| Día 1 | Sprint Planning: definición del objetivo y selección de ítems del backlog | Sprint Backlog, Sprint Goal |
+| Días 2-9 | Desarrollo, pruebas, integración continua | Incremento de software |
+| Día 9 | Sprint Review: demostración del incremento al Product Owner | Feedback documentado |
+| Día 10 | Sprint Retrospective: análisis del proceso | Action items para mejora |
+
+### 4.2 Prácticas de Programación Extrema (XP)
+
+Complementariamente, se incorporan prácticas de **Programación Extrema (XP)** (Beck, 2004) que fortalecen la calidad del código:
+
+- **Desarrollo guiado por pruebas (TDD):** Antes de escribir la lógica de negocio, se escriben las pruebas unitarias que validan el comportamiento esperado.
+- **Integración continua:** Cada commit se integra y prueba automáticamente para detectar regresiones.
+- **Refactorización constante:** El código se mejora continuamente sin cambiar su comportamiento externo, reduciendo la deuda técnica.
+- **Propiedad colectiva del código:** Cualquier desarrollador puede modificar cualquier parte del código base para mejorarlo.
+- **Estándares de codificación:** Se siguen guías de estilo consistentes (ESLint para JavaScript/TypeScript, Prettier para formateo).
+
+### 4.3 Arquitectura de Desarrollo
+
+El ciclo de vida del desarrollo sigue el modelo de **Arquitectura Dirigida por Pruebas (ATDD)** combinado con **Domain-Driven Design (DDD)** (Evans, 2003):
+
+1. **Análisis del dominio:** Comprensión profunda del negocio de cobranzas mediante entrevistas y observación.
+2. **Modelado conceptual:** Definición de entidades, agregados y bounded contexts (Usuarios, Créditos, Cobranzas, Reportes).
+3. **Diseño técnico:** Definición de la arquitectura, selección de tecnologías, diseño de API y esquema de base de datos.
+4. **Implementación:** Codificación siguiendo TDD.
+5. **Pruebas:** Pruebas unitarias, de integración, de sistema y de aceptación.
+6. **Despliegue:** Puesta en producción en el entorno del cliente piloto.
+
+---
+
+## 5. Población y Muestra
+
+### 5.1 Población Objetivo
+
+La población objetivo de esta investigación está conformada por:
+
+1. **Empresas de cobranzas** que operan en la región de Carapeguá y áreas circundantes del Departamento de Paraguarí, Paraguay. Se estima que existen aproximadamente 30 empresas que realizan actividades de gestión de cobranzas (formalmente constituidas) en la zona de influencia del estudio.
+2. **Usuarios del sistema**, clasificados en:
+   - Administradores/gerentes de empresas de cobranzas.
+   - Supervisores de campo.
+   - Cobradores que realizan la gestión en terreno.
+
+### 5.2 Muestra
+
+Dado que el proyecto corresponde a un desarrollo tecnológico con implementación en empresas reales, se utiliza un **muestreo no probabilístico intencional** (Otzen & Manterola, 2017). La muestra está compuesta por:
+
+| Estrato | Cantidad | Criterio de selección |
+|---|---|---|
+| Empresas piloto | 2 | Empresas que manifestaron interés en participar del proyecto, con procesos de cobranza activos y disposición a adoptar nuevas tecnologías |
+| Administradores | 2 | Dueños o gerentes generales de las empresas piloto |
+| Supervisores | 3 | Encargados de coordinar equipos de cobradores en las empresas piloto |
+| Cobradores | 8 | Cobradores de campo activos, con experiencia mínima de 6 meses en el puesto |
+
+#### Criterios de Inclusión
+
+- Empresas con al menos 6 meses de operación continua en el rubro de cobranzas.
+- Empresas que actualmente gestionan sus procesos de forma manual o con herramientas básicas (planillas electrónicas, cuadernos de registro).
+- Usuarios con disponibilidad para participar en entrevistas y pruebas del sistema.
+- Cobradores que realizan gestión de cobro presencial (visitas domiciliarias).
+
+#### Criterios de Exclusión
+
+- Empresas que ya utilizan un sistema de gestión de cobranzas comercial.
+- Usuarios sin experiencia previa en el uso de aplicaciones móviles.
+- Empresas con menos de 100 cuotas activas en su cartera (volumen insuficiente para medir impacto).
+
+### 5.3 Caracterización de la Muestra
+
+La muestra queda caracterizada de la siguiente manera:
+
+**Empresas participantes:**
+- Empresa A: Cartera de ~1.500 cuotas activas, 3 supervisores, 5 cobradores.
+- Empresa B: Cartera de ~2.000 cuotas activas, 2 supervisores, 4 cobradores.
+
+**Perfil de los participantes:**
+- Administradores: Edad 35-55 años, nivel educativo universitario.
+- Supervisores: Edad 28-45 años, experiencia en cobranzas 3+ años.
+- Cobradores: Edad 22-50 años, educación secundaria/técnica, experiencia en cobranzas 6 meses - 10 años.
+
+---
+
+## 6. Técnicas e Instrumentos de Recolección de Datos
+
+### 6.1 Entrevista Semiestructurada
+
+Se aplica una **entrevista semiestructurada** a administradores y supervisores de las empresas participantes. Este instrumento permite explorar en profundidad las necesidades del negocio y las expectativas sobre el sistema.
+
+**Guía de entrevista para administradores:**
+
+1. ¿Cómo gestionan actualmente las cobranzas en su empresa?
+2. ¿Qué herramientas utilizan para el registro de pagos y control de cartera?
+3. ¿Cuáles son los principales problemas que enfrentan en la gestión diaria?
+4. ¿Qué información considera indispensable en un reporte de cobranzas?
+5. ¿Cómo miden la eficiencia de sus cobradores actualmente?
+6. ¿Qué funcionalidades le gustaría que tuviera un sistema de gestión de cobranzas?
+
+**Guía de entrevista para supervisores:**
+
+1. ¿Cómo asignan las cuotas a los cobradores actualmente?
+2. ¿Qué información reciben sobre el desempeño diario de sus cobradores?
+3. ¿Cómo manejan las novedades (clientes ausentes, reagendamientos, descansos)?
+4. ¿Qué problemas de comunicación tienen con los cobradores en campo?
+5. ¿Cómo realizan la rendición de cuentas al final de la jornada?
+
+### 6.2 Encuesta de Satisfacción y Usabilidad
+
+Se aplica un **cuestionario estructurado** a todos los usuarios del sistema después del período de prueba. El cuestionario utiliza la **Escala de Usabilidad del Sistema (SUS)** (Brooke, 1996), complementada con preguntas específicas del dominio.
+
+| Sección | Ítems | Escala |
+|---|---|---|
+| Datos demográficos | 5 preguntas | Opción múltiple |
+| Experiencia con tecnología | 3 preguntas | Likert 1-5 |
+| Usabilidad del sistema (SUS) | 10 preguntas | Likert 1-5 |
+| Utilidad percibida | 8 preguntas | Likert 1-5 |
+| Satisfacción general | 3 preguntas | Likert 1-5 |
+| Comentarios abiertos | 3 preguntas | Texto libre |
+
+### 6.3 Observación Directa
+
+Se realiza **observación directa no participante** de las siguientes actividades:
+
+- Jornada completa de trabajo de un cobrador (desde la salida hasta la rendición).
+- Proceso de asignación de cuotas por parte del supervisor.
+- Cierre de caja y arqueo al final de la jornada.
+- Reuniones de coordinación del equipo de cobranzas.
+
+Las observaciones se registran en un **diario de campo** estructurado con los siguientes campos:
+
+- **Fecha:** Día de la observación.
+- **Hora:** Intervalo de tiempo registrado.
+- **Actividad observada:** Descripción de la tarea.
+- **Participantes:** Personas involucradas.
+- **Descripción detallada:** Narración de lo observado.
+- **Problemas identificados:** Incidencias o dificultades detectadas.
+- **Notas del investigador:** Comentarios y reflexiones.
+
+### 6.4 Análisis Documental
+
+Se revisan y analizan los siguientes documentos proporcionados por las empresas participantes:
+
+- **Registros de cobranza:** Planillas, cuadernos o archivos Excel donde se registran los pagos.
+- **Reportes de morosidad:** Documentos que identifican cuotas vencidas y acciones de recuperación.
+- **Liquidaciones de cobradores:** Cálculos de comisiones y rendiciones.
+- **Contratos de crédito:** Formatos y cláusulas utilizadas.
+- **Registros de clientes:** Bases de datos de deudores (anonimizadas para el análisis).
+
+### 6.5 Registros del Sistema (Logs y Métricas)
+
+El propio sistema cobrApp genera datos que son utilizados como fuente de información:
+
+- **Logs de acceso:** Registro de inicios de sesión, horas de actividad y sesiones concurrentes.
+- **Métricas de uso:** Frecuencia de uso de cada funcionalidad, tiempo promedio por tarea, tasa de errores.
+- **Datos de gestión:** Cantidad de cobros registrados, montos procesados, visitas realizadas.
+
+---
+
+## 7. Procedimiento de Investigación
+
+El estudio se desarrolla en las siguientes fases secuenciales:
+
+### Fase 1: Diagnóstico (Semanas 1-3)
+
+- Revisión bibliográfica y análisis del estado del arte.
+- Entrevistas iniciales con administradores y supervisores.
+- Observación directa de procesos actuales.
+- Análisis documental de registros existentes.
+- Identificación de requisitos funcionales y no funcionales.
+- Elaboración del documento de especificación de requisitos.
+
+**Producto entregable:** Documento de Requisitos del Sistema (DRS) validado por las empresas participantes.
+
+### Fase 2: Diseño (Semanas 4-6)
+
+- Diseño de la arquitectura del sistema (3 capas).
+- Modelado de la base de datos (diagrama entidad-relación).
+- Diseño de la API REST (contrato de endpoints).
+- Diseño de las interfaces de usuario (wireframes y prototipos).
+- Validación de prototipos con usuarios finales.
+
+**Producto entregable:** Documento de Arquitectura y Diseño del Sistema (DADS) + prototipos navegables.
+
+### Fase 3: Desarrollo (Semanas 7-16)
+
+- Sprint 1: Configuración del proyecto, autenticación y RBAC.
+- Sprint 2: Gestión de clientes y créditos.
+- Sprint 3: Asignación de cuotas y agenda del cobrador.
+- Sprint 4: Registro de cobros y gestión de visitas.
+- Sprint 5: Reportes y dashboard de supervisión.
+- Sprint 6: Mensajería, descansos y geolocalización.
+- Sprint 7: Arqueo de caja y módulo de caja.
+- Sprint 8: Pruebas integrales y correcciones.
+
+### Fase 4: Implementación (Semanas 17-18)
+
+- Configuración del entorno de producción.
+- Migración de datos desde sistemas anteriores.
+- Capacitación de usuarios (administradores, supervisores, cobradores).
+- Implementación piloto en la Empresa A.
+- Período de pruebas en producción (1 semana).
+- Ajustes post-implementación.
+- Implementación en la Empresa B.
+
+**Producto entregable:** Sistema en producción operativo en ambas empresas piloto.
+
+### Fase 5: Evaluación (Semanas 19-20)
+
+- Aplicación de encuestas de satisfacción y usabilidad.
+- Recolección de métricas de uso del sistema.
+- Comparación de indicadores pre vs. post implementación.
+- Entrevistas de cierre con administradores.
+- Análisis de resultados y elaboración de conclusiones.
+
+**Producto entregable:** Informe de Evaluación del Sistema.
+
+---
+
+## 8. Técnicas de Análisis de Datos
+
+### 8.1 Análisis Cuantitativo
+
+Los datos cuantitativos recolectados (encuestas, métricas del sistema, indicadores de gestión) se procesan mediante **estadística descriptiva e inferencial**:
+
+- **Medidas de tendencia central:** Media, mediana y moda para resumir los datos de usabilidad y satisfacción.
+- **Medidas de dispersión:** Desviación estándar y rango intercuartílico para evaluar la variabilidad de las respuestas.
+- **Prueba t de Student:** Para comparar los indicadores de eficiencia antes y después de la implementación del sistema (α = 0.05).
+- **Coeficiente de correlación de Pearson:** Para analizar la relación entre la frecuencia de uso del sistema y la mejora en los indicadores de cobranza.
+- **Análisis de varianza (ANOVA):** Para comparar la percepción de usabilidad entre los diferentes roles (administradores, supervisores, cobradores).
+
+Los datos se tabulan y procesan utilizando **Microsoft Excel** y **SPSS** (Statistical Package for the Social Sciences).
+
+### 8.2 Análisis Cualitativo
+
+Los datos cualitativos (entrevistas, observaciones, comentarios abiertos) se analizan mediante la **técnica de análisis de contenido** (Krippendorff, 2018), siguiendo estos pasos:
+
+1. **Transcripción:** Digitalización de entrevistas y notas de campo.
+2. **Codificación abierta:** Identificación de conceptos y categorías emergentes en los textos.
+3. **Codificación axial:** Establecimiento de relaciones entre las categorías identificadas.
+4. **Codificación selectiva:** Integración de categorías en temas centrales.
+5. **Interpretación:** Construcción de significados a partir de los patrones identificados.
+
+### 8.3 Triangulación de Resultados
+
+Para garantizar la validez de los hallazgos, se aplica **triangulación metodológica** (Denzin, 2017) contrastando:
+
+- Los resultados cuantitativos de las encuestas con los hallazgos cualitativos de las entrevistas.
+- La percepción de los usuarios con las métricas objetivas del sistema.
+- Los datos reportados por administradores con los registros automáticos del sistema.
+
+---
+
+## 9. Aspectos Éticos
+
+### 9.1 Consentimiento Informado
+
+Todos los participantes en el estudio firman un **consentimiento informado** que especifica:
+
+- El propósito de la investigación.
+- El carácter voluntario de la participación.
+- La confidencialidad de los datos proporcionados.
+- El derecho a retirarse del estudio en cualquier momento sin consecuencias.
+- El uso exclusivo de los datos para fines académicos y de investigación.
+
+### 9.2 Confidencialidad y Anonimización
+
+Se garantiza la **confidencialidad** de los datos de las empresas participantes mediante:
+
+- Anonimización de los nombres comerciales en los reportes de investigación.
+- Omisión de datos sensibles de clientes (nombres, cédulas, direcciones) en los análisis publicados.
+- Almacenamiento seguro de los datos recolectados en repositorios con acceso restringido.
+- Destrucción de los datos personales una vez concluida la investigación.
+
+### 9.3 Protección de Datos Personales
+
+El manejo de datos personales se alinea con la **Ley N° 1682/01 "De Protección de Datos de Carácter Personal"** del Paraguay y con los principios establecidos en el Reglamento General de Protección de Datos (GDPR) de la Unión Europea:
+
+- **Finalidad:** Los datos se recolectan únicamente para los fines declarados.
+- **Proporcionalidad:** Solo se recolectan los datos estrictamente necesarios.
+- **Calidad:** Los datos deben ser exactos y actualizados.
+- **Seguridad:** Se implementan medidas técnicas y organizativas para proteger los datos.
+
+---
+
+## 10. Limitaciones del Estudio
+
+### 10.1 Limitaciones de la Muestra
+
+- El tamaño reducido de la muestra (2 empresas, 13 participantes) limita la generalización de los resultados a otras empresas del sector.
+- El muestreo intencional (no probabilístico) puede introducir sesgos de selección, ya que las empresas participantes son las que voluntariamente aceptaron formar parte del estudio.
+
+### 10.2 Limitaciones Temporales
+
+- El período de evaluación (2 semanas en producción) puede ser insuficiente para capturar el impacto completo del sistema en los procesos de cobranza.
+- La estacionalidad del negocio de cobranzas (picos en ciertos meses del año) puede no estar representada en el período de estudio.
+
+### 10.3 Limitaciones Tecnológicas
+
+- Los resultados están condicionados a la infraestructura tecnológica disponible en las empresas participantes (calidad de conexión a internet, dispositivos móviles disponibles).
+- Las conclusiones sobre el rendimiento del sistema pueden variar en entornos con mayor carga de datos o mayor número de usuarios concurrentes.
+
+### 10.4 Limitaciones del Alcance
+
+- El estudio se enfoca en el proceso de cobranza en campo, excluyendo otros procesos relacionados como la gestión de créditos inicial o la cobranza judicial.
+- No se evalúa el módulo de facturación electrónica ni la integración con sistemas contables externos, que quedan fuera del alcance de esta investigación.
+
+---
+
+## 11. Cronograma de Actividades
+
+| Fase | Actividad | Semana 1-3 | Semana 4-6 | Semana 7-10 | Semana 11-14 | Semana 15-16 | Semana 17-18 | Semana 19-20 |
+|---|---|---|---|---|---|---|---|---|
+| **Fase 1** | Diagnóstico y relevamiento | ███████ | | | | | | |
+| **Fase 1** | Especificación de requisitos | ███████ | ███ | | | | | |
+| **Fase 2** | Diseño de arquitectura | | ███████ | ███ | | | | |
+| **Fase 2** | Prototipado de interfaces | | ███████ | ███████ | | | | |
+| **Fase 3** | Sprint 1-2 (Base del sistema) | | | ███████ | | | | |
+| **Fase 3** | Sprint 3-4 (Cobranzas) | | | | ███████ | | | |
+| **Fase 3** | Sprint 5-6 (Reportes y comunicación) | | | | ███████ | ███████ | | |
+| **Fase 3** | Sprint 7-8 (Caja y pruebas) | | | | | ███████ | ███ | |
+| **Fase 4** | Implementación piloto | | | | | | ███████ | |
+| **Fase 4** | Capacitación | | | | | | ███████ | ███ |
+| **Fase 5** | Evaluación y análisis | | | | | | | ███████ |
+| **Fase 5** | Elaboración de informe final | | | | | | | ███████ |
+
+---
+
+## 12. Matriz de Operacionalización de Variables
+
+| Variable | Definición Conceptual | Dimensión | Indicador | Instrumento | Escala |
+|---|---|---|---|---|---|
+| **Eficiencia operativa** | Capacidad del sistema para optimizar los procesos de gestión de cobranzas | Productividad | Gestiones por cobrador por día | Registros del sistema | Razón |
+| | | Tiempo | Tiempo promedio de registro de cobro | Registros del sistema | Razón (minutos) |
+| | | Cobertura | % de cuotas gestionadas vs. asignadas | Registros del sistema | Porcentaje |
+| **Usabilidad del sistema** | Grado en que el sistema puede ser utilizado con efectividad, eficiencia y satisfacción | Efectividad | Tasa de finalización de tareas | Pruebas de usabilidad | Porcentaje |
+| | | Eficiencia | Tiempo por tarea | Registros del sistema | Razón (segundos) |
+| | | Satisfacción | Puntuación SUS | Cuestionario SUS | Intervalo (0-100) |
+| **Satisfacción del usuario** | Percepción positiva del usuario respecto al sistema | Utilidad percibida | Promedio en escala de utilidad | Encuesta | Likert (1-5) |
+| | | Facilidad de uso | Promedio en escala de facilidad | Encuesta | Likert (1-5) |
+| | | Intención de uso | % de usuarios que recomendarían el sistema | Encuesta | Porcentaje |
+| **Reducción de morosidad** | Disminución del % de cuotas vencidas sobre el total de la cartera | Mora temprana | % cuotas con 1-30 días de atraso | Reportes del sistema | Porcentaje |
+| | | Mora media | % cuotas con 31-60 días de atraso | Reportes del sistema | Porcentaje |
+| | | Mora tardía | % cuotas con más de 60 días de atraso | Reportes del sistema | Porcentaje |
+
+---
+
+## 13. Recursos del Proyecto
+
+### 13.1 Recursos Humanos
+
+| Rol | Cantidad | Dedicación |
+|---|---|---|
+| Investigador / Desarrollador | 1 | Tiempo completo (20 semanas) |
+| Tutor / Asesor metodológico | 1 | 4 horas semanales |
+| Administradores (empresas piloto) | 2 | 2 horas semanales |
+| Supervisores | 3 | 1 hora semanal |
+| Cobradores | 8 | 30 minutos semanales |
+
+### 13.2 Recursos Tecnológicos
+
+| Recurso | Especificación | Propósito |
+|---|---|---|
+| Servidor de desarrollo | Laptop personal (16 GB RAM, SSD 512 GB) | Desarrollo y pruebas locales |
+| Servidor de producción | VPS Linux (4 vCPU, 8 GB RAM, 100 GB SSD) | Hosting del sistema en producción |
+| Dispositivos móviles | Smartphones Android (3 unidades) | Pruebas de la aplicación móvil |
+| Conexión a internet | Fibra óptica 100 Mbps | Desarrollo, pruebas y despliegue |
+| Software de desarrollo | VS Code, Node.js 22.x, MySQL 8.x | Entorno de desarrollo |
+
+### 13.3 Recursos Bibliográficos
+
+| Tipo | Cantidad | Fuente |
+|---|---|---|
+| Libros académicos | 25 | Biblioteca física y digital |
+| Artículos científicos | 15 | IEEE Xplore, ACM, SciELO |
+| Documentación técnica | 10 | Documentación oficial de frameworks |
+| Normativas legales | 3 | Legislación paraguaya aplicable |
+
+---
+
+## 14. Presupuesto Estimado
+
+| Rubro | Descripción | Costo Estimado (USD) |
+|---|---|---|
+| Servidor VPS | Hosting en la nube (12 meses) | $240 |
+| Dominio web | Registro de dominio (.com.py, 12 meses) | $50 |
+| Dispositivos móviles | Smartphones para pruebas (3 unidades) | $450 |
+| Certificado SSL | Certificado digital para HTTPS | $0 (Let's Encrypt) |
+| Conectividad | Plan de internet (12 meses) | $— |
+| Imprevistos | 10% del subtotal | $74 |
+| **Total estimado** | | **$814** |
+
+> **Nota:** Los rubros con "—" corresponden a recursos ya disponibles (equipo personal, conexión existente) que no representan un desembolso adicional.
+
+---
+
+## Referencias del Marco Metodológico
+
+Avison, D., Lau, F., Myers, M., & Nielsen, P. A. (2018). Action research. *Communications of the ACM*, 42(1), 94-97.
+
+Beck, K. (2004). *Extreme Programming Explained: Embrace Change* (2nd ed.). Addison-Wesley.
+
+Brooke, J. (1996). SUS: A "quick and dirty" usability scale. En P. W. Jordan, B. Thomas, B. A. Weerdmeester, & I. L. McClelland (Eds.), *Usability Evaluation in Industry* (pp. 189-194). Taylor & Francis.
+
+Creswell, J. W., & Creswell, J. D. (2018). *Research Design: Qualitative, Quantitative, and Mixed Methods Approaches* (5th ed.). SAGE Publications.
+
+Denzin, N. K. (2017). *The Research Act: A Theoretical Introduction to Sociological Methods*. Routledge.
+
+Evans, E. (2003). *Domain-Driven Design: Tackling Complexity in the Heart of Software*. Addison-Wesley.
+
+Hernández, R., Fernández, C., & Baptista, P. (2018). *Metodología de la Investigación* (6a ed.). McGraw-Hill.
+
+Kerlinger, F. N., & Lee, H. B. (2002). *Investigación del Comportamiento* (4a ed.). McGraw-Hill.
+
+Krippendorff, K. (2018). *Content Analysis: An Introduction to Its Methodology* (4th ed.). SAGE Publications.
+
+Lozada, J. (2014). Investigación aplicada: Definición, propiedad intelectual e industria. *CienciAmérica*, 3(1), 34-39.
+
+Otzen, T., & Manterola, C. (2017). Técnicas de muestreo sobre una población a estudio. *International Journal of Morphology*, 35(1), 227-232.
+
+Schwaber, K., & Sutherland, J. (2020). *The Scrum Guide: The Definitive Guide to Scrum*. https://scrumguides.org/
+
+---
+
+> *Documento de Marco Teórico y Metodológico — Proyecto de Investigación cobrApp*  
+> *Universidad Católica Nuestra Señora de la Asunción — Unidad Pedagógica Carapeguá, 2026*

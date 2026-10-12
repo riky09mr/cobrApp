@@ -1,5 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middlewares/authMiddleware');
+const { requirePermission } = require('../middlewares/permissionMiddleware');
 const {
   getTipos,
   crearTipo,
@@ -8,26 +9,19 @@ const {
   getReporteDescansos,
 } = require('../controllers/descansosController');
 
-const soloSupervisor = (req, res, next) => {
-  if (!['SUPERVISOR', 'ADMIN'].includes(req.user.rol)) {
-    return res.status(403).json({ message: 'Acceso restringido a supervisores' });
-  }
-  return next();
-};
-
 const router = express.Router();
 
 router.use(authenticateToken);
 
 // Cualquier usuario autenticado puede ver los tipos de su empresa
-router.get('/tipos',         getTipos);
+router.get('/tipos',         requirePermission('descansos', 'ver'), getTipos);
 
-// Solo supervisores/admins pueden crear/editar/desactivar
-router.post('/tipos',        soloSupervisor, crearTipo);
-router.put('/tipos/:id',     soloSupervisor, editarTipo);
-router.delete('/tipos/:id',  soloSupervisor, desactivarTipo);
+// Solo con permiso de editar descansos
+router.post('/tipos',        requirePermission('descansos', 'editar'), crearTipo);
+router.put('/tipos/:id',     requirePermission('descansos', 'editar'), editarTipo);
+router.delete('/tipos/:id',  requirePermission('descansos', 'editar'), desactivarTipo);
 
-// Reporte de descansos (solo supervisores)
-router.get('/reporte',       soloSupervisor, getReporteDescansos);
+// Reporte de descansos
+router.get('/reporte',       requirePermission('descansos', 'ver'), getReporteDescansos);
 
 module.exports = router;

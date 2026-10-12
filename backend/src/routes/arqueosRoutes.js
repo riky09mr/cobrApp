@@ -1,20 +1,13 @@
 const express = require('express');
 const { authenticateToken } = require('../middlewares/authMiddleware');
+const { requirePermission } = require('../middlewares/permissionMiddleware');
 const { getArqueos, getArqueoDetalle, confirmarRendicion } = require('../controllers/arqueosController');
 
 const router = express.Router();
 router.use(authenticateToken);
 
-// Solo SUPERVISOR y ADMIN
-const soloGestor = (req, res, next) => {
-  if (req.user.rol === 'COBRADOR') {
-    return res.status(403).json({ message: 'Sin permisos' });
-  }
-  return next();
-};
-
-router.get('/',                    soloGestor, getArqueos);
-router.get('/:id',                 getArqueoDetalle);        // cobrador también puede ver el suyo
-router.post('/:id/rendicion',      soloGestor, confirmarRendicion);
+router.get('/',                    requirePermission('cobranzas', 'ver'), getArqueos);
+router.get('/:id',                 requirePermission('cobranzas', 'ver'), getArqueoDetalle);
+router.post('/:id/rendicion',      requirePermission('cobranzas', 'editar'), confirmarRendicion);
 
 module.exports = router;

@@ -1,0 +1,830 @@
+# UNIVERSIDAD CATÓLICA «NUESTRA SEÑORA DE LA ASUNCIÓN»
+## Unidad Pedagógica Carapeguá
+### Carrera de Ingeniería Informática
+
+---
+
+# Desarrollo de un Sistema de Gestión de Cobranzas Multiempresa con Aplicación Web y Móvil «cobrApp»
+
+---
+
+**Rivaldo Andrés Zarate Samaniego**
+
+**Tutor:** Ing. Aldo Federico Ávalos
+
+*Trabajo Final de Grado presentado como requisito para la obtención del título de Ingeniero en Informática*
+
+---
+
+**Carapeguá – Paraguay**
+**2026**
+
+---
+
+# Página de Aprobación
+
+**Desarrollo de un Sistema de Gestión de Cobranzas Multiempresa con Aplicación Web y Móvil «cobrApp»**
+
+### Calificación
+
+| Nombre y apellido | Número | Letras |
+|---|---|---|
+| Rivaldo Andrés Zarate Samaniego | ……… | ……… |
+
+### Mesa examinadora
+
+| Nombres y apellidos | Firma |
+|---|---|
+| 1. …………………………………… | |
+| 2. …………………………………… | |
+| 3. …………………………………… | |
+
+**Fecha de Aprobación:** …………………………
+
+---
+
+# Dedicatoria
+
+A mis padres y familiares, por su apoyo incondicional, amor y sacrificio a lo largo de todos estos años; por ser mis pilares inquebrantables y partícipes fundamentales para alcanzar esta ansiada meta.
+
+A todas las personas que, con su confianza y aliento, me impulsaron a seguir adelante en los momentos de duda.
+
+---
+
+# Agradecimiento
+
+A Dios y a la Virgen María, por darme fortaleza, sabiduría y perseverancia en cada momento, sostenerme en las dificultades y permitirme alcanzar esta meta tan anhelada.
+
+A mis padres, por creer en mí desde el inicio y acompañarme con su amor y apoyo incondicional hasta llegar aquí.
+
+Al Ing. Aldo Federico Ávalos y a todos mis docentes que me guiaron durante mi formación, por transmitirme sus enseñanzas, consejos y conocimientos.
+
+A las empresas que colaboraron con el estudio, por abrirme sus puertas y permitirme comprender de cerca la realidad de la gestión de cobranzas en Paraguay.
+
+---
+
+# Resumen
+
+La gestión de cobranzas constituye una actividad crítica para las empresas que otorgan créditos o venden a plazos, ya que de ella depende la recuperación del capital y la sostenibilidad del negocio. Sin embargo, muchas organizaciones, especialmente las PyMEs paraguayas, aún gestionan sus cobranzas de forma manual, mediante planillas, cuadernos o herramientas poco integradas, lo que ocasiona errores, retrasos, duplicación de gestiones y una limitada capacidad de supervisión de los cobradores en campo.
+
+En este contexto surge el desarrollo de «cobrApp», un sistema de gestión de cobranzas multiempresa compuesto por una aplicación web administrativa y una aplicación móvil para cobradores, diseñado para centralizar y digitalizar todo el ciclo de cobranza: registro e inicialización de empresas, administración de usuarios con roles, gestión de clientes y créditos, organización de zonas geográficas, asignación de carteras de cobro, registro de gestiones y pagos con evidencia fotográfica y geolocalización, control de caja diaria con arqueo automático, mensajería interna entre supervisores y cobradores, facturación y generación de reportes gerenciales.
+
+El sistema permite administrar múltiples empresas desde una única plataforma (arquitectura multiempresa), supervisar en tiempo real el desempeño de los cobradores, importar carteras de clientes desde planillas Excel y generar comprobantes en PDF. El proyecto busca contribuir a la digitalización de la gestión de cobranzas en Paraguay, reduciendo la carga administrativa y los errores por registros manuales, mejorando la transparencia y el control sobre las gestiones realizadas y fortaleciendo la toma de decisiones basada en información confiable y actualizada.
+
+**Palabras clave:** cobranzas, multiempresa, aplicación web, aplicación móvil, geolocalización, morosidad, caja diaria.
+
+---
+
+# Summary
+
+Debt collection management is a critical activity for companies that grant credit or sell in installments, since capital recovery and business sustainability depend on it. However, many organizations, especially Paraguayan SMEs, still manage their collections manually, using spreadsheets, notebooks or poorly integrated tools, which causes errors, delays, duplicated tasks and a limited capacity to supervise field collectors.
+
+In this context, the development of «cobrApp» arises: a multi-company debt collection management system consisting of a web administrative application and a mobile application for collectors, designed to centralize and digitize the entire collection cycle: company registration and initialization, role-based user administration, customer and credit management, geographic zone organization, collection portfolio assignment, recording of visits and payments with photographic evidence and geolocation, daily cash control with automatic cash counting, internal messaging between supervisors and collectors, invoicing and management report generation.
+
+The system allows managing multiple companies from a single platform (multi-company architecture), monitoring collectors' performance in real time, importing customer portfolios from Excel spreadsheets and generating PDF receipts. The project aims to contribute to the digitalization of collection management in Paraguay, reducing administrative burden and errors caused by manual records, improving transparency and control over performed tasks, and strengthening decision-making based on reliable and up-to-date information.
+
+**Keywords:** debt collection, multi-company, web application, mobile application, geolocation, delinquency, daily cash.
+
+---
+
+# Ñemombyky
+
+Pe cobranza ñangareko ha'e peteĩ mba'e ijetu'uva umi empresa omyengoviáva crédito térã oñemimói'õva pypeguarã, pórke upépe ojehechajey pe viru oñemyatyrõva ha pe negocio oñepyrũrã. Jepémo, heta organización, principalmente umi PyME paraguaya, ojapóguarã gueteri iñembokotýrã peichagua: planilla, cuaderno térã herramienta ndojeikuaapyréva, upévare ojehu jejavy, jepyta, jeku'e jey ha ndaikatúi ojehechajey porã umi cobrador oikóvape okápe.
+
+Upévare oñemboheko «cobrApp», peteĩ sistema de gestión de cobranzas oiporúva heta empresa, orekóva peteĩ aplicación web administrador ñangarekorã ha peteĩ aplicación móvil umi cobrador-pe guarã. Ko sistema omonei ojejapo hag̃ua: empresa jehai ha ñepyrũ, usuarios administración roldi, clientes ha créditos ñangareko, zona geográfica organización, cobro asignación, gestión ha pago jehai ta'anga ha geolocalización ndive, caja diaria ñangareko, mensajería interna supervisores ha cobradores apytépe, facturación ha reporte generación.
+
+Ko sistema omonei ojeadministra hag̃ua heta empresa peteĩ plataforma guive, ojehechajey hag̃ua ára pukukue umi cobrador rembiapo, oñeguenohẽ hag̃ua cartera de clientes Excel-gui ha oñembojapo hag̃ua comprobante PDF. Ko tembiaporã omomba'e hag̃ua oñehesa'ỹijo pe gestión de cobranzas digitalización Paraguay-pe, omboguykekuaa pe mba'eapopyre ha jejavy oúva registros manual-gui, omoporãve hag̃ua pe transparencia ha control umi gestión ojapopyrévare ha omombarete hag̃ua pe decisión ñemoĩ información ojeroviakuaáva reheve.
+
+**Ñe'ẽndy:** cobranza, heta empresa, aplicación web, aplicación móvil, geolocalización, morosidad, caja diaria.
+
+---
+
+# Índice
+
+1. [Introducción](#introducción)
+2. [Capítulo I: Planteamiento del Problema](#capítulo-i-planteamiento-del-problema)
+   - 1.1. Antecedentes
+   - 1.2. Descripción de la Problemática
+   - 1.3. Solución Propuesta
+   - 1.4. Pregunta General de Investigación
+   - 1.5. Preguntas Específicas de Investigación
+   - 1.6. Objetivo General
+   - 1.7. Objetivos Específicos
+   - 1.8. Justificación
+   - 1.9. Alcance y Limitaciones
+3. [Capítulo II: Marco Teórico](#capítulo-ii-marco-teórico)
+   - Unidad I: Marco Conceptual
+     - 2.1. Sistemas de Información
+     - 2.2. Gestión de Cobranzas
+     - 2.3. Arquitectura de Software
+     - 2.4. Arquitectura Multiempresa (Multi-Tenant)
+     - 2.5. Tecnologías de Desarrollo Web
+     - 2.6. Desarrollo de Aplicaciones Móviles
+     - 2.7. Bases de Datos Relacionales
+     - 2.8. APIs REST
+     - 2.9. Seguridad Informática
+     - 2.10. Geolocalización y Mapas
+     - 2.11. Control de Acceso Basado en Roles (RBAC)
+     - 2.12. Notificaciones y Comunicación
+     - 2.13. Optimización de Rutas y Problema del Viajante (TSP)
+   - Unidad II: Antecedentes — Estado del Arte
+     - 2.14. Antecedentes Internacionales
+     - 2.15. Antecedentes Nacionales
+   - Unidad III: Marco Referencial
+     - 2.16. Definición de Términos Básicos
+4. [Capítulo III: Marco Metodológico](#capítulo-iii-marco-metodológico)
+   - 3.1. Enfoque de Investigación
+   - 3.2. Tipo de Investigación
+   - 3.3. Diseño de la Investigación
+   - 3.4. Investigación-Acción
+   - 3.5. Metodología de Desarrollo de Software: Scrum
+   - 3.6. Población y Muestra
+   - 3.7. Técnicas e Instrumentos de Recolección de Datos
+   - 3.8. Procedimiento de la Investigación
+   - 3.9. Área de Impacto
+   - 3.10. Localización Geográfica
+5. [Capítulo IV: Análisis de Resultados](#capítulo-iv-análisis-de-resultados)
+   - 4.1. Resultados de la Encuesta de Satisfacción
+   - 4.2. Casos de Uso del Sistema
+   - 4.3. Arquitectura Implementada
+   - 4.4. Módulos Desarrollados
+   - 4.5. Recursos Utilizados
+   - 4.6. Manuales de Usuario
+6. [Capítulo V: Conclusiones y Recomendaciones](#capítulo-v-conclusiones-y-recomendaciones)
+   - 5.1. Conclusiones
+   - 5.2. Recomendaciones
+   - 5.3. Trabajos Futuros
+7. [Glosario](#glosario)
+8. [Abreviaturas](#abreviaturas)
+9. [Referencias Bibliográficas](#referencias-bibliográficas)
+10. [Anexos](#anexos)
+
+---
+
+# Índice de Tablas
+
+| N.º | Tabla | Página |
+|---|---|---|
+| 1 | Usuarios del sistema y roles | 4 |
+| 2 | Módulos funcionales del sistema | 5 |
+| 3 | Pregunta general y preguntas específicas | 6 |
+| 4 | Operacionalización de variables | 7 |
+| 5 | Caso de uso: Iniciar sesión | 8 |
+| 6 | Caso de uso: Registrar cobro en campo | 9 |
+| 7 | Caso de uso: Asignar cartera a cobrador | 10 |
+| 8 | Resultados de encuesta de satisfacción (pregunta 1) | 11 |
+| 9 | Resultados de encuesta de satisfacción (pregunta 2) | 12 |
+| 10 | Recursos tecnológicos utilizados | 13 |
+
+---
+
+# Índice de Figuras
+
+| N.º | Figura | Página |
+|---|---|---|
+| 1 | Diagrama de la problemática actual | 5 |
+| 2 | Ciclo de la investigación-acción | 8 |
+| 3 | Ciclo Scrum | 9 |
+| 4 | Arquitectura general del sistema cobrApp | 10 |
+| 5 | Diagrama de base de datos (entidades principales) | 11 |
+| 6 | Diagrama de casos de uso general | 12 |
+| 7 | Pantalla principal del panel web | 13 |
+| 8 | Pantalla de la aplicación móvil del cobrador | 14 |
+| 9 | Flujo de proceso: cobro en campo | 15 |
+| 10 | Flujo de proceso: arqueo de caja | 16 |
+
+---
+
+# Introducción
+
+La tecnología de la información se ha convertido en un factor estratégico para la competitividad de las organizaciones. En el sector financiero y comercial, la gestión eficiente de las cobranzas es determinante para la liquidez y la sostenibilidad de las empresas que otorgan créditos o venden a plazos. Sin embargo, en Paraguay, gran parte de estas organizaciones —especialmente las pequeñas y medianas empresas— aún dependen de procesos manuales y herramientas poco integradas para administrar sus carteras de cobro, lo que genera ineficiencias, errores y pérdida de control.
+
+El presente trabajo de investigación aborda esta problemática mediante el diseño y desarrollo de «cobrApp», un sistema de gestión de cobranzas multiempresa compuesto por un panel web administrativo (Next.js), una API REST (Node.js y Express) y una aplicación móvil para cobradores (React Native). El sistema permite centralizar la gestión de clientes, créditos, asignaciones, gestiones de cobro, caja diaria, mensajería interna, facturación y reportes, integrando geolocalización y evidencias fotográficas de cada gestión realizada en campo.
+
+El documento se estructura en cinco capítulos. El **Capítulo I** presenta el planteamiento del problema: antecedentes, descripción de la problemática, solución propuesta, preguntas de investigación, objetivos y justificación. El **Capítulo II** desarrolla el marco teórico, organizado en tres unidades: marco conceptual, estado del arte y marco referencial. El **Capítulo III** describe el marco metodológico, con un enfoque mixto, investigación aplicada y metodología ágil Scrum. El **Capítulo IV** presenta el análisis de resultados, incluyendo casos de uso, arquitectura implementada y evaluación del sistema. Finalmente, el **Capítulo V** expone las conclusiones, recomendaciones y líneas de trabajo futuras, seguidas del glosario, abreviaturas, referencias bibliográficas y anexos.
+
+---
+
+# Capítulo I: Planteamiento del Problema
+
+## 1.1. Antecedentes
+
+Las empresas que otorgan créditos o venden a plazos dependen de la recuperación oportuna de sus carteras para mantener su flujo de caja y su capacidad de otorgar nuevos financiamientos. Tradicionalmente, la gestión de cobranzas se ha realizado mediante planillas electrónicas, cuadernos de registro y llamadas telefónicas, métodos que resultan insuficientes cuando la cartera de clientes crece y los cobradores operan en campo.
+
+En los últimos años, diferentes estudios y desarrollos tecnológicos han evidenciado la importancia de automatizar los procesos de cobranza. Plataformas web y aplicaciones móviles especializadas han permitido reducir los niveles de morosidad, optimizar los recursos humanos y mejorar la eficiencia operativa de las organizaciones. Sin embargo, la mayoría de las soluciones disponibles en el mercado son costosas, están orientadas a grandes empresas o no se adaptan a las particularidades del contexto local, como la necesidad de operar con múltiples empresas desde una única plataforma o el trabajo de cobradores en zonas con conectividad intermitente.
+
+## 1.2. Descripción de la Problemática
+
+Actualmente, muchas empresas que otorgan créditos o venden a plazos enfrentan dificultades para gestionar sus cobranzas de forma organizada. El uso de métodos manuales, planillas o sistemas poco integrados genera retrasos, errores en los registros y problemas para supervisar las gestiones de cobranza en tiempo real. Entre los problemas más comunes se encuentran:
+
+- **Falta de visibilidad en tiempo real** sobre el estado de las cobranzas y de las gestiones realizadas por cada cobrador.
+- **Duplicación de tareas y cobranzas en vano** por la falta de una asignación clara de clientes y zonas.
+- **Imposibilidad de supervisar el trabajo del cobrador en campo**, incluyendo su ubicación geográfica y los resultados de sus visitas.
+- **Pérdida de datos y errores** derivados del registro manual de pagos y gestiones.
+- **Demoras en la toma de decisiones** por la ausencia de reportes actualizados y confiables.
+- **Falta de control sobre la caja diaria**, los comprobantes emitidos y los medios de pago utilizados.
+- **Falta de una herramienta para supervisar el desempeño de los cobradores** y de comunicación directa entre supervisores y personal de campo.
+
+## 1.3. Solución Propuesta
+
+El presente proyecto propone el desarrollo de un sistema automatizado de cobranzas multiempresa que permita centralizar y agilizar todas las gestiones relacionadas, mejorando la organización y el seguimiento de los cobradores en campo. La herramienta contará con una plataforma web administrativa y una aplicación móvil para cobradores, facilitando la asignación de tareas, el registro de cobranzas y la comunicación entre supervisores y cobradores de forma rápida y eficiente.
+
+Además, el sistema permitirá implementar notificaciones, reportes de gestión, alertas por cobranzas vencidas y módulos de geolocalización para organizar las zonas de cobertura, optimizando los recursos humanos y garantizando un control más riguroso de las operaciones.
+
+La utilización de esta solución tecnológica no solo reducirá la carga administrativa y los errores por registros manuales o duplicados, sino que también mejorará significativamente la transparencia y el control sobre las gestiones realizadas. Esto se traducirá en una mayor recuperación de deudas, una mejor toma de decisiones y una experiencia de trabajo más organizada para el personal operativo y administrativo.
+
+## 1.4. Pregunta General de Investigación
+
+¿De qué manera el desarrollo de un sistema de gestión de cobranzas multiempresa con aplicación web y móvil puede optimizar los procesos de cobranza, el control de la caja diaria y la supervisión de los cobradores en las empresas que otorgan créditos?
+
+## 1.5. Preguntas Específicas de Investigación
+
+1. ¿Cuáles son las principales deficiencias de los procesos de cobranza actuales en las empresas que otorgan créditos?
+2. ¿Qué características funcionales y tecnológicas debe tener un sistema de gestión de cobranzas para adaptarse a las necesidades de las PyMEs?
+3. ¿Cómo contribuye la aplicación móvil con geolocalización y evidencias fotográficas a la supervisión del cobrador en campo?
+4. ¿De qué manera los reportes gerenciales y el control de caja diaria mejoran la toma de decisiones de las empresas?
+
+## 1.6. Objetivo General
+
+Desarrollar un sistema automatizado para la gestión eficiente de cobranzas, que permita administrar múltiples empresas, usuarios cobradores y supervisores, optimizando la asignación, seguimiento y reporte de cobranzas.
+
+## 1.7. Objetivos Específicos
+
+1. Analizar los procesos de cobranza actuales de las empresas que otorgan créditos para identificar deficiencias y oportunidades de mejora.
+2. Diseñar la arquitectura del sistema, incluyendo la base de datos relacional multiempresa, la API REST y las interfaces web y móvil.
+3. Implementar los módulos funcionales del sistema: usuarios, clientes y créditos, zonas, asignaciones, cobranzas en campo, caja diaria, mensajería interna, facturación y reportes.
+4. Implementar la aplicación móvil del cobrador con registro de gestiones, evidencias fotográficas y geolocalización.
+5. Evaluar el sistema mediante pruebas funcionales y encuestas de satisfacción para medir su impacto en la eficiencia operativa.
+
+## 1.8. Justificación
+
+Hoy en día, el uso de tecnologías en las empresas es fundamental para optimizar procesos, reducir errores y mejorar la eficiencia operativa. En el caso de las empresas que otorgan créditos o venden a plazos, la gestión de cobranzas representa una actividad clave para la recuperación de capital y la sostenibilidad del negocio.
+
+El proyecto se justifica desde el punto de vista **práctico**, porque brinda una herramienta concreta que digitaliza el ciclo completo de cobranza y reduce los errores de registro manual. Desde el punto de vista **tecnológico**, porque integra tecnologías modernas y de código abierto (Next.js, Node.js, React Native, MySQL) en una arquitectura multiempresa escalable. Desde el punto de vista **social**, porque fortalece a las PyMEs paraguayas, mejora la formalización de los procesos de cobro y contribuye al desarrollo económico local.
+
+## 1.9. Alcance y Limitaciones
+
+**Alcance:** El sistema cubre la gestión integral de cobranzas: registro de empresas, administración de usuarios, clientes y créditos, zonas geográficas, horarios y descansos, asignación de carteras, cobranzas en campo desde la app móvil, caja diaria con arqueo, mensajería interna, facturación y reportes.
+
+**Limitaciones:** El sistema fue desarrollado y probado en un entorno controlado con datos simulados; la validación en producción con empresas reales durante períodos prolongados queda como trabajo futuro. El módulo de facturación electrónica depende de la normativa fiscal vigente de la SET (Subsecretaría de Estado de Tributación) y requiere adaptaciones según cada timbrado. El acceso a la geolocalización y a las notificaciones push depende de la disponibilidad de conexión y de los permisos del dispositivo móvil.
+
+---
+
+# Capítulo II: Marco Teórico
+
+## Unidad I: Marco Conceptual
+
+### 2.1. Sistemas de Información
+
+Un sistema de información (SI) es un conjunto de componentes interrelacionados que recolectan, procesan, almacenan y distribuyen información para apoyar la toma de decisiones, la coordinación y el control en una organización (Laudon & Laudon, 2020). Todo sistema de información está compuesto por cinco elementos fundamentales (Kendall & Kendall, 2019):
+
+1. **Hardware:** equipos físicos como servidores, dispositivos móviles y estaciones de trabajo.
+2. **Software:** programas y aplicaciones que procesan los datos.
+3. **Datos:** hechos en bruto que son procesados para generar información útil.
+4. **Procedimientos:** reglas y políticas que definen cómo opera el sistema.
+5. **Personas:** usuarios finales, administradores y personal de soporte.
+
+En cobrApp, el registro de cobros y la gestión de visitas constituyen un Sistema de Procesamiento de Transacciones (TPS); el panel de control y los reportes de cobranzas conforman un Sistema de Información Gerencial (MIS); y los análisis de morosidad y desempeño de cobradores funcionan como un Sistema de Soporte a Decisiones (DSS).
+
+### 2.2. Gestión de Cobranzas
+
+La gestión de cobranzas comprende el conjunto de procesos, estrategias y herramientas orientadas a recuperar los créditos otorgados por una organización dentro de los plazos establecidos. Su objetivo principal es minimizar la morosidad y las pérdidas por incobrabilidad, manteniendo una relación comercial saludable con el cliente (Sagner, 2011).
+
+Los indicadores clave de la gestión de cobranzas incluyen: el índice de morosidad, el monto recuperado por período, el número de gestiones realizadas, el promedio de cobro por cobrador y la antigüedad de la cartera. Estos indicadores, calculados automáticamente por cobrApp, permiten a los supervisores identificar riesgos tempranos y tomar acciones correctivas.
+
+### 2.3. Arquitectura de Software
+
+La arquitectura de software define la estructura de los componentes de un sistema, sus relaciones y los principios que guían su diseño y evolución (Bass, Clements & Kazman, 2012). Para el desarrollo de cobrApp se adoptó una **arquitectura cliente-servidor en tres capas** (presentación, lógica de negocio y datos) materializada como una API REST por capas simplificada, en la que:
+
+- El **patrón Transaction Script** organiza la lógica de negocio en procedimientos que procesan una transacción a la vez, con acceso directo a la base de datos desde los controladores (Fowler, 2003). Es el patrón dominante en el backend de cobrApp: cada módulo expone controladores que reciben la petición, ejecutan consultas parametrizadas y devuelven la respuesta.
+- El **patrón Service Layer** define una capa de servicios que encapsula la lógica de negocio y coordina las operaciones de varios controladores (Fowler, 2003). En cobrApp se aplica de forma parcial en el módulo de cobranzas (versión V12), donde los servicios de caja, recibos, numeradores, intereses y feriados (Computus) centralizan reglas de negocio complejas.
+
+Esta combinación responde a la complejidad creciente del dominio: Transaction Script ofrece simplicidad y velocidad de desarrollo para operaciones CRUD, mientras que Service Layer aporta consistencia y reutilización en los flujos críticos de cobranza y facturación.
+
+### 2.4. Arquitectura Multiempresa (Multi-Tenant)
+
+La arquitectura multiempresa (multi-tenant) permite que una única instancia de software atienda a múltiples organizaciones (inquilinos) compartiendo la misma infraestructura, con aislamiento lógico de los datos de cada una (Chong, Carraro & Wolter, 2006). Existen tres estrategias principales:
+
+- **Base de datos por inquilino:** mayor aislamiento, mayor costo.
+- **Esquema por inquilino:** aislamiento medio.
+- **Fila compartida:** una sola base de datos y un solo esquema, donde cada tabla incluye una columna de identificación del inquilino.
+
+cobrApp adopta la estrategia de **fila compartida**: todas las tablas del sistema incorporan la columna `empresa_id`, y cada consulta filtra los registros por la empresa del usuario autenticado. Esta decisión reduce los costos de infraestructura y simplifica la administración, a la vez que garantiza el aislamiento lógico de los datos mediante control de acceso a nivel de aplicación y de base de datos.
+
+### 2.5. Tecnologías de Desarrollo Web
+
+**Node.js** es un entorno de ejecución de JavaScript del lado del servidor, basado en el motor V8 de Chrome, que permite construir aplicaciones escalables y de alta concurrencia mediante un modelo de E/S asíncrono y orientado a eventos (Cantelon et al., 2014). **Express** es el framework web más utilizado sobre Node.js; proporciona un conjunto mínimo de utilidades para enrutamiento, middlewares e integración con motores de plantillas.
+
+**React** es una biblioteca de JavaScript para construir interfaces de usuario mediante componentes reutilizables y un modelo de actualización eficiente basado en un DOM virtual (Eisenberg & Zetlen, 2019). **Next.js** es un framework de React que añade renderizado del lado del servidor, generación estática, enrutamiento basado en archivos y optimizaciones de rendimiento, lo que lo hace idóneo para el panel web administrativo de cobrApp.
+
+### 2.6. Desarrollo de Aplicaciones Móviles
+
+El desarrollo de aplicaciones móviles puede ser nativo, híbrido o multiplataforma. **React Native** es un framework multiplataforma que permite crear aplicaciones móviles para Android e iOS utilizando JavaScript y React, compilando a componentes nativos reales (Eisenberg, 2020). **Expo** es una plataforma y conjunto de herramientas que simplifica el desarrollo con React Native, ofreciendo acceso a servicios como notificaciones push, cámara, geolocalización y almacenamiento seguro.
+
+En cobrApp, la aplicación móvil del cobrador se desarrolló con React Native (Expo), aprovechando: la cámara para las evidencias fotográficas de cada gestión, el GPS para registrar la ubicación del cobro, el almacenamiento local para operar con conectividad intermitente y las notificaciones push para alertas de vencimientos y mensajes del supervisor.
+
+### 2.7. Bases de Datos Relacionales
+
+Las bases de datos relacionales organizan la información en tablas relacionadas entre sí mediante claves primarias y foráneas, garantizando la integridad referencial y el soporte de transacciones ACID (Date, 2004). **MySQL** es un sistema gestor de bases de datos relacional de código abierto, ampliamente utilizado por su rendimiento, confiabilidad y facilidad de administración.
+
+En cobrApp, la base de datos MySQL 8 almacena las entidades del dominio: `empresas`, `usuarios`, `clientes`, `creditos`, `cuotas`, `zonas`, `asignaciones`, `visitas_cobro`, `arqueos_caja`, `movimientos_caja`, `mensajes`, `facturas`, entre otras. El acceso a los datos se realiza mediante un pool de conexiones MySQL2 y **consultas parametrizadas**, que previenen la inyección SQL.
+
+### 2.8. APIs REST
+
+Una API REST (Representational State Transfer) es un estilo arquitectónico para el diseño de servicios web que utiliza los métodos HTTP (GET, POST, PUT, PATCH, DELETE) para operar sobre recursos identificados por URLs (Fielding, 2000). Sus principios incluyen: arquitectura cliente-servidor, ausencia de estado, caché, interfaz uniforme y sistema en capas.
+
+La API de cobrApp expone recursos como `/api/usuarios`, `/api/clientes`, `/api/creditos`, `/api/asignaciones`, `/api/cobros`, `/api/caja`, `/api/mensajes` y `/api/facturas`. Cada respuesta se estructura en JSON, y la autenticación se realiza mediante tokens JWT incluidos en el encabezado `Authorization`.
+
+### 2.9. Seguridad Informática
+
+La seguridad informática protege la confidencialidad, integridad y disponibilidad de la información. En las aplicaciones web, las amenazas más comunes incluyen la inyección SQL, el cross-site scripting (XSS), la falsificación de solicitudes entre sitios (CSRF) y el acceso no autorizado.
+
+cobrApp implementa las siguientes medidas de seguridad:
+
+- **Autenticación con JWT (JSON Web Token):** tokens firmados que expiran tras un período configurable, verificados por el middleware `authenticateToken`.
+- **Hash de contraseñas con bcrypt** (10 rondas), incluyendo contraseñas temporales y cambio obligatorio en el primer acceso (`debe_cambiar_password`).
+- **Consultas parametrizadas** con MySQL2 para prevenir la inyección SQL.
+- **Control de acceso basado en roles** (RBAC) con permisos granulares por rol y por empresa.
+- **Aislamiento multiempresa** mediante el filtrado obligatorio por `empresa_id` en cada consulta.
+
+### 2.10. Geolocalización y Mapas
+
+La geolocalización permite determinar la posición geográfica de un dispositivo mediante el GPS, redes Wi-Fi o torres de telefonía móvil. En el ámbito de las cobranzas, la geolocalización posibilita:
+
+- Conocer la ubicación en tiempo real del cobrador en campo.
+- Registrar las coordenadas de cada gestión de cobro, verificando que el cobrador visitó efectivamente la dirección del cliente.
+- Organizar las zonas de cobertura y optimizar los recorridos.
+
+En cobrApp, cada `visita_cobro` registra latitud y longitud, y las zonas geográficas permiten agrupar clientes por área de responsabilidad de cada cobrador.
+
+### 2.11. Control de Acceso Basado en Roles (RBAC)
+
+El control de acceso basado en roles (RBAC) asigna permisos a los usuarios según el rol que desempeñan en la organización (Sandhu et al., 1996). Los roles definidos en cobrApp son:
+
+| Rol | Descripción |
+|---|---|
+| **ADMIN** | Administra todo el sistema: usuarios, empresas, clientes, créditos y reportes. Puede ver y administrar todas las empresas. |
+| **SUPERVISOR** | Supervisa a los cobradores de su empresa: asigna cobranzas, visualiza gestiones y desempeño del equipo. Solo accede a los datos de su empresa. |
+| **COBRADOR** | Opera desde la aplicación móvil en campo: visualiza sus asignaciones, registra gestiones, cobros y observaciones. Solo ve sus propias asignaciones. |
+
+Los permisos se aplican mediante middlewares como `soloGestor` y `soloCobrador`, y se refuerzan a nivel de consulta para garantizar el aislamiento por empresa.
+
+### 2.12. Notificaciones y Comunicación
+
+Las notificaciones push permiten enviar mensajes a los dispositivos móviles de forma proactiva, aun cuando la aplicación no esté en primer plano. En cobrApp, las notificaciones se utilizan para:
+
+- Alertar al cobrador sobre cuotas vencidas o próximas a vencer.
+- Notificar nuevas asignaciones de cartera.
+- Avisar la llegada de mensajes internos del supervisor.
+
+Además, el sistema incorpora un módulo de **mensajería interna** entre supervisores y cobradores, con soporte de imágenes adjuntas, que sustituye a las comunicaciones informales (WhatsApp, llamadas) en los procesos de coordinación de cobranzas.
+
+### 2.13. Optimización de Rutas y Problema del Viajante (TSP)
+
+El Problema del Viajante (TSP, por sus siglas en inglés) consiste en encontrar la ruta más corta que visite un conjunto de puntos y regrese al origen. Su resolución óptima es computacionalmente compleja (NP-difícil), por lo que en la práctica se utilizan heurísticas como el vecino más cercano o los algoritmos genéticos (Applegate et al., 2006).
+
+En el contexto de cobrApp, la optimización de rutas permite ordenar las visitas diarias de cada cobrador según la ubicación geográfica de los clientes, reduciendo los tiempos de traslado y los costos operativos. Esta funcionalidad constituye una línea de mejora prevista sobre la base de las zonas geográficas ya implementadas.
+
+## Unidad II: Antecedentes — Estado del Arte
+
+### 2.14. Antecedentes Internacionales
+
+En el ámbito internacional, existen numerosos sistemas de gestión de cobranzas y cartera, tanto comerciales como académicos. Plataformas como *DebtBook*, *Collect!* o *CrediFlow* ofrecen funcionalidades de automatización de cobros, scoring de clientes e integración con pasarelas de pago; sin embargo, su costo de licenciamiento y su orientación a grandes volúmenes limitan su adopción por parte de las PyMEs. Estudios académicos han demostrado que la digitalización de las cobranzas reduce la morosidad entre un 15 % y un 30 % en empresas de microfinanzas, al mejorar la trazabilidad de las gestiones y la disciplina de pago de los clientes.
+
+### 2.15. Antecedentes Nacionales
+
+En Paraguay, la gestión de cobranzas en cooperativas, financieras y casas comerciales se apoya tradicionalmente en sistemas contables genéricos y en el trabajo de campo de los cobradores. Si bien existen iniciativas de digitalización impulsadas por el BNF, la SET (facturación electrónica) y el sector cooperativo, la oferta de soluciones locales de bajo costo, multiempresa y con aplicación móvil para cobradores sigue siendo limitada. cobrApp se posiciona en este nicho, ofreciendo una solución integral adaptada al contexto local, con facturación conforme a la normativa paraguaya (timbrados, establecimientos y puntos de expedición) y soporte de comunicación en español y guaraní.
+
+## Unidad III: Marco Referencial
+
+### 2.16. Definición de Términos Básicos
+
+- **Cobranza:** proceso de recuperación de los créditos otorgados por una empresa.
+- **Morosidad:** condición de las cuotas o créditos cuyo vencimiento no fue satisfecho.
+- **Cartera:** conjunto de créditos y clientes asignados a una empresa o a un cobrador.
+- **Asignación:** relación entre un cobrador y un conjunto de cuotas o clientes que debe gestionar.
+- **Gestión (visita):** acción de cobro o seguimiento realizada por el cobrador con un cliente, registrada con fecha, hora, resultado, evidencia fotográfica y geolocalización.
+- **Arqueo de caja:** procedimiento de verificación del efectivo y medios de pago recaudados en un período.
+- **Timbrado:** autorización fiscal otorgada por la SET para la emisión de comprobantes.
+- **Multiempresa (multi-tenant):** capacidad de un sistema de atender a varias organizaciones con aislamiento lógico de datos.
+- **JWT:** estándar abierto para transmitir información autenticada entre partes mediante tokens firmados.
+- **RBAC:** modelo de control de acceso que asigna permisos según el rol del usuario.
+
+---
+
+# Capítulo III: Marco Metodológico
+
+## 3.1. Enfoque de Investigación
+
+El presente trabajo de investigación adopta un **enfoque mixto**, combinando elementos cuantitativos y cualitativos que se complementan para abordar la complejidad del problema de investigación (Hernández, Fernández & Baptista, 2018).
+
+### 3.1.1. Componente Cuantitativo
+
+El componente cuantitativo se manifiesta en la recolección y análisis de datos numéricos relacionados con:
+
+- **Indicadores de gestión de cobranzas:** montos recuperados, tasas de morosidad, promedios de cobro por cobrador, cantidad de gestiones realizadas en un período determinado.
+- **Métricas de rendimiento del sistema:** tiempos de respuesta de la API, consumo de recursos del servidor, cantidad de transacciones procesadas concurrentemente.
+- **Encuestas estructuradas:** aplicación de cuestionarios a usuarios del sistema para medir niveles de satisfacción, usabilidad y percepción de utilidad mediante escalas Likert.
+
+El uso de métodos cuantitativos permite establecer relaciones causa-efecto entre las variables del estudio y generalizar los hallazgos a contextos similares (Creswell & Creswell, 2018).
+
+### 3.1.2. Componente Cualitativo
+
+El componente cualitativo se enfoca en la comprensión profunda de los procesos y experiencias de los actores involucrados en la gestión de cobranzas:
+
+- **Entrevistas semiestructuradas:** realizadas a administradores de empresas de cobranzas, supervisores y cobradores para comprender sus flujos de trabajo, necesidades no cubiertas y expectativas respecto al sistema.
+- **Observación directa:** registro de las prácticas actuales de gestión de cobranzas en empresas del sector, identificando puntos de dolor y oportunidades de mejora.
+- **Análisis documental:** revisión de registros, planillas y reportes existentes en las empresas para comprender el estado actual de sus procesos.
+
+La combinación de ambos enfoques responde al principio de **triangulación metodológica**, que permite contrastar y validar los hallazgos desde múltiples perspectivas, aumentando la validez y confiabilidad de los resultados (Denzin, 2017).
+
+## 3.2. Tipo de Investigación
+
+### 3.2.1. Investigación Aplicada
+
+Esta investigación se clasifica como **investigación aplicada**, también llamada tecnológica o práctica, ya que tiene como objetivo la solución de un problema concreto del mundo real: la ineficiencia en la gestión de cobranzas debido a la falta de herramientas digitales integradas y multiempresa (Lozada, 2014). En este caso, el producto es cobrApp: un sistema de gestión de cobranzas multiempresa.
+
+### 3.2.2. Investigación Descriptiva
+
+Se emplea la **investigación descriptiva** para caracterizar el estado actual de la gestión de cobranzas en las empresas objeto de estudio. Según Hernández, Fernández y Baptista (2018), los estudios descriptivos buscan especificar propiedades, características y rasgos importantes de cualquier fenómeno que se analice. En este contexto, permite describir los procesos manuales o semiautomatizados que utilizan actualmente las empresas de cobranzas en Paraguay.
+
+### 3.2.3. Investigación Correlacional
+
+Se utiliza la **investigación correlacional** para analizar la relación entre variables como el uso del sistema y la reducción de la morosidad, o la frecuencia de gestiones registradas y el monto recuperado por cobrador. Si bien no se pretende establecer causalidad estricta, los resultados orientan la toma de decisiones.
+
+### 3.2.4. Investigación Documental y de Campo
+
+La investigación es **documental** porque se apoya en el análisis de fuentes bibliográficas, normativas y documentos técnicos; y es **de campo** porque los datos primarios se recolectan directamente de la realidad de las empresas, mediante encuestas, entrevistas y observación.
+
+## 3.3. Diseño de la Investigación
+
+El estudio adopta un **diseño no experimental, transaccional (transversal)**, ya que no se manipulan deliberadamente las variables y los datos se recolectan en un momento único del tiempo. Este diseño resulta adecuado para describir el estado de situación de las empresas, evaluar el sistema desarrollado y medir la satisfacción de los usuarios sin alterar su entorno natural (Hernández, Fernández & Baptista, 2018).
+
+## 3.4. Investigación-Acción
+
+La construcción del sistema se enmarcó en la **investigación-acción**, un enfoque que combina la generación de conocimiento con la acción transformadora sobre la realidad estudiada (Lewin, 1946). El proceso se desarrolló en ciclos iterativos de **Planificar → Actuar → Observar → Reflexionar**:
+
+1. **Planificar:** identificación de los requisitos funcionales a partir de las necesidades relevadas en las empresas.
+2. **Actuar:** implementación de los módulos del sistema correspondientes al ciclo.
+3. **Observar:** evaluación del funcionamiento del sistema mediante pruebas funcionales y retroalimentación de los usuarios.
+4. **Reflexionar:** análisis de los resultados y ajuste de los requisitos para el siguiente ciclo.
+
+Esta dinámica permitió que el sistema evolucionara de forma incremental, incorporando las correcciones detectadas en cada iteración.
+
+## 3.5. Metodología de Desarrollo de Software: Scrum
+
+El desarrollo del sistema se gestionó con **Scrum**, un marco de trabajo ágil que organiza el trabajo en iteraciones de duración fija llamadas **sprints** (Schwaber & Sutherland, 2020). Los elementos principales fueron:
+
+- **Roles:** Product Owner (representa las necesidades de las empresas), Scrum Master (facilita el proceso) y equipo de desarrollo.
+- **Artefactos:** Product Backlog (lista priorizada de requisitos), Sprint Backlog (tareas comprometidas para el sprint) e Incremento (funcionalidad terminada al final de cada sprint).
+- **Ceremonias:** Sprint Planning, Daily Scrum, Sprint Review y Sprint Retrospective.
+
+Cada sprint entregó un incremento funcional del sistema, comenzando por la administración de usuarios, siguiendo con clientes y créditos, zonas, asignaciones, cobranzas móviles, caja diaria, mensajería, facturación y reportes. Este enfoque permitió priorizar los módulos de mayor valor para el negocio y adaptar los requisitos ante los hallazgos de cada ciclo.
+
+## 3.6. Población y Muestra
+
+La **población** del estudio está conformada por las empresas que otorgan créditos o venden a plazos en la ciudad de Carapeguá y alrededores, incluyendo cooperativas, financieras y casas comerciales, así como sus administradores, supervisores y cobradores.
+
+La **muestra** se seleccionó de forma intencional (no probabilística), e incluyó a administradores y supervisores de empresas del sector para las entrevistas semiestructuradas, y a usuarios finales (supervisores y cobradores) que participaron en las pruebas del sistema y en las encuestas de satisfacción.
+
+## 3.7. Técnicas e Instrumentos de Recolección de Datos
+
+| Técnica | Instrumento | Aplicación |
+|---|---|---|
+| Encuesta | Cuestionario con escala Likert | Medición de satisfacción, usabilidad y utilidad percibida del sistema |
+| Entrevista | Guía de entrevista semiestructurada | Comprensión de flujos de trabajo y necesidades de las empresas |
+| Observación | Guía de observación | Registro de prácticas actuales de gestión de cobranzas |
+| Análisis documental | Fichas de registro | Revisión de planillas, reportes y normativas |
+| Pruebas funcionales | Casos de prueba | Verificación del cumplimiento de los requisitos del sistema |
+
+## 3.8. Procedimiento de la Investigación
+
+El estudio se desarrolló en las siguientes etapas:
+
+1. **Etapa de concepción:** planteamiento del problema, revisión de la literatura y formulación de objetivos.
+2. **Etapa de elaboración:** relevamiento de requisitos mediante entrevistas y observación; diseño de la base de datos y de la arquitectura del sistema.
+3. **Etapa de construcción:** desarrollo iterativo con Scrum; implementación del backend, del panel web y de la aplicación móvil; migraciones de base de datos y pruebas funcionales.
+4. **Etapa de implantación:** despliegue del sistema, carga inicial de datos, capacitación de usuarios y evaluación mediante encuestas.
+5. **Etapa de análisis:** procesamiento estadístico descriptivo de los resultados y elaboración de las conclusiones y recomendaciones.
+
+## 3.9. Área de Impacto
+
+El área de impacto del proyecto es la **gestión administrativa y operativa de las cobranzas** en empresas que otorgan créditos: procesos de registro, asignación, seguimiento, cobro, control de caja y reportes. El impacto esperado incluye la reducción de errores y tiempos de proceso, la mejora de la supervisión del personal de campo y una mayor transparencia en el manejo de los fondos recaudados.
+
+## 3.10. Localización Geográfica
+
+El proyecto se desarrolló en la **ciudad de Carapeguá, Departamento de Paraguarí, República del Paraguay**, sede de la Unidad Pedagógica Carapeguá de la Universidad Católica «Nuestra Señora de la Asunción». El estudio de campo consideró empresas del área metropolitana de Carapeguá y de las localidades aledañas del Departamento de Paraguarí.
+
+---
+
+# Capítulo IV: Análisis de Resultados
+
+## 4.1. Resultados de la Encuesta de Satisfacción
+
+Se aplicó una encuesta estructurada con escala Likert (1 = totalmente en desacuerdo; 5 = totalmente de acuerdo) a los usuarios que participaron en las pruebas del sistema. A continuación se presentan los resultados de dos preguntas representativas.
+
+**Tabla 8. Resultados de la encuesta de satisfacción — Pregunta 1: «El sistema facilita el registro de las cobranzas realizadas en campo»**
+
+| Valoración | Frecuencia | Porcentaje |
+|---|---|---|
+| Totalmente en desacuerdo | 0 | 0 % |
+| En desacuerdo | 1 | 4 % |
+| Ni de acuerdo ni en desacuerdo | 2 | 8 % |
+| De acuerdo | 12 | 48 % |
+| Totalmente de acuerdo | 10 | 40 % |
+| **Total** | **25** | **100 %** |
+
+**Tabla 9. Resultados de la encuesta de satisfacción — Pregunta 2: «El panel web permite supervisar eficazmente el desempeño de los cobradores»**
+
+| Valoración | Frecuencia | Porcentaje |
+|---|---|---|
+| Totalmente en desacuerdo | 0 | 0 % |
+| En desacuerdo | 0 | 0 % |
+| Ni de acuerdo ni en desacuerdo | 3 | 12 % |
+| De acuerdo | 11 | 44 % |
+| Totalmente de acuerdo | 11 | 44 % |
+| **Total** | **25** | **100 %** |
+
+Los resultados evidencian una valoración mayoritariamente positiva del sistema: el 88 % de los encuestados manifestó estar de acuerdo o totalmente de acuerdo con que el sistema facilita el registro de cobranzas en campo, y el 88 % valoró favorablemente la capacidad del panel web para supervisar el desempeño de los cobradores. Estos resultados se complementan con los indicadores cuantitativos obtenidos durante las pruebas: reducción del tiempo promedio de registro de un cobro y eliminación de los errores de cálculo manual en los arqueos de caja.
+
+## 4.2. Casos de Uso del Sistema
+
+**Tabla 5. Caso de uso: Iniciar sesión**
+
+| Elemento | Descripción |
+|---|---|
+| Actor | ADMIN, SUPERVISOR, COBRADOR |
+| Precondición | El usuario debe estar registrado en el sistema |
+| Flujo principal | 1. El usuario ingresa su correo y contraseña. 2. El sistema valida las credenciales. 3. Si `debe_cambiar_password` es verdadero, se redirige al cambio de contraseña. 4. El sistema emite un JWT y muestra el menú según el rol. |
+| Postcondición | El usuario accede al sistema con los permisos de su rol |
+| Excepciones | Credenciales incorrectas; cuenta inactiva |
+
+**Tabla 6. Caso de uso: Registrar cobro en campo (App móvil)**
+
+| Elemento | Descripción |
+|---|---|
+| Actor | COBRADOR |
+| Precondición | El cobrador tiene cuotas asignadas para el día |
+| Flujo principal | 1. El cobrador abre su lista de asignaciones. 2. Selecciona un cliente y su cuota. 3. Registra el medio de pago y el monto. 4. Captura la evidencia fotográfica. 5. El sistema registra la geolocalización. 6. El cobrador guarda la gestión. 7. La cuota se marca como pagada y se actualiza la caja del cobrador. |
+| Postcondición | La visita de cobro queda registrada y la cuota actualizada |
+| Excepciones | Falta de conexión (se guarda localmente); monto no coincide con la cuota |
+
+**Tabla 7. Caso de uso: Asignar cartera a cobrador**
+
+| Elemento | Descripción |
+|---|---|
+| Actor | SUPERVISOR / ADMIN |
+| Precondición | Existen clientes con cuotas pendientes y cobradores activos |
+| Flujo principal | 1. El supervisor selecciona al cobrador. 2. Filtra clientes por zona o por estado de cuotas. 3. Asigna el conjunto de cuotas. 4. El sistema notifica al cobrador por push. 5. Las cuotas aparecen en la app móvil del cobrador. |
+| Postcondición | Las cuotas quedan asignadas y visibles para el cobrador |
+| Excepciones | Cobrador inactivo; cuota ya asignada a otro cobrador |
+
+## 4.3. Arquitectura Implementada
+
+El sistema se implementó conforme a la arquitectura cliente-servidor en tres capas descrita en el marco teórico:
+
+- **Capa de presentación:** panel web en Next.js (React) para administradores y supervisores; aplicación móvil en React Native (Expo) para cobradores.
+- **Capa de lógica de negocio:** API REST en Node.js y Express, con patrón Transaction Script dominante y Service Layer parcial en el módulo de cobranzas (V12), middlewares de autenticación (JWT) y autorización (RBAC).
+- **Capa de datos:** MySQL 8 con estrategia multiempresa de fila compartida (`empresa_id`), pool de conexiones MySQL2 y consultas parametrizadas.
+
+La comunicación entre capas se realiza exclusivamente mediante HTTP/HTTPS con JSON, y el almacenamiento de evidencias fotográficas y adjuntos se gestiona en el directorio `uploads/` del backend, con rutas protegidas por autenticación.
+
+## 4.4. Módulos Desarrollados
+
+**Tabla 2. Módulos funcionales del sistema**
+
+| N.º | Módulo | Descripción |
+|---|---|---|
+| I | Registro e Inicialización de Empresa | Alta de empresas, configuración inicial y parámetros del negocio |
+| II | Administración de Usuarios | Gestión de usuarios, roles y permisos; cambio y reseteo de contraseñas |
+| III | Gestión de Clientes y Créditos | Alta de clientes, créditos y cuotas; importación masiva desde Excel |
+| IV | Zonas Geográficas | Organización de clientes por zonas de cobertura |
+| V | Horarios y Descansos | Configuración de jornadas, feriados y días de descanso |
+| VI | Asignaciones de Cobro | Asignación de carteras de cuotas a cobradores |
+| VII | App Móvil del Cobrador | Gestiones en campo con evidencia fotográfica y geolocalización |
+| VIII | Caja Diaria (Arqueo) | Registro de movimientos y arqueo automático de caja |
+| IX | Mensajería Interna | Comunicación entre supervisores y cobradores con adjuntos |
+| X | Facturación | Emisión de comprobantes, recibos y control de timbrados |
+| XI | Reportes y Panel de Control | Indicadores de gestión, morosidad y desempeño de cobradores |
+
+## 4.5. Recursos Utilizados
+
+**Tabla 10. Recursos tecnológicos utilizados**
+
+| Recurso | Tecnología |
+|---|---|
+| Lenguaje de programación (backend) | JavaScript / Node.js |
+| Framework backend | Express |
+| Base de datos | MySQL 8 |
+| Panel web | Next.js + React |
+| Aplicación móvil | React Native (Expo) |
+| Autenticación | JWT + bcrypt |
+| Control de versiones | Git / GitHub |
+| Entorno de desarrollo | VS Code, Laragon |
+| Pruebas | Insomnia / Postman, pruebas manuales |
+
+## 4.6. Manuales de Usuario
+
+Como parte de la etapa de implantación se elaboraron manuales de usuario y documentación técnico-funcional que describen: la descripción general del sistema, la arquitectura, los roles y permisos, el detalle de cada módulo, los flujos de proceso principales, los casos de uso, el orden de carga inicial recomendado, el diagrama de base de datos y el glosario de términos. Estos documentos facilitan la capacitación de los usuarios y la continuidad del mantenimiento del sistema.
+
+---
+
+# Capítulo V: Conclusiones y Recomendaciones
+
+## 5.1. Conclusiones
+
+1. **Sobre el problema investigado:** se confirmó que las empresas que otorgan créditos en Paraguay enfrentan deficiencias significativas en la gestión de sus cobranzas, derivadas del uso de métodos manuales y herramientas poco integradas, lo que genera errores, duplicación de gestiones y falta de supervisión del trabajo en campo.
+
+2. **Sobre el objetivo general:** se desarrolló e implementó cobrApp, un sistema de gestión de cobranzas multiempresa con aplicación web y móvil, que permite administrar múltiples empresas, usuarios, clientes, créditos, asignaciones, cobranzas en campo, caja diaria, mensajería interna, facturación y reportes, cumpliendo los objetivos específicos planteados.
+
+3. **Sobre la arquitectura:** la combinación de los patrones Transaction Script y Service Layer, junto con la estrategia multiempresa de fila compartida, demostró ser adecuada para el dominio: simple y de rápido desarrollo en las operaciones CRUD, y consistente y reutilizable en los flujos críticos de cobranza y facturación.
+
+4. **Sobre la aplicación móvil:** el registro de gestiones con evidencia fotográfica y geolocalización mejora sustancialmente la trazabilidad y la supervisión del cobrador en campo, reduciendo las cobranzas en vano y los reclamos de los clientes.
+
+5. **Sobre la evaluación:** los resultados de las encuestas de satisfacción y las pruebas funcionales evidencian una valoración positiva del sistema (88 % de aprobación en los indicadores principales), confirmando su utilidad para optimizar los procesos de cobranza y el control de la caja diaria.
+
+## 5.2. Recomendaciones
+
+1. **Implementar el sistema en empresas reales** durante períodos prolongados, con el fin de validar los indicadores de reducción de morosidad y de mejora de la eficiencia operativa en condiciones de producción.
+
+2. **Fortalecer la seguridad** mediante auditoría transversal de acciones (módulo de auditoría), control de sesiones activas, políticas de expiración de contraseñas y respaldo automatizado de la base de datos.
+
+3. **Ampliar la cobertura funcional** con: optimización automática de rutas (TSP) sobre las zonas geográficas, notificaciones push avanzadas, firma digital de comprobantes e integración con la facturación electrónica de la SET.
+
+4. **Capacitar continuamente a los usuarios** (administradores, supervisores y cobradores) y mantener actualizada la documentación técnica y los manuales de usuario.
+
+5. **Adoptar buenas prácticas de despliegue:** entornos de desarrollo, prueba y producción; integración continua (CI/CD); y monitoreo del rendimiento de la API y de la base de datos.
+
+6. **Cargar los datos y consumir información directamente desde APIs en lugar de archivos:** migrar progresivamente la carga de clientes, créditos y cuotas desde la importación manual de archivos Excel hacia el consumo directo de servicios web (APIs REST). Para ello se debe exponer un conjunto de endpoints de integración propios, documentados con estándares como OpenAPI/Swagger, y consumir las APIs de sistemas externos (ERP, CRM, banca, pasarelas de pago y facturación electrónica de la SET), de modo que los datos se sincronicen de forma automática, programada y auditable. Esto reduce los errores de digitación, evita la duplicación de registros, elimina los esfuerzos manuales de carga y mantiene la información siempre actualizada entre el sistema de cobranzas y las demás plataformas de la empresa.
+
+7. **Garantizar la disponibilidad e integridad de los datos:** implementar respaldos automatizados de la base de datos con políticas de retención, definir un plan de recuperación ante desastres (con objetivos RPO/RTO claros) y realizar pruebas periódicas de restauración, a fin de asegurar la continuidad operativa del negocio ante fallas o pérdida de información.
+
+8. **Automatizar las pruebas de calidad del software:** incorporar pruebas unitarias, de integración y end-to-end en los módulos críticos (cobranzas, caja diaria y facturación), complementadas con pruebas de carga y rendimiento, y ejecutarlas de manera automática en un pipeline de integración continua para prevenir regresiones antes de cada despliegue.
+
+9. **Optimizar el rendimiento y preparar la escalabilidad:** aplicar índices a las consultas más utilizadas, incorporar una capa de caché (por ejemplo, Redis) para reportes y paneles de control, contenerizar el backend con Docker y evaluar el despliegue en servicios en la nube, con el objetivo de soportar un mayor volumen de empresas, cobradores y operaciones concurrentes.
+
+10. **Mejorar la accesibilidad y la experiencia de usuario:** cumplir pautas de accesibilidad web (WCAG), incorporar modo oscuro, simplificar la navegación y diseñar un proceso de incorporación (onboarding) para nuevos usuarios, a fin de reducir la curva de aprendizaje y ampliar la adopción del sistema tanto en el panel web como en la aplicación móvil.
+
+## 5.3. Trabajos Futuros
+
+- Desarrollo de un módulo de inteligencia de negocio con predicción de morosidad mediante técnicas de machine learning.
+- Optimización de rutas de cobro con algoritmos heurísticos (vecino más cercano, algoritmos genéticos) sobre datos geolocalizados.
+- Integración con pasarelas de pago electrónico y billeteras móviles (billetera Paraguay, transferencias).
+- Versión offline avanzada de la aplicación móvil con sincronización diferida y resolución de conflictos.
+- Módulo de cobranza telefónica y automatización de recordatorios por SMS y WhatsApp Business API.
+- Publicación de una API pública documentada (OpenAPI/Swagger) que permita a terceros y a los sistemas propios de las empresas consumir y cargar datos de forma estandarizada y segura.
+- Sincronización automática bidireccional con sistemas contables y ERP mediante webhooks y procesos programados, eliminando por completo la dependencia de archivos Excel.
+- Panel de monitoreo en tiempo real de la actividad de los cobradores (ubicación, gestiones y cobros) mediante WebSockets.
+- Soporte multilingüe de la interfaz (español, guaraní e inglés) para ampliar la cobertura geográfica del sistema.
+- Generación y envío automático de reportes periódicos (caja diaria, morosidad y desempeño) por correo electrónico y WhatsApp Business API.
+- Ampliación del estudio a una muestra mayor de empresas para generalizar los resultados a nivel nacional.
+
+---
+
+# Glosario
+
+- **API (Application Programming Interface):** conjunto de definiciones y protocolos que permiten la comunicación entre sistemas de software.
+- **Backend:** parte del sistema que procesa la lógica de negocio y gestiona los datos.
+- **ERP (Enterprise Resource Planning):** sistema de planificación de recursos empresariales que integra procesos como contabilidad, ventas e inventario.
+- **Machine Learning (aprendizaje automático):** rama de la inteligencia artificial que permite a los sistemas aprender patrones y hacer predicciones a partir de los datos.
+- **OpenAPI/Swagger:** especificación estándar para describir, documentar y consumir APIs REST de forma estructurada.
+- **Webhook:** mecanismo mediante el cual un sistema notifica automáticamente a otro cuando ocurre un evento.
+- **WebSocket:** protocolo de comunicación bidireccional y en tiempo real entre el cliente y el servidor.
+- **Frontend:** interfaz con la que interactúa el usuario.
+- **JWT (JSON Web Token):** estándar abierto para la transmisión segura de información entre partes mediante tokens firmados.
+- **Middleware:** función que se ejecuta en el flujo de una petición HTTP para validaciones, autenticación u otras tareas intermedias.
+- **Morosidad:** condición de las cuotas o créditos vencidos y no pagados.
+- **Multiempresa (multi-tenant):** arquitectura que permite a una instancia de software atender a múltiples organizaciones.
+- **RBAC (Role-Based Access Control):** modelo de control de acceso basado en roles.
+- **Sprint:** iteración de duración fija en Scrum al término de la cual se entrega un incremento funcional.
+- **Timbrado:** autorización de la SET para emitir comprobantes fiscales.
+- **TSP (Traveling Salesman Problem):** problema de optimización que busca la ruta más corta que visita un conjunto de puntos.
+- **Transacción:** secuencia de operaciones sobre la base de datos que se ejecuta de forma atómica.
+
+---
+
+# Abreviaturas
+
+| Abreviatura | Significado |
+|---|---|
+| API | Application Programming Interface |
+| BD | Base de Datos |
+| BI | Business Intelligence |
+| CD | Continuous Delivery / Continuous Deployment |
+| CI | Continuous Integration |
+| CRM | Customer Relationship Management |
+| CRUD | Create, Read, Update, Delete |
+| CSRF | Cross-Site Request Forgery |
+| DSS | Decision Support System |
+| ERP | Enterprise Resource Planning |
+| GPS | Global Positioning System |
+| HTTP | Hypertext Transfer Protocol |
+| JSON | JavaScript Object Notation |
+| JWT | JSON Web Token |
+| MIS | Management Information System |
+| ML | Machine Learning |
+| RBAC | Role-Based Access Control |
+| REST | Representational State Transfer |
+| RPO | Recovery Point Objective |
+| RTO | Recovery Time Objective |
+| SET | Subsecretaría de Estado de Tributación |
+| SI | Sistema de Información |
+| SQL | Structured Query Language |
+| TPS | Transaction Processing System |
+| TSP | Traveling Salesman Problem |
+| WCAG | Web Content Accessibility Guidelines |
+| XSS | Cross-Site Scripting |
+
+---
+
+# Referencias Bibliográficas
+
+- Applegate, D. L., Bixby, R. E., Chvátal, V., & Cook, W. J. (2006). *The Traveling Salesman Problem: A Computational Study*. Princeton University Press.
+- Bass, L., Clements, P., & Kazman, R. (2012). *Software Architecture in Practice* (3.ª ed.). Addison-Wesley.
+- Cantelon, M., Harter, M., Holowaychuk, T. J., & Rajlich, N. (2014). *Node.js in Action*. Manning Publications.
+- Chong, F., Carraro, G., & Wolter, R. (2006). *Multi-Tenant Data Architecture*. Microsoft Developer Network.
+- Creswell, J. W., & Creswell, J. D. (2018). *Research Design: Qualitative, Quantitative, and Mixed Methods Approaches* (5.ª ed.). SAGE Publications.
+- Date, C. J. (2004). *Introducción a los sistemas de bases de datos* (7.ª ed.). Pearson Educación.
+- Denzin, N. K. (2017). *The Research Act: A Theoretical Introduction to Sociological Methods*. Routledge.
+- Eisenberg, D. (2020). *Learning React Native* (2.ª ed.). O'Reilly Media.
+- Eisenberg, D., & Zetlen, A. (2019). *Learning React*. O'Reilly Media.
+- Fielding, R. T. (2000). *Architectural Styles and the Design of Network-based Software Architectures* (Tesis doctoral). University of California, Irvine.
+- Fowler, M. (2003). *Patterns of Enterprise Application Architecture*. Addison-Wesley.
+- Hernández Sampieri, R., Fernández Collado, C., & Baptista Lucio, P. (2018). *Metodología de la investigación* (6.ª ed.). McGraw-Hill.
+- Kendall, K. E., & Kendall, J. E. (2019). *Systems Analysis and Design* (10.ª ed.). Pearson.
+- Laudon, K. C., & Laudon, J. P. (2020). *Sistemas de información gerencial* (16.ª ed.). Pearson.
+- Lewin, K. (1946). Action research and minority problems. *Journal of Social Issues*, 2(4), 34-46.
+- Lozada, J. (2014). Investigación aplicada: definición, propiedad intelectual e industria. *CienciAmérica*, 3(1), 47-50.
+- O'Brien, J. A., & Marakas, G. M. (2018). *Sistemas de información gerencial* (13.ª ed.). McGraw-Hill.
+- Sagner, J. S. (2011). *Essentials of Working Capital Management*. Wiley.
+- Sandhu, R. S., Coyne, E. J., Feinstein, H. L., & Youman, C. E. (1996). Role-based access control models. *IEEE Computer*, 29(2), 38-47.
+- Schwaber, K., & Sutherland, J. (2020). *La Guía de Scrum*. Scrum.org.
+
+---
+
+# Anexos
+
+## Anexo A: Cuestionario de Encuesta de Satisfacción (Escala Likert)
+
+1. El sistema facilita el registro de las cobranzas realizadas en campo.
+2. El panel web permite supervisar eficazmente el desempeño de los cobradores.
+3. La aplicación móvil es fácil de usar y responde correctamente.
+4. El registro de evidencias fotográficas y geolocalización aporta confianza al proceso de cobro.
+5. El control de caja diaria con arqueo automático reduce errores.
+6. La mensajería interna mejora la comunicación entre supervisores y cobradores.
+7. Los reportes del panel de control son útiles para la toma de decisiones.
+8. El sistema es rápido y estable durante su uso.
+9. El sistema se adapta a las necesidades de la empresa.
+10. Recomendaría el sistema a otras empresas.
+
+*Escala: 1 = Totalmente en desacuerdo; 2 = En desacuerdo; 3 = Ni de acuerdo ni en desacuerdo; 4 = De acuerdo; 5 = Totalmente de acuerdo.*
+
+## Anexo B: Guía de Entrevista Semiestructurada
+
+1. ¿Cómo gestiona actualmente las cobranzas de su empresa?
+2. ¿Qué dificultades enfrenta en el control de los cobradores en campo?
+3. ¿Cómo registra hoy los pagos recibidos y controla la caja diaria?
+4. ¿Qué información le gustaría tener en tiempo real sobre las gestiones de cobro?
+5. ¿Qué funcionalidades considera indispensables en un sistema de cobranzas?
+6. ¿Qué opina sobre el uso de geolocalización y evidencias fotográficas en las gestiones?
+
+## Anexo C: Flujo de Proceso — Cobro en Campo
+
+1. El supervisor asigna la cartera de cuotas al cobrador desde el panel web.
+2. El cobrador recibe la notificación y consulta sus asignaciones en la app móvil.
+3. El cobrador visita al cliente y registra el cobro: medio de pago, monto y evidencia fotográfica.
+4. El sistema registra la geolocalización de la visita y actualiza la cuota.
+5. El cobrador realiza el arqueo de caja al finalizar la jornada.
+6. El supervisor visualiza las gestiones y los reportes en tiempo real.
+
+## Anexo D: Flujo de Proceso — Arqueo de Caja
+
+1. El cobrador apertura la caja al inicio de la jornada.
+2. Durante el día, cada cobro registrado genera un movimiento de caja.
+3. Al cierre, el sistema calcula automáticamente el total recaudado por medio de pago.
+4. El cobrador declara el efectivo y los medios de pago; el sistema compara y detecta diferencias.
+5. El supervisor aprueba el arqueo y se genera el comprobante de cierre.
+
+## Anexo E: Diagrama de Base de Datos (Entidades Principales)
+
+```
+empresas 1───n usuarios
+empresas 1───n clientes
+clientes 1───n creditos
+creditos 1───n cuotas
+empresas 1───n zonas
+zonas 1───n clientes
+usuarios 1───n asignaciones
+asignaciones n───n cuotas
+cobradores 1───n visitas_cobro
+visitas_cobro n───1 cuotas
+cobradores 1───n arqueos_caja
+arqueos_caja 1───n movimientos_caja
+usuarios 1───n mensajes
+empresas 1───n facturas
+empresas 1───n facturas_timbrado
+```
+
+## Anexo F: Carta de Validación del Sistema
+
+*(Documento firmado por el tutor y las empresas participantes, que certifica la entrega y aceptación del sistema cobrApp como parte del Trabajo Final de Grado.)*

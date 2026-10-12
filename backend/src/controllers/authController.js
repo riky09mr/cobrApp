@@ -2,6 +2,7 @@ const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { registrarAuditoriaSegura } = require('../services/cobranzas/auditoriaService');
+const { getPermisosUsuario } = require('../middlewares/permissionMiddleware');
 
 const BCRYPT_SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS || 10);
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
@@ -98,6 +99,18 @@ const login = async (req, res, next) => {
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
+    // La app móvil es exclusiva para cobradores.
+    // Solo se aplica esta restricción cuando la petición proviene de la app móvil
+    // (header X-App-Origen: mobile). El login desde la web no se ve afectado.
+    const esAppMovil = req.headers['x-app-origen'] === 'mobile';
+    if (esAppMovil && user.rol !== 'COBRADOR') {
+      return res.status(403).json({
+        message: 'No tienes acceso a la app móvil',
+        code: 'NO_ACCESO_APP',
+        rol: user.rol,
+      });
+    }
+
     const token = jwt.sign(
       {
         id: user.id,
@@ -111,6 +124,13 @@ const login = async (req, res, next) => {
     );
 
     const debeCambiarPassword = user.debe_cambiar_password === 1 || user.debe_cambiar_password === true;
+
+    // Permisos efectivos del usuario (para el frontend)
+    const permisos = await getPermisosUsuario({
+      id: user.id,
+      rol_id: user.rol_id,
+      rol: user.rol,
+    });
 
     // Auditoría: LOGIN exitoso (fire-and-forget, nunca interrumpe el flujo)
     await registrarAuditoriaSegura({
@@ -137,6 +157,7 @@ const login = async (req, res, next) => {
         rol: user.rol,
         empresa_nombre: user.empresa_nombre ?? null,
         empresa_logo: user.empresa_logo ?? null,
+        permisos,
       },
     });
   } catch (error) {

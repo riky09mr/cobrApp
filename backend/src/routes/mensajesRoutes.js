@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { authenticateToken } = require('../middlewares/authMiddleware');
+const { requirePermission } = require('../middlewares/permissionMiddleware');
 const {
   getConversaciones,
   getConversacion,
@@ -35,9 +36,9 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get('/no-leidos',      getNoLeidos);
-router.get('/',               getConversaciones);
-router.get('/:usuarioId',     getConversacion);
-router.post('/',              uploadImagen.single('imagen'), enviarMensaje);
+router.get('/no-leidos',      requirePermission('mensajes', 'ver'), getNoLeidos);
+router.get('/',               requirePermission('mensajes', 'ver'), getConversaciones);
+router.get('/:usuarioId',     requirePermission('mensajes', 'ver'), getConversacion);
+router.post('/',              requirePermission('mensajes', 'crear'), uploadImagen.single('imagen'), enviarMensaje);
 
 module.exports = router;

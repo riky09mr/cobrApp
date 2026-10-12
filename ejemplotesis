@@ -1,0 +1,1275 @@
+
+
+Universidad Católica «Nuestra Señora de la Asunción» |
+Unidad Pedagógica Carapeguá
+Carrera de Análisis de Sistemas
+
+
+
+
+
+
+
+Desarrollo de un Sistema de Gestión de Eventos “Alejandro Jara Wedding | Event Planner” de la ciudad de Paraguarí.
+
+Luz Diana Lezcano Peralta
+Gabriela Beatriz Ramírez Dávalos
+
+
+Tutor: Lic. Aldo Avalos
+Trabajo Final de Grado presentado como requisito para la obtención del título de
+Licenciado en Análisis de Sistemas   
+
+
+Carapeguá – Paraguay
+2026
+
+Página de Aprobación
+
+Desarrollo de un Sistema de Gestión de Eventos “Alejandro Jara Wedding | Event Planner” de la ciudad de Paraguarí.
+Calificación
+Nombre y apellido	Número	Letras
+Luz Diana Lezcano Peralta	……….	………
+Gabriela Beatriz Ramírez Dávalos	……….	……….
+
+
+Mesa examinadora
+Nombres y apellidos	Firma
+1.	…………………………………….
+2.	…………………………………….
+3.	…………………………………….
+.
+
+
+
+Fecha de Aprobación: …………………………
+
+
+Dedicatoria
+A nuestros padres y familiares, por su apoyo incondicional, amor y sacrificio a lo largo de todos estos años; por ser nuestros pilares inquebrantables y partícipes fundamentales para alcanzar nuestra ansiada meta.
+
+
+Agradecimiento
+A Dios y a la Virgen María, por darnos fortaleza, sabiduría y perseverancia en cada momento, sostenernos en las dificultades y permitirnos alcanzar esta meta tan anhelada.
+A nuestros padres, por creer en nosotras desde el inicio y acompañarnos con su amor y apoyo incondicional hasta llegar aquí.
+Al Lic. Aldo Ávalos y a nuestros docentes que nos guiaron durante nuestra formación, por transmitirnos sus enseñanzas, consejos y conocimientos.
+
+
+
+Resumen
+La creciente demanda de servicios de organización y planificación de eventos sociales ha generado la necesidad de implementar soluciones tecnológicas que permitan optimizar la gestión y mejorar la experiencia tanto de los administradores como de los clientes. En este contexto, surge el desarrollo del sistema “Alejandro Jara Wedding | Event Planner”, una aplicación web y móvil orientada a la administración integral de servicios para eventos sociales. Actualmente, gran parte de los procesos se realizan de forma manual, lo que ocasiona errores, demoras, pérdida de tiempo y dificultades en el control de pedidos, stock e información.
+El sistema permitirá centralizar la gestión de datos, controlar en tiempo real la disponibilidad de materiales y registrar nuevos recursos desde la plataforma web. Además, facilitará la organización de servicios mediante combos clasificados por categorías, automatizando funciones como las reservas anticipadas y la visualización de fechas disponibles. Asimismo, los clientes podrán realizar reservas desde la aplicación móvil, seleccionando la fecha del evento, el servicio deseado y la ubicación correspondiente.
+El sistema contará con una funcionalidad de aprobación de clientes, mediante la cual el administrador habilitará el acceso y el usuario recibirá por correo sus credenciales de ingreso. Además, el cliente podrá visualizar el contrato del evento y aceptar o rechazar las condiciones establecidas. El proyecto busca contribuir a la digitalización de la gestión de eventos sociales, brindando mayor eficiencia en los procesos administrativos, un mejor control de los servicios ofrecidos y una atención más rápida y moderna para los clientes.
+Palabras clave: eventos, planificación, cliente, administrador, servicios.
+
+Summary
+	The growing demand for social event organization and planning services has created the need to implement technological solutions that optimize management processes and improve the experience for both administrators and clients. In this context, the development of the “Alejandro Jara Wedding | Event Planner” system emerges as a web and mobile application focused on the comprehensive management of social event services. Currently, many processes are carried out manually, causing errors, delays, time loss, and difficulties in controlling orders, inventory, and information.
+	The system will allow the centralization of data management, real-time control of material availability, and the registration of new resources through the web platform. In addition, it will facilitate the organization of services through categorized packages, automating functions such as advance reservations and the visualization of available dates. Likewise, clients will be able to make reservations through the mobile application by selecting the event date, desired service, and event location.
+	The system will include a client approval functionality, through which the administrator will authorize access and the user will receive login credentials via email. Furthermore, the client will be able to view the event contract and accept or reject the established conditions. The project seeks to contribute to the digitalization of social event management by providing greater efficiency in administrative processes, better control of the services offered, and faster and more modern customer service.
+	Keywords: events, planning, client, administrator, services.
+
+
+Ñemombyky
+Oñembohetave rupi umi servicio ojeguerekóva aty ha tembiapo guasu ñembosako’i rehegua, tekotevẽ oñemoinge solución tecnológica omoporãvéva gestión ha ombohape hag̃ua tembiapo administrador ha cliente-kuérape guarã. Ko contexto-pe oñemoheñói sistema “Alejandro Jara Wedding | Event Planner”, peteĩ aplicación web ha móvil oñembohekopyréva administración integral servicio-kuéra rehegua aty ha tembiapo social-pe guarã. Ko’ág̃a rupi heta proceso ojegueroguata po rupive, upéva omoheñói jejavy, ñembotapykuere, aravo ñehundi ha sa’i control pedido, stock ha marandu rehe.
+Pe sistema omoneĩta oñecentralisa hag̃ua gestión de datos, oñekontrola hag̃ua tiempo real-pe disponibilidad material-kuéra rehegua ha oñeregistra hag̃ua recurso pyahu plataforma web guive. Avei ombohapéta organización servicio-kuéra rehegua combo ha categoría rupive, omautomatisa función-kuéra reserva anticipada ha fecha disponible jehechauka rehegua. Upéicha avei, cliente-kuéra ikatúta ojapo reserva aplicación móvil rupive, oiporavóvo fecha evento rehegua, servicio oipotáva ha dirección lugar evento rehegua.
+Pe sistema oguerekóta peteĩ funcionalidad aprobación cliente-kuéra rehegua, upérupi administrador ome’ẽta permiso jeike hag̃ua sistema-pe ha usuario ohupytyta correo electrónico rupive iusuario ha contraseña. Avei, cliente ikatúta ohecha contrato evento rehegua ha omoneĩ térã ombotove umi condición oñemoĩva. Ko proyecto oheka omopyenda hag̃ua digitalización gestión de eventos sociales rehegua, ome’ẽvo eficiencia porãve proceso administrativo-kuérape, control iporãvéva umi servicio oñeme’ẽvare ha atención moderna ha pya’éva cliente-kuérape guarã.
+Ñe'ẽtekotevẽtéva: eventos, planificación, cliente, administrador, servicios.
+
+
+Índice 
+
+Dedicatoria	3
+Agradecimiento	3
+Resumen	4
+Summary	5
+Ñemombyky	6
+Índice	7
+Indice de tablas	10
+Indice de figuras	11
+Introducción	13
+Capítulo I: Planteamiento del problema	14
+Antecedentes del problema	14
+Descripción de la problemática	14
+Solución del problema	15
+Pregunta General	15
+Preguntas específicas	16
+Objetivos	16
+Objetivo general	16
+Objetivos específicos	16
+Justificación	16
+Capítulo II: Marco teórico	18
+Unidad I: Marco Conceptual	18
+Eventos	18
+Clasificación De Los Eventos.	18
+Materiales Esenciales que Necesita una Organización de Eventos	19
+Definición De Organización De Eventos	20
+Event Planner	20
+Fases de la organización de eventos	20
+Alquiler	21
+Contrato	21
+Unidad II: Antecedentes	21
+Estado del arte	21
+Nivel nacional:	22
+Nivel internacional:	22
+Unidad III: Marco referencial	22
+Definición de sistema informático	22
+Componentes de un sistema informático	22
+Hardware	22
+Software	23
+El software contiene los siguientes elementos:	23
+Notificaciones push	23
+Dispositivo móvil	24
+Navegadores web	24
+Sistema operativo	25
+Definición de programas en informática	25
+Tipos de programas en informática	25
+Aplicación web	26
+Tipos de aplicaciones web	26
+Aplicación móvil	28
+Tipos de aplicaciones móvil	28
+Diferencia entre aplicación móvil y sitios web móviles	29
+Aplicaciones móviles más usados:	29
+Importancia de las aplicaciones para las empresas	30
+Obtención de datos	30
+Experiencias personalizadas	31
+Comunicación directa con notificaciones in-app y push	31
+Servidores web	32
+Capítulo III: Marco metodológico	33
+Tipo de investigación	33
+Tipo de Investigación según el tiempo	33
+Procedimientos	33
+Etapa de Concepción	34
+Etapa de Elaboración	34
+Etapa de Construcción	35
+Etapa de Implantación	35
+Procedimiento de recolección de datos	35
+Área de impacto	36
+Localización geográfica	36
+Capítulo IV: Análisis de resultados	38
+Listado de Casos de Uso	38
+Descripción de casos de Uso	42
+Listado de Diagramas de Actividad	47
+Recursos Tecnológicos	58
+Requerimiento de Hardware	58
+Requerimiento de Software	58
+Requerimientos No Funcionales	58
+Requerimientos de Interfaz	59
+Requerimientos de Licencia	59
+Implementación	60
+Arquitectura del sistema	60
+Diagrama de Entidad-Relación	60
+Manual del usuario	67
+Accesos y funcionalidades del sistema web.	67
+Administrar seguridad del sistema	69
+Administrar datos referenciales	72
+Manual de la Aplicación móvil para el Cliente	87
+Manual de la Aplicación móvil para el Administrador	108
+Capítulo V: Conclusiones y recomendaciones	113
+Conclusiones	113
+Recomendaciones	114
+Partes complementarias	115
+Glosario	115
+Abreviaturas	116
+Referencias bibliográficas	117
+Anexo A.	120
+Instrumento de recolección de datos para el diagnóstico inicial.	120
+Anexo B.	122
+Entrevista de satisfacción del usuario.	122
+
+
+
+Indice de tablas
+Tabla 1  Listado de Casos de Uso	38
+Tabla 2  Descripción de Casos de Uso - Gestionar Usuarios	42
+Tabla 3  Descripción de Casos de Uso - Gestionar Servicios	42
+Tabla 4  Descripción de Casos de Uso - Gestión de Pedidos y Gestión de Contrato, Pagos	43
+Tabla 5  Descripción de Casos de Uso - Gestión de Evento y Post-Evento	44
+Tabla 6  Descripción de Casos de Uso - Gestión del Administrador	45
+Tabla 7  Listado de Diagramas de Actividad	46
+Tabla 8   Listado de Diagramas de Secuencia	52
+
+
+
+Indice de figuras 
+Figura 1  Ubicación de la Empresa Alejandro Jara Wedding Event Planner	37
+Figura 2  Gestión de Usuarios	39
+Figura 3  Gestión de Servicios	39
+Figura 4  Gestión de Pedidos y Gestión de Contratos, Pagos	40
+Figura 5 Gestión de Evento y Post-Evento	40
+Figura 6  Gestión Administrativa	41
+Figura 7  Diagrama de Actividad - Gestión de Usuarios	47
+Figura 8  Diagrama de Actividad - Gestión de Servicios	48
+Figura 9  Diagrama de Actividad - Gestión de Pedidos y Gestión de Contratos, Pagos	49
+Figura 10  Diagrama de Actividad - Gestión Evento y Post-Evento	50
+Figura 11  Diagrama de Actividad - Gestión Administrativa	51
+Figura 12  Diagramas de Secuencia – Gestión de Usuarios	52
+Figura 13   Diagrama de Secuencia - Gestión de Servicios	53
+Figura 14  Diagrama de Secuencia - Gestión de Pedidos y Gestión de Contrato, Pagos	54
+Figura 15  Diagrama de Secuencia - Gestión Evento y Post-Evento	55
+Figura 16  Diagrama de Secuencia - Gestión Administrativa	56
+Figura 17  Diagrama de Entidad-Relación General	59
+Figura 18  Diagrama de Entidad-Relación Artículos	60
+Figura 19  Diagrama de Entidad-Relación Pedido	61
+Figura 20  Diagrama de Entidad-Relación Servicio	62
+Figura 21  Diagrama de Entidad-Relación Disponibilidad	62
+Figura 22  Diagrama de Entidad-Relación Factura	63
+Figura 23  Diagrama de Entidad-Relación Usuario/App	64
+Figura 24  Diagrama de Entidad-Relación Timbrado / Zona Cobertura	64
+Figura 25  Diagrama de componentes de Event Planner	65
+Figura 26  Inicio de Sesión	66
+Figura 27  Pantalla Inicio	67
+Figura 28  Opciones del Menú	67
+Figura 29  Pantalla Roles	68
+Figura 30  Pantalla Insertar Rol	69
+Figura 31  Permisos del Rol	69
+Figura 32 Vincular funcionalidades al Rol	70
+Figura 33  Insertar nuevo usuario	70
+Figura 34  Menú Artículos	71
+Figura 35  Agregar nuevo artículo	72
+Figura 36  Menú Servicios	73
+Figura 37  Agregar Nuevo Servicio	73
+Figura 38  Servicio Combo	74
+Figura 39  Menú Zonas de Cobertura	74
+Figura 40  Agregar Nueva Zona	75
+Figura 41  Activación de Usuarios	75
+Figura 42  Menú Clientes	76
+Figura 43  Menú Usuarios	76
+Figura 44  Activar/Desactivar Usuarios	77
+Figura 45  Menú Reservas	78
+Figura 46  Acción Enviar Presupuesto de Traslado	79
+Figura 47  Pantalla Agregar Costo de Traslado	79
+Figura 48  Acción Enviar Contrato y Anular	80
+Figura 49  Estado Cancelado de Reserva	80
+Figura 50  Pantalla de Contrato enviado, Pendiente de Seña	81
+Figura 51  Pantalla de Contrato Aceptado, Pendiente de revisión de Seña	82
+Figura 52  Pantalla de Revisión de Seña	82
+Figura 53  Pantalla de Reserva en Estado Activo, Seña aprobada	83
+Figura 54  Acción de Entregar Evento	84
+Figura 55  Pestaña de Revisión de artículos faltantes, Cerrar Evento	85
+Figura 56  Resumen Revisión de Artículos faltantes	86
+Figura 57  Menú Facturas	87
+Figura 58  Factura	87
+Figura 59  Inicio de Sesión Cliente	88
+Figura 60  Ingresar datos	89
+Figura 61  Correo de Confirmación de Registro	89
+Figura 62  Información del Usuario	91
+Figura 63  Pantalla Principal, Servicios Ofrecidos	92
+Figura 64  Menú de Opciones	93
+Figura 65  Servicio Personalizado	94
+Figura 66  Pantalla de Carga de Datos para Reserva	95
+Figura 67  Servicio Combo	96
+Figura 68  Pantalla de Información de Artículo	97
+Figura 69  Pantalla de Contrato Pendiente	98
+Figura 70  Notificación de Contrato recibido	98
+Figura 71  Formato de Contrato recibido	99
+Figura 72  Contrato Rechazado, Reserva Anulada	100
+Figura 73  Pantalla de Registrar Pago	101
+Figura 74  Notificación de Costo final del evento	102
+Figura 75  Notificación de Reserva Confirmada	102
+Figura 76  Reservas en estado Activo	103
+Figura 77  Pantalla de Detalles de Reserva	104
+Figura 78  Pantalla de Cancelar Saldo	105
+Figura 79  Notificación de Reserva Finalizada	106
+Figura 80  Pantalla de Menú Mis Eventos, Eventos Finalizados	106
+Figura 81  Calendario de Disponibilidad	107
+Figura 82  Menú Políticas de la Empresa	108
+Figura 83  Inicio de Sesión de Administrador	109
+Figura 84  Pantalla Inicio	110
+Figura 85  Notificación de Nuevo Evento Registrado	111
+Figura 86  Pantalla de Lista de Eventos	111
+Figura 87  Notificación de Nuevo Registro de Persona	112
+Figura 88  Pantalla de Visualización de Nuevos Registros	112
+Figura 89  Pantalla de Registro de Artículos Faltantes, Cerrar Evento	113
+
+
+Introducción
+La evolución constante de la tecnología ha llevado a las empresas de servicios a optimizar sus procesos mediante el uso de sistemas informáticos que permitan una gestión más eficiente. En este marco, se propone el desarrollo de un software de gestión para la empresa “Alejandro Jara Wedding | Event Planner”, con el fin de automatizar actividades que actualmente se realizan de manera manual.
+La solución propuesta contempla procesos como la gestión de pedidos, el control de inventario, la organización de combos de servicios, las reservas y la comunicación con los clientes. Para ello, se plantea el desarrollo de una aplicación web y app móvil para la administración interna y una aplicación móvil destinada a los clientes.
+El objetivo principal del sistema es automatizar la planificación de eventos, optimizando los procesos administrativos y mejorando la experiencia tanto de los clientes como de los administradores de la empresa.
+El presente trabajo se estructura de la siguiente manera: 
+Capítulo I se presenta el planteamiento del problema y los objetivos a ser alcanzados. 
+Capítulo II se abordan los antecedentes y fundamentos teóricos relacionados con el sistema propuesto.
+Capítulo III se desarrolla la metodología de análisis y diseño elegida para el desarrollo del sistema. 
+Capítulo IV se explica el proceso de implementación del sistema, incluyendo el manual de instalación y uso.
+Capítulo V se presentan las conclusiones generales y las recomendaciones para futuros trabajos.
+
+
+
+
+
+
+
+
+
+Capítulo I: Planteamiento del problema
+Antecedentes del problema
+La empresa “Alejandro Jara Wedding | Event Planner”, dedicada a la organización de eventos sociales, enfrenta actualmente una serie de dificultades en la gestión de sus servicios debido al manejo manual de sus procesos. Esta situación genera demoras, pérdida de tiempo, errores frecuentes, desorganización en los pedidos, y una comunicación dispersa con los clientes a través de canales como WhatsApp, Instagram y reuniones presenciales.
+Al revisar los antecedentes y estudios relacionados con la digitalización en la planificación de eventos, se observa que existen soluciones tecnológicas que permiten optimizar estos procesos, facilitando la centralización de información, la automatización de tareas y la mejora en la atención al cliente. Sin embargo, en el contexto específico de esta empresa, no se ha aplicado aún una herramienta informática adaptada a sus necesidades, lo que evidencia un vacío que esta investigación pretende abordar.
+La falta de seguimiento en tiempo real, el control ineficiente del stock y la imposibilidad de que los clientes consulten información de sus eventos de forma autónoma son aspectos que impactan negativamente en la eficiencia operativa y en la experiencia del usuario. Por tanto, surge la necesidad de desarrollar un sistema informático personalizado que permita gestionar de manera ágil, precisa y automatizada cada etapa de la organización de eventos, contribuyendo así a mejorar la calidad del servicio ofrecido por la empresa.
+Descripción de la problemática
+Alejandro Jara Wedding | Event Planner es una empresa dedicada al diseño y organización de bodas, 15 años, etc. Actualmente, todas sus gestiones se realizan de forma manual, lo que genera retrasos en las operaciones y limita su eficiencia. Que las gestiones sean manuales trae consigo varias dificultades, entre ellas las siguientes: 
+1.Comunicación con clientes dispersa en WhatsApp, Instagram y presencial, lo que dificulta la centralización de la información. 
+2.Información registrada manualmente utilizando Word y Excel, incrementando el riesgo de errores y pérdida de tiempo. 
+3.Es complicado gestionar múltiples consultas al mismo tiempo. 
+4.Falta de seguimiento en tiempo real de los procesos. 
+5.Los clientes no pueden acceder a información sobre sus eventos de manera independiente.
+6.Errores frecuentes en registros en la selección de servicio y costos de combos. 
+7.Falta de control sobre inventario, provocando sobreventa y conflictos. 
+8.Demoras en brindar información precisa y en tiempo real a los clientes.
+Solución del problema
+En respuesta a la problemática identificada, se desarrolla un sistema informático compuesto por una aplicación web y una aplicación móvil para la empresa “Alejandro Jara Wedding | Event Planner”.
+El sistema permite centralizar la información, gestionar pedidos, controlar el stock de materiales y organizar los servicios mediante combos y categorías, además de automatizar procesos como reservas, notificaciones y seguimiento del estado de los eventos.
+De esta manera, se busca reducir errores, optimizar los tiempos de gestión y mejorar la atención al cliente, logrando una organización más eficiente de los servicios ofrecidos.
+Pregunta General
+¿De qué manera desarrollar un sistema informático que permita gestionar la planificación y organización de eventos sociales de la empresa “Alejandro Jara Wedding | Event Planner” de la ciudad de Paraguarí?
+Preguntas específicas
+1.¿De qué manera el cliente podrá comunicarse con el organizador de eventos? 
+2.¿Cómo se podría optimizar los agendamientos de los eventos? 
+3.¿De qué manera el cliente podrá saber el estado de su pedido?
+4.¿Cómo se gestionará la disponibilidad de servicios y la presencia del Event Planner en el sistema para el evento? 
+5.¿Cómo podrá el cliente comprender claramente las condiciones de los estados de los pedidos?
+Objetivos
+Objetivo general
+Desarrollar un sistema informático que permita gestionar la planificación y organización de eventos sociales de la empresa Alejandro Jara Wedding | Event Planner.
+Objetivos específicos
+1.Implementar una funcionalidad que permita a los clientes realizar pedidos a través de una aplicación móvil de manera rápida y sencilla. 
+2.Desarrollar un módulo que permita a los clientes realizar reservas de pedidos con antelación, asegurando la disponibilidad de servicios para fechas específicas.
+3.Incorporar notificaciones en el sistema para mantener informados a los clientes sobre el estado de su pedido.
+4.Desarrollar un módulo en la aplicación móvil para verificar la disponibilidad que incluya tanto los servicios y la presencia del Event Planner para garantizar la organización eficiente de los eventos. 
+5.Establecer un apartado donde se detallen las condiciones y criterios de los estados de los pedidos, garantizando que se comprendan las políticas de la empresa y el proceso de gestión de solicitudes.
+Justificación 
+La creación de una aplicación web y móvil para la gestión de la planificación y organización de eventos sociales de la empresa Alejandro Jara Wedding | Event Planner se justifica por varias razones: 
+1.Acceso de manera rápida y sencilla a información clave sobre los servicios disponibles. Esto incluirá detalles como disponibilidad, características, precios y fotos de los materiales y servicios, lo que facilitará la selección adecuada según las necesidades del evento. 
+2.Facilitación de comunicación entre el cliente y el planificador, agilizando los trámites y reduciendo el tiempo necesario para gestionar las necesidades del evento. 
+3.Seguimiento a las reservas de materiales, proporcionando a los usuarios un mayor grado de transparencia en el proceso de alquiler para la organización de su evento, generando confianza y asegurando que los clientes puedan monitorear el estado de sus pedidos y las respuestas recibidas en tiempo real.
+
+
+
+
+
+
+
+
+
+Capítulo II: Marco teórico
+Unidad I: Marco Conceptual
+En esta sección se destacan las definiciones de los principales conceptos que sirven de soporte teórico a este trabajo de investigación y desarrollo.
+Eventos
+Los eventos son aquellos fenómenos que surgen de ocasiones no rutinarias y que tienen objetivos de ocio, culturales, personales u organizativos establecidos de forma separada a la actividad normal diaria, cuya finalidad es ilustrar, celebrar, entretener o generar experiencias en un grupo de personas (Shone & Parry, 2010)
+Un evento es todo acontecimiento previamente organizado que reúne a un determinado número de personas en tiempo y lugar preestablecidos, que desarrollarán y compartirán una serie de actividades afines a un mismo objetivo para estímulo del comercio, la industria, el intercambio social y la cultura general (Rosario, 2003)
+Clasificación De Los Eventos.
+(Contreras, 2022) explica que, según el tipo de celebración podemos mencionar a:
+Bodas: Es de los eventos familiares más comunes en cualquier lugar del planeta, Las bodas sociales son un día especial para los novios que se consolidan como familia para formar un hogar por el resto de sus vidas. 
+La mayoría de las personas prefieren contratar a personas con experiencia en la planificación de boda, pues los preparativos son muchos y específicos e incluyen desde la selección temática, traje, anillos, definición de salón de eventos y flores, hasta detalles de la ceremonia y fiesta nupcial.
+Reuniones familiares, cumpleaños y aniversarios: Es el modo más cotidiano y usual de celebrar la vida. De acuerdo a la temática y la cantidad de amigos a invitar, dependerá el presupuesto y los elementos de celebración.
+Las fiestas infantiles requieren un poco más de planificación, pues las ideas formas de entretenimiento deben ser más variadas y adecuada a la edad de los niños que asistirán.
+Comunión, 15 años, confirmación: Se trata de eventos tradicionales culturales y religiosos, que practican muchas familias en todo el mundo, algunas de estas celebraciones tienen pequeñas variaciones.
+Materiales Esenciales que Necesita una Organización de Eventos
+Los materiales esenciales que necesita una organización de eventos incluyen mesas y sillas, decoración, tendencias actuales en iluminación y un sistema de sonido adecuado (Eras, 2024)
+Mesas y sillas: La selección de estos muebles puede marcar la diferencia en la decoración y funcionalidad de cualquier espacio, es fundamental considerar el material, color y tamaño para que se adapten a las necesidades y estilo. La elección de estos muebles puede influir significativamente en la atmósfera que se desea crear.
+Decoración: La elección de los elementos decorativos puede influir en la atmósfera y el ambiente del lugar, aportando personalidad y estilo.
+Algunas tendencias actuales en decoración incluyen el uso de colores neutros y vivos, elementos naturales, materiales orgánicos, la iluminación también juega un papel crucial en la decoración, la combinación de luces cálidas y frías, así como la utilización de lámparas decorativas, pueden aportar profundidad y calidez a cualquier ambiente.
+Sistema de sonido: Un buen sistema de sonido garantiza una experiencia de audio inmersiva y de alta fidelidad. Los sistemas compactos son ideales para espacios reducidos, mientras que los sistemas más grandes y potentes son perfectos para áreas más amplias.
+Definición De Organización De Eventos
+(CEUPE, 2011), la organización de eventos es la actividad de diseñar, planificar y producir fiestas, ceremonias, conferencias, festivales o cualquier tipo de encuentro, con el objetivo de lograr un resultado deseado.
+Cuando hablamos de diseñar, nos referimos a la creación del concepto, la temática y la estética del evento, así como la distribución del espacio y la selección de elementos decorativos.
+Planificar significa elaborar un plan detallado que incluya el cronograma, el presupuesto, la logística, la seguridad y todos los aspectos necesarios para llevar a cabo el evento de forma exitosa.
+Por último, la producción supone la ejecución de todos los elementos planificados, asegurando que el evento se desarrolle según lo previsto.
+Event Planner
+Ocampos García de Quevedo (2008) describe al profesional de eventos como la persona encargada de negociar y coordinar cualquier tipo de evento desde la recepción del encargo, el diseño y elaboración de presupuestos, hasta la organización, coordinación, supervisión de actividades dentro del evento y la valoración posterior del mismo (p. 11).
+Fases de la organización de eventos
+Ocampos García de Quevedo (2008) señala que las fases de la organización de eventos pueden dividirse en: 
+Funciones de diseño: Definir el objetivo del evento interpretando los requerimientos del cliente. Definir el tipo y magnitud del evento de acuerdo a la estimación de los asistentes, del equipo de trabajo a involucrar en el evento y de los recursos necesarios. Solicitar presupuestos a proveedores y elaborar presupuesto total del evento para el cliente.
+Funciones de planificación: Seleccionar fechas, definir número de asistentes, lugar de realización, programación de actividades. Negociar con proveedores y definir roles y tareas de cada miembro del equipo. Cronograma de tareas y realización de check list para control de coordinación. 
+Funciones de producción: Contratación de recursos necesarios (espacios, seguros, profesionales, etc). Supervisión de cumplimiento del plan, tiempo y ejecución del contrato. Coordinación de la ejecución del plan y supervisión de los estándares de calidad establecidos. 
+Funciones de evaluación: Evaluar la calidad del servicio y la satisfacción del cliente. Realizar propuestas de mejoras para futuros eventos.
+Alquiler
+En el contexto de eventos sociales, el alquiler es el acuerdo mediante el cual una persona u organización obtiene, por un tiempo determinado y a cambio de un pago, el uso de bienes o servicios necesarios para la realización del evento.
+Ejemplo: alquiler de mesas, sillas, equipos de sonido, iluminación, vajilla o salones.
+Contrato
+El contrato es el documento o acuerdo formal que establece las condiciones bajo las cuales se realiza el alquiler o la prestación de servicios en un evento social. Incluye detalles como:
+Identificación de las partes (cliente y proveedor).
+Bienes o servicios alquilados.
+Duración y fecha del evento.
+Costos, formas de pago y garantías.
+Responsabilidades de cada parte.
+Cláusulas en caso de incumplimiento o daños.
+Unidad II: Antecedentes 
+Estado del arte
+Tras una investigación mediante diversas fuentes de internet se identificaron diversas plataformas digitales que ofrecen funcionalidades relacionadas con la gestión de eventos sociales. En la actualidad existen diversos sistemas, principalmente a nivel internacional, los cuales fueron creados con el objetivo de optimizar la organización, planificación y control de diferentes tipos de eventos.
+Nivel nacional:
+RV Solutions: ofrece experiencias de eventos innovadoras y sin interrupciones a través de tecnología de vanguardia y un servicio excepcional. Visualiza un futuro donde cada evento sea una experiencia memorable e impactante, impulsada por soluciones (Solutions, 2024).
+Nivel internacional:
+Eventplanner: es un software para planificar eventos como bodas, eventos de negocios y festivales. Permite organizar tareas e ideas y guardar detalles de lugares, proveedores y otra información relacionada con eventos en el panel de estado integrado.
+Dispone de una función de lista de verificación que te ayuda a organizar las acciones y ver las tareas que hay pendientes para la organización del evento (eventplanner, s.f). 
+Eventika: Plataforma con herramientas impulsadas por IA para todo tipo de eventos sociales (bodas, XV años, cumpleaños, bautizos, aniversarios). Ofrece web del evento, RSVP, gestión de invitados, distribución de mesas, mensajes automáticos, presupuesto, cronograma, proveedores, check-in con QR y más (Eventika, 2026). 
+Wedify: Software diseñado para organizadores de bodas. Facilita la creación de página web, gestión de invitados, planificación de mesas, intolerancias, asignación de servicios y coste automatizado (Wedify, 2025). 
+Unidad III: Marco referencial 
+Definición de sistema informático
+CEUPE (2011) explica que un sistema informático se compone de elementos físicos y lógicos que permiten almacenar y procesar información. El hardware representa la parte tangible y el software la intangible, mientras que el personal encargado de operar los equipos también forma parte esencial de esta estructura.
+Componentes de un sistema informático
+Hardware
+El hardware comprende las partes físicas de un sistema Informático. Es decir, todo aquello que se puede tocar.
+Un ejemplo de un hardware de un sistema informático sería un ordenador, el cual, si se refiere a uno simple, podría contener los siguientes elementos:
+a) Pantalla.
+b) Placa base, también llamada tarjeta madre o placa principal.
+c) Procesador, también llamado microprocesador.
+d) Tarjetas de expansión.
+e) Módulos de RAM.
+f) Fuente de alimentación, también llamada fuente de potencia o fuente de poder.
+g) Unidad de disco duro (HDD) O unidad de estado sólido (SSD).
+h) Teclado.
+i) Ratón, también llamado mouse.
+Así mismo, otros dispositivos como relojes inteligentes, móviles, tablets, portátiles y cámaras de seguridad también poseen sus propios hardwares. 
+Software
+El software constituye la parte lógica de un sistema informático, encargada de enviar instrucciones al hardware y permitir su funcionamiento adecuado (CEUPE, 2011).
+El software contiene los siguientes elementos:
+a)Software del sistema: Es todo aquello que es indispensable para el manejo de un sistema, por lo tanto, son elementos que un dispositivo o máquina debe poseer para poder funcionar: sistema operativo, controladores del sistema, BIOS, línea de comandos, cargador de arranque (bootloader), hipervisor, interfaz gráfica de usuario (GUI), utilidades y herramientas de programación.
+b)Software de aplicación: Se refiere a las diversas aplicaciones o programas que un sistema puede utilizar: navegador web, juegos, editor de imágenes. reproductor de videos, antivirus, procesador de texto, calculadoras. 
+Notificaciones push
+Las notificaciones push son mensajes que llegan a nuestros smartphones, tablets y smartwatches, enviados por una de las aplicaciones que tenemos instaladas. Conforme a Actualizatec(2021), «Para que tu usuario reciba la notificación no será necesario estar ejecutando la App, pero sí que en algún momento haya dado su permiso para ello» Es un tipo de mensajería instantánea cuyo fin principal es recordatorio o comercial y que se envía de forma directa por el gestor de notificaciones de la App (párr. 2). 
+Dispositivo móvil 
+Cuando pensamos en dispositivos móviles, lo primero que nos viene a la cabeza es un teléfono móvil; sin embargo, Blog de CEUPE(2011) plantea que:
+En la actualidad, existen múltiples dispositivos en el mercado que encajan dentro de esta categoría, como ordenadores portátiles, netbooks, pocketPC, tabletas, etc. Esta diversidad, en palabras de los expertos de Droiders.com, genera una importante problemática para quien debe programarlos, ya que cada dispositivo tiene sus propias características, distintas dimensiones de su pantalla, resoluciones diferentes y, técnicamente, sus componentes pueden ser muy dispares, como una memoria determinada, una capacidad de procesamiento mayor o menor, GPS, etc. Por último, pueden soportar sistemas operativos y unos entornos específicos. En la actualidad, una gran cantidad de dispositivos electrónicos se clasifican como dispositivos móviles, desde teléfonos hasta tabletas, pasando por dispositivos como lectores de RFID. Esta diversidad de dispositivos clasificados como móviles crea cierta dificultad a la hora de definirlos (párr. 1). 
+Navegadores web
+Un navegador web es un programa que permite ver la información que contiene una página web. Según Euskadi.eus,( s.f.): 
+El navegador interpreta el código, HTML generalmente, en el que está escrita la página web y lo presenta en pantalla permitiendo al usuario interactuar con su contenido y navegar. Es de vital importancia contemplar los distintos navegadores con los que los usuarios van a utilizar nuestras páginas. En teoría, los estándares web publicados por el W3C deberían permitir que las páginas fueran visualizadas exactamente igual en todos los navegadores. La realidad, sin embargo, es distinta: Cada navegador (especialmente, Internet Explorer) implementa diferencias que pueden hacer necesario el uso de técnicas “especiales” para que nuestros portales se muestren de la misma forma en todos los navegadores.
+Los navegadores web son fundamentales para acceder e interactuar con la información en internet. Sin embargo, las diferencias entre ellos pueden generar variaciones en la visualización de las páginas web.
+Sistema operativo
+Un sistema operativo (SO) es el conjunto de programas de un sistema informático que gestiona los recursos del hardware y provee servicios a los programas de aplicación de software. Estos programas se ejecutan en modo privilegiado respecto de los restantes. Uno de los propósitos del sistema operativo que gestiona el núcleo intermediario consiste en gestionar los recursos de localización y protección de acceso del hardware, hecho que alivia a los programadores de aplicaciones de tener que tratar con estos detalles (Wikipedia, 2025). 
+Definición de programas en informática 
+Un programa informático o programa de computador es una pieza de software, es decir, una secuencia compleja de instrucciones y procesos orquestados para cumplir una tarea específica en un computador o sistema de computadores. Estos programas pueden ser programas preinstalados en el computador, como el Sistema Operativo que controla todo el funcionamiento del mismo, o pueden ser añadidos adicionalmente por el usuario.
+Por lo general, los programas de computador disponen de cierto margen de recursos del sistema informático mientras se ejecutan, y cumplen roles de todo tipo en el mismo, desde controlar los recursos y las operaciones internas del computador, hasta mediar con el usuario y permitirle trabajar, recrearse, explorar Internet, etc. (Etecé, 2025) 
+Tipos de programas en informática
+La principal clasificación de los programas informáticos atiende a su naturaleza, dividiéndolos en dos clases. Según Etecé (2025):
+Software del sistema: Aquellos programas básicos que permiten el uso del computador, vinculando al usuario con los distintos aspectos de hardware y/o redes del sistema, así como con las aplicaciones instaladas en el mismo. Este tipo de programas dan soporte a las aplicaciones y en muchos casos vienen ya instalados e incluso empotrados en el computador. Por ejemplo: controladores de hardware, Sistemas Operativos, líneas de comandos, etc.
+Software de aplicación: Toda la diversidad de programas secundarios que podemos descargar o instalar en nuestro computador y que permiten llevar a cabo numerosas funciones: procesadores de texto, hojas de cálculo, exploradores Web, videojuegos, software de telecomunicaciones, reproductores multimedia, etc. 
+Aplicación web
+Las aplicaciones web son básicamente programas que usamos en internet para hacer distintas actividades, como editar documentos, enviar mensajes, comprar cosas o manejar una empresa en línea.
+Las aplicaciones web son programas de software que se ejecutan en un navegador web, como Google Chrome o Firefox. Estas aplicaciones no se descargan en nuestros dispositivos, sino que se ejecutan en un servidor y se transmiten a través de Internet al navegador de nuestro dispositivo (Platziteam, 2025). 
+Tipos de aplicaciones web 
+Las aplicaciones web llegaron a la vida de las personas para facilitar muchas gestiones y, en otros casos, crear necesidades e inquietudes nuevas. Da igual el sector en el que te muevas, la posibilidad de obtener una aplicación es muy amplia y los usuarios que estén detrás de la pantalla lo agradecerán (ESIC, 2024). A continuación, detallamos las distintas aplicaciones web que existen:
+Aplicaciones web estáticas
+Se caracterizan por tener un contenido fijo y no interactivo, por lo que son comunes para mostrar información básica en blogs, portfolios o landing pages informativas. La ventaja es que son rápidas y de fácil lectura, aunque no tienen mucha interactividad y su contenido es poco personalizable.
+Aplicaciones web dinámicas
+Su contenido cambia en respuesta a las interacciones del usuario y se basan en bases de datos y scripts del lado del servidor para generar ese dinamismo. Usan tecnologías como AJAX para actualizar el contenido sin recargar la página. Algunos ejemplos son los foros o las redes sociales, sitios altamente interactivos y con una personalización del contenido en tiempo real. Eso sí, son más complejas de desarrollar y mantener.
+Aplicaciones web de página única (SPA)
+Toda la información se carga en una sola página y utilizan frameworks de JavaScript como React, Angular y Vue.js. Sus actualizaciones se manejan sin recargar la página, como ocurre en Gmail, Google Maps o Trello. Además, cuentan con una experiencia rápida y fluida, a pesar de ser complejas en su desarrollo y acarrear posibles problemas de SEO y accesibilidad.
+Aplicaciones web de múltiples páginas (MPA)
+Su estructura es la tradicional, con múltiples páginas HTML para que cada acción del usuario cargue una nueva página del servidor. Se puede apreciar en e-commerce, portales de noticias o plataformas educativas, lugares con un SEO sencillo, aunque con una experiencia de flujo menos fluida.
+Aplicaciones web progresivas (PWA)
+Son aplicaciones que ofrecen una experiencia similar a las aplicaciones nativas, pues utilizan tecnologías como Service Workers y Manifiesto de Aplicación Web para funcionar online y recibir notificaciones push. Es el caso de Pinterest o Starbucks, que además poseen una experiencia de usuario nativa y son más rápidas. Aun así, requieren un conocimiento avanzado para poder implementarlas y tienen algunas limitaciones funcionales si las comparamos con las aplicaciones nativas.
+Aplicaciones web de e-commerce
+Están destinadas a facilitar la compra-venta de productos y servicios online, por lo que tienen integrados catálogos de productos, carritos de compra y sistemas de pago en su propio portal. Esto les facilita la venta, la posibilidad de personalización y el análisis de datos, aunque requieren otro tipo de necesidades relacionadas con la legalidad y la logística. El ejemplo más claro es Amazon.
+Aplicaciones web en tiempo real
+Son aquellas enfocadas en proporcionar actualizaciones instantáneas basadas en datos en tiempo real. Utilizan tecnologías de comunicación bidireccional para mejorar la experiencia de usuario, y requieren de una infraestructura robusta para manejar conexiones continuas. Aplicaciones de chat como WhatsApp Web o videojuegos online son algunos ejemplos.
+Aplicaciones web sociales
+Proponen una comunicación más fluida entre usuarios e incluyen creación de perfiles, mensajería y redes, como en el caso de LinkedIn, Facebook o Instagram. Lo más positivo de estas aplicaciones es el poder fomentar la interacción y el networking, aunque deban tener en cuenta la gestión de privacidad y la posible sobrecarga de contenido.
+Aplicación móvil 
+Una aplicación móvil (en ocasiones, también aplicación telefónica) es una aplicación informática diseñada para ser ejecutada en teléfonos inteligentes, tabletas y otros dispositivos móviles. Este tipo de aplicaciones permiten al usuario efectuar un variado conjunto de tareas profesional, de ocio, educativas, de acceso a servicios, etcétera, facilitando las gestiones o actividades a desarrollar.  
+Tipos de aplicaciones móvil
+Según (appdesign.dev, 2022), los tipos de aplicaciones son:
+App Nativa
+Las aplicaciones nativas (Native App) son apps desarrolladas para un sistema operativo móvil concreto (iOS o Android normalmente), en el lenguaje de programación específico de cada plataforma. Esto quiere decir que una app nativa creada para Android no puede ser utilizada en un dispositivo iOS y viceversa.
+Es el tipo de aplicación móvil más conocida. Para que funcione, debemos descargarla desde los markets de apps, como App Store o Google Play e instalarla en nuestro teléfono. 
+App híbrida
+Las aplicaciones híbridas o multiplataforma combinan elementos de las aplicaciones nativas y las aplicaciones web. Estas aplicaciones se desarrollan utilizando tecnologías web como HTML, CSS y JavaScript, pero se empaquetan en un formato que puede ser instalado en un dispositivo móvil como cualquier otra aplicación nativa. Por tanto, podemos obtener una aplicación para varias plataformas con un único desarrollo.
+React Native se ha convertido en el framework de trabajo más utilizado. Permite a los desarrolladores crear aplicaciones nativas para Android e iOS utilizando JavaScript y React, lo que les permite acelerar el proceso de desarrollo y ofrecer un rendimiento similar al de las aplicaciones nativas. 
+Diferencia entre aplicación móvil y sitios web móviles
+Es normal, que algunos usuarios suelen confundir las aplicaciones móviles con sitios web móviles, pero en realidad, la diferencia es muy sencilla. Cuando hablamos de una App, nos referimos a programas que se instalan en el software del dispositivo haciendo que se encuentren allí de forma permanente y puedas usarlas de forma continua. Estas, requerirán de la conexión a datos para su uso dependiendo de la naturaleza de las mismas, pero, no desaparecerán del móvil aún y cuando no tengas conexión a internet.
+Ahora bien, cuando hablamos de un sitio web móvil, nos referimos a una página que ha sido creada bajo una modalidad responsiva y puede visualizarse y ajustarse a las pantallas de los mismos. En otras palabras, simplemente colocas la URL de la página web que deseas buscar desde tus Smartphone o Tablet y en cuanto aparezca, verás cómo la misma se adapta a tu espacio de visión, más no significa que tengas algún programa instalado. Simplemente con salir del enlace, ya no visualizarás el sitio y hasta allí llegará el proceso, Por lo tanto, es completamente necesario tener datos para poder acceder a un sitio web móvil.
+Aplicaciones móviles más usados:
+Se puede afirmar que las aplicaciones móviles más utilizadas son aquellas que han logrado ganarse la preferencia del público, no solo por su apariencia, sino también por su usabilidad, buen funcionamiento, diseño atractivo y la experiencia de usuario que ofrecen. Aunque actualmente existe una cantidad casi incontable de aplicaciones disponibles, algunas se posicionan entre las más descargadas y utilizadas, resultando prácticamente indispensables en los dispositivos móviles (Softcorp, 2019).
+Facebook: Indudablemente, Facebook es la aplicación más utilizada en los últimos años con millones de descargas a nivel mundial y con una comunidad de seguidores que va en aumento. Se puede decir que son más los que usan la red social desde sus celulares que desde las computadoras.
+WhatsApp: Esta aplicación de mensajería desplazó casi que completamente los SMS comunes por su estupenda usabilidad y, sobre todo por la posibilidad de conectarse con quien quieras sin restricciones territoriales.
+YouTube: El video domina la preferencia de los usuarios en cuanto a consumo de información se refiere, por lo que la descarga de YouTube es una idea que ya está posicionada en la mente de los consumidores digitales.
+Amazon: Las compras online crecen cada día más, y la tienda Amazon domina el mercado ayudado de su app on donde el usuario puede elegir e insertar al carrito de manera confiable lo que le guste. De este modo, mientras estas de paseo en un parque puedes comprar un par de zapatos y esperar a que lleguen a casa.
+Google Maps: Esta app ha cobrado fuerza en la vida cotidiana y también en el ámbito laboral. Su fácil manejo y la utilidad que brinda a quienes In consumen la vuelve indispensable. Con ella podrás ubicarte en cualquier dirección Indicándote además como llegar a todo lugar, bien sea, a través del marcado de rutas en el mapa o por gula por voz, Suele ser la favorita de millones de transportista y mensajeros a nivel mundial,
+Instagram: La red social de alto impacto en Imágenes no podía quedarse atrás. La misma se ha convertido en una de las favoritas de millones de usuarios que la prefieren por su uso más personal. Cuenta con mensajería Instantánea, historias y la posibilidad de ganar seguidores más rápidamente que en cualquier otra red social.
+Telegram: La app que pretende de cierto modo reemplazar a WhatsApp, está siendo muy bien aceptada por los consumidores debido a su estabilidad.
+Gmail: El mundo del email marketing aún es capaz de ofrecer excelentes frutos y es que, simplemente aún todo se maneja por correo. La gran mayoría de las aplicaciones y redes sociales existentes requieren de una cuenta Gmail para comenzar, por lo que estar pendiente de nuestras notificaciones desde el celular es la mejor alternativa. 
+Importancia de las aplicaciones para las empresas
+Las aplicaciones móviles son utilizadas por las empresas para la monitorización y gestión de procesos, así como para planificación y coordinación de estrategias y actividades clave para las mismas. Estas tecnologías permiten realizar trabajos más eficientes, aumentar los beneficios o reducir costes (Dimensiona, 2020).
+Obtención de datos
+Las apps son una gran fuente de datos que permiten obtener información de valor sobre los distintos perfiles de usuarios que las utilizan, así como de su comportamiento en el entorno de la app. También son muy utilizadas por las empresas para obtener y procesar datos sobre sus procesos de manera eficiente. 
+Medir y analizar toda esta información es clave para generar estrategias que permitan el aumento del tiempo de uso en la app, la mejora de las recomendaciones de compra o procesos empresariales, el aumento de las ventas, de la adaptación de los productos/servicios al usuario o la visualización de anuncios, entre muchas otras.
+Experiencias personalizadas
+El diseño y desarrollo de muchas aplicaciones es un proceso centrado en conseguir el mayor porcentaje de conversión de los usuarios que las utilizan.
+Las apps pueden tener un único objetivo o varios, pero mantener una interfaz atractiva y de fácil navegación sigue siendo uno de los elementos clave para mejorar la experiencia de los usuarios, esté diseñada para uso interno de trabajadores o para el gran público.
+Sin embargo, muchas veces esto no es suficiente y es que cada vez son más las empresas que apuestan por la personalización de esta experiencia. Gracias a los datos que se recogen y analizan periódicamente se puede conocer cuándo es el mejor momento para mandar notificaciones a un cliente en concreto, qué tipo de productos son sus favoritos o qué tipo de mensajes incrementan la apertura de la aplicación.
+Comunicación directa con notificaciones in-app y push
+Las aplicaciones permiten mandar notificaciones a los usuarios dentro y fuera de las apps. Según Dimensiona (2020) se distinguen principalmente en dos tipos:
+Notificaciones in-app: Las comunicaciones in-app suelen mostrarse a pantalla completa para mandar mensajes clave al usuario y promover su interacción con el contenido.
+Notificaciones push: Las comunicaciones push son notificaciones que aparecen en la pantalla de bloqueo de los móviles, aunque pueden ser desactivadas por los usuarios en la instalación de las apps o en los ajustes de las mismas.
+Este tipo de notificaciones, muy empleadas en todas las redes sociales, tienen como principal objetivo la reactivación de los usuarios, o lo que es lo mismo, que los usuarios vuelvan a abrir la aplicación, a veces, con un objetivo concreto o comunicación.
+Las grandes compañías estudian en profundidad las creatividades y contenidos de estas notificaciones que en muchos casos varían en función del usuario. Todo esto permite una comunicación mucho más directa y personalizada que no podemos conseguir mediante otros medios.
+Servidores web
+Un servidor web es un ordenador que almacena, procesa y entrega archivos de sitios web a los usuarios desde un navegador:
+ Los servidores web están formados por hardware y software que utilizan el Protocolo de Transferencia de Hipertexto (HTTP) para responder a las peticiones de los usuarios de la web realizadas a través de la World Wide Web.A través de este proceso, los servidores web cargan y entregan la página solicitada al navegador del usuario, como Google Chrome, por ejemplo. Los servidores web también utilizan el Protocolo Simple de Transferencia de Correo (SMTP) y el Protocolo de Transferencia de Archivos (FTP) para procesar archivos para el correo electrónico o el almacenamiento (Betania, 2024). 
+
+
+
+
+
+
+
+
+
+Capítulo III: Marco metodológico
+Tipo de investigación
+El enfoque de la presente investigación es aplicada, ya que busca dar solución a una problemática real mediante el desarrollo de un sistema informático que optimice la gestión de eventos sociales. La investigación aplicada, según Hernández, Fernández y Baptista (2014), «busca generar conocimientos para resolver necesidades prácticas mediante la utilización de teorías, principios y métodos científicos» (p. 136). En este sentido, el proyecto tiene un carácter práctico y funcional, al proponer una solución tecnológica a una problemática operativa real.
+Además, el nivel de investigación corresponde a una investigación y desarrollo (I+D), ya que se orienta al diseño, construcción e implementación de un sistema web que centralice procesos como reservaciones, pedidos y facturación. Según Tamayo y Tamayo (2004), la investigación de desarrollo «consiste en la creación de productos, procesos o sistemas aplicables a una necesidad específica, con base en el conocimiento científico disponible» (p. 88). Esto se vincula directamente con los objetivos del estudio, que apuntan a transformar procesos manuales en procesos digitales automatizados. 
+Tipo de Investigación según el tiempo 
+El presente proyecto es un tipo de Investigación Transversal. Recopilamos información sobre investigaciones referentes a la gestión y planificación de eventos, para obtener una visión general y comparativa de diferentes aspectos relacionados con ello en un momento en específico.
+Procedimientos
+El desarrollo del sistema web para la gestión de eventos se llevó a cabo siguiendo una metodología estructurada por etapas, acorde al enfoque de análisis de sistemas. La solución fue implementada utilizando GeneXus 18 como plataforma de desarrollo, Tomcat como servidor de aplicaciones y SQL Server como sistema de gestión de base de datos.
+Etapa de Concepción
+Estructuración de la problemática.
+Se identificaron las dificultades en la gestión manual de pedidos, control de inventario, organización de combos y comunicación con los clientes.
+Análisis amplio de requerimientos.
+Se recopilaron los requerimientos mediante entrevistas y observación del proceso de la empresa. Se definieron las necesidades principales: mejor interacción entre el cliente y el dueño de la empresa, gestión de pedidos, reservas y visualización de disponibilidad.
+Propuesta de solución.
+ 	Se propuso el desarrollo de una aplicación web y móvil para el administrador y una app móvil para los clientes con interfaz intuitiva para acceder a funcionalidades claves desde cualquier dispositivo con acceso a internet, con el fin de automatizar la gestión de eventos.
+Etapa de Elaboración
+Arquitectura de la solución.
+Se definió una arquitectura cliente-servidor, donde el sistema web gestiona la administración y la app móvil permite la interacción del cliente, mientras que el servidor ejecuta la lógica de negocio sobre Tomcat y accede a los datos almacenados en SQL Server.
+Planos de la solución.
+Se definieron los distintos módulos del sistema: módulo de reservas, servicios, artículos, zonas de cobertura, facturación y se elaboraron diagramas UML.
+Diagramas relacionados a los procesos.
+Se modelaron los procesos de reservas, pedidos y gestión de eventos como casos de uso, diagramas de secuencia, actividad y entidad-relación para representar el funcionamiento del sistema.
+Etapa de Construcción
+Diseño de los procesos
+Se implementaron las funcionalidades usando los objetos de GeneXus (WebPanels, Panel, Transactions, DataProviders, Procedures). Se definieron reglas de negocio para asegurar la integridad y coherencia de los datos, así como validaciones automáticas.
+Diseño de la base de datos
+Se diseñó un modelo relacional para almacenar información de clientes, artículos, reservas y servicios. La base de datos fue generada automáticamente por GeneXus en SQL Server, facilitando la sincronización entre el modelo conceptual y físico.
+Diseño de las interfaces
+Se diseñaron interfaces amigables, responsivas y adaptadas a distintos dispositivos. Se priorizó la simplicidad en la navegación y la facilidad de uso tanto para el cliente como para el administrador de la empresa Alejandro Jara Wedding | Event Planner.
+Etapa de Implantación
+Proceso iterativo de mejoramiento continuo
+Durante la fase de pruebas, se recogieron observaciones del dueño de la empresa, lo que permitió mejorar las funcionalidades e interfaces mediante iteraciones sucesivas en GeneXus.
+Elaboración de manuales
+Se elaboraron manuales de usuario y manuales técnicos. El manual de usuario incluye instrucciones para consultar servicios, realizar reservas, y generar pedidos. El manual técnico describe la arquitectura del sistema, configuración de entorno, despliegue en Tomcat y estructura de base de datos en SQL Server.
+Procedimiento de recolección de datos
+Los datos fueron recolectados de manera sistemática a través de entrevistas aplicadas al dueño de la empresa Alejandro Jara Wedding | Event Planner, utilizando guías de preguntas previamente estructuradas como instrumento principal, lo cual permitió establecer con precisión la problemática y las alternativas de solución a la misma.
+Área de impacto 
+El área de impacto corresponde a la empresa Alejandro Jara Wedding | Event Planner ubicada en Paraguarí, Paraguay, dedicada a la gestión y organización de eventos.
+El impacto esperado se orienta hacia:
+Administrador: quien contará con un sistema centralizado que facilite la toma de decisiones y reduzca la carga de trabajo operativo.
+Clientes: quienes percibirán mejoras en la atención, rapidez en el servicio y mayor confiabilidad en los procesos de reservación.
+La implementación de sistemas informáticos en empresas de servicios mejora la productividad y contribuye a una mayor satisfacción del cliente.
+  Localización geográfica
+La empresa “Alejandro Jara Wedding | Event Planner” se encuentra ubicada en la ciudad de Paraguarí, capital del 9° departamento de Paraguay, específicamente en la calle Pa’i Gómez. 
+	Paraguarí se caracteriza por ser un centro económico y cultural de la región, con una población aproximada de 26.000 habitantes, cuya principal actividad económica se centra en el comercio, el turismo interno y la prestación de servicios recreativos (Dirección General de Estadística, Encuestas y Censos [DGEEC], 2022).
+En términos socioeconómicos, la zona presenta un nivel medio de desarrollo, con un importante dinamismo en el sector terciario, lo que genera oportunidades para el crecimiento de negocios enfocados en el ocio y la hospitalidad.
+
+
+Figura 1 
+Ubicación de la Empresa Alejandro Jara Wedding Event Planner
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Capítulo IV: Análisis de resultados
+Se realizaron pruebas al sistema web y a la aplicación móvil con el objetivo de verificar su funcionamiento y desempeño. Los resultados obtenidos permitieron comprobar que las funcionalidades implementadas operan de manera adecuada y eficiente.
+Asimismo, se evidenció la importancia de contar con un sistema informático que permita automatizar los procesos, optimizando la gestión y mejorando la eficiencia de los servicios mediante la solución propuesta.
+Listado de Casos de Uso
+Tabla 1 
+Listado de Casos de Uso
+N°	Nombre de Caso de Uso	Módulo	Complejidad	Prioridad
+1	Gestión de Usuarios	Administrador	Alta	Alta
+2	Gestión de Servicios	Cliente	Alta	Alta
+3	Gestión de Pedidos	Cliente	Alta	Alta
+4	Gestión de Contratos y Pagos	Administrador	Alta	Alta
+5	Gestión del Evento y Post-Evento	Administrador	Alta	Alta
+6	Gestión Administrativa	Administrador	Alta	Alta
+Nota. Listado de casos de uso que se presentan en el análisis con sus respectivos actores.
+
+
+Diagramas de casos de uso
+Figura 2 
+Gestión de Usuarios
+
+Nota. En este diagrama se visualiza como se lleva a cabo el proceso gestionar usuarios.
+Figura 3 
+Gestión de Servicios
+
+Nota. En este diagrama se visualiza como se lleva a cabo el proceso gestionar servicios.
+
+Figura 4 
+Gestión de Pedidos y Gestión de Contratos, Pagos
+
+Nota. En este diagrama se visualiza como se lleva a cabo el proceso gestionar pedidos, contratos y pago.
+Figura 5
+Gestión de Evento y Post-Evento
+
+Nota. En este diagrama se visualiza como se lleva a cabo el proceso de gestión de eventos y post-evento.
+Figura 6 
+Gestión Administrativa
+
+Nota. En este diagrama se visualiza la gestión administrativa.
+
+
+Descripción de casos de Uso
+Tabla 2 
+Descripción de Casos de Uso - Gestionar Usuarios
+Prioridad:	Alta [X] Media [ ] Baja [ ]
+Complejidad:	Simple [ ] Mediano [X] Complejo [ ]
+Tipo:	Concreto [X] Abstracto [ ]
+Actor Principal:	Cliente / Administrador
+Objetivo:	Gestionar el alta de nuevos clientes en la plataforma.
+Precondición:	El cliente debe instalar la app; el administrador debe estar autenticado.
+Post condición:	El cliente queda activo en la base de datos y recibe sus credenciales.
+Actor	Sistema
+1. El cliente descarga la app y completa el formulario de registro.	2. Almacena la solicitud en estado "Pendiente".
+3. El administrador visualiza las solicitudes y valida los datos.	4. Verifica la integridad de la información cargada.
+5. El administrador confirma el alta del cliente.	6. Cambia estado a "Activo", genera acceso y envía correo automático al cliente con sus datos.
+Nota. En esta tabla se visualiza la descripción del caso de uso, cuyo objetivo es Gestionar el acceso de los clientes en el sistema Event Planner
+
+
+Tabla 3 
+Descripción de Casos de Uso - Gestionar Servicios
+Prioridad:	Alta [X] Media [ ] Baja [ ]
+Complejidad:	Simple [ ] Mediano [X] Complejo [ ]
+Tipo:	Concreto [X] Abstracto [ ]
+Actor Principal:	Cliente 
+Objetivo:	Visualizar, seleccionar combos y personalizar servicios según disponibilidad.
+Precondición:	El usuario debe estar autenticado en el sistema.
+Post condición:	El servicio seleccionado y personalizado queda vinculado a la solicitud de pedido.
+Actor	Sistema
+1. El cliente ingresa al catálogo para visualizar servicios (combos y personalizados).	2. El sistema despliega las opciones disponibles con sus descripciones y costos.
+3. El usuario consulta disponibilidad de una fecha específica.	4. El sistema verifica el calendario y confirma si el servicio puede prestarse en esa fecha.
+5. El cliente procede a seleccionar servicio de su interés.	6. El sistema habilita las opciones para completar de los datos para dicho servicio.
+Nota. En esta tabla se visualiza la descripción del caso de uso, cuyo objetivo es la gestión de los servicios por parte del cliente en la app Event Planner.
+Tabla 4 
+Descripción de Casos de Uso - Gestión de Pedidos y Gestión de Contrato, Pagos
+Prioridad:	Alta [X] Media [ ] Baja [ ]
+Complejidad:	Simple [ ] Mediano [ ] Complejo [X]
+Tipo:	Concreto [X] Abstracto [ ]
+Actor Principal:	Cliente / Administrador
+Objetivo:	Formalizar la reserva de un evento y gestionar el contrato y pagos.
+Precondición:	El cliente debe estar logueado; el servicio debe estar disponible.
+Post condición:	Se genera la reserva oficial y se registra el pago de la seña.
+Actor	Sistema
+1. El cliente crea un pedido seleccionando fecha y ubicación.	2. Valida disponibilidad y registra el pedido temporal.
+3. El administrador prepara el contrato y lo envía al cliente.	4. Habilita la opción de respuesta en el perfil del cliente.
+5. El cliente acepta el contrato y realiza el pago de la seña.	6. Registra la transacción, genera la reserva y actualiza el calendario.
+Nota. En esta tabla se visualiza la descripción del caso de uso, cuyo objetivo es Gestionar los pedidos por parte del cliente en la app y la gestión de Contratos y Pago por parte del administrador desde la web.
+Tabla 5 
+Descripción de Casos de Uso - Gestión de Evento y Post-Evento
+Prioridad:	Alta [ ] Media [X] Baja [ ]
+Complejidad:	Simple [ ] Mediano [X] Complejo [ ]
+Tipo:	Concreto [X] Abstracto [ ]
+Actor Principal:	Administrador
+Objetivo:	Controlar el estado del inventario post-evento y liquidar daños.
+Precondición:	El evento debe haber finalizado.
+Post condición:	Se actualiza el stock.
+Actor	Sistema
+1. El administrador gestiona el estado de las reservas.	2. Despliega listado de reservas con las acciones a realizar.
+3. El administrador revisa los artículos utilizados en el evento.	4. Despliega lista de ítems vinculados al pedido.
+5. El administrador registra daños o faltantes de artículos.	6. Calcula automáticamente el costo de reposición.
+7. El administrador genera la factura final del evento.	8. Suma servicios, logística y daños; notifica el monto total al cliente.
+Nota. En esta tabla se visualiza la descripción del caso de uso, cuyo objetivo es la gestión del evento y el post-evento dentro del sistema Event Planner.
+
+Tabla 6 
+Descripción de Casos de Uso - Gestión del Administrador
+Prioridad:	Alta [ ] Media [X] Baja [ ]
+Complejidad:	Simple [X] Mediano [ ] Complejo [ ]
+Tipo:	Concreto [X] Abstracto [ ]
+Actor Principal:	Administrador
+Objetivo:	Configurar los parámetros base del sistema como stock, fechas y zonas.
+Precondición:	El administrador debe tener permisos de acceso al módulo de configuración.
+Post condición:	Los cambios impactan en la disponibilidad y costos visibles para el cliente.
+Actor	Sistema
+1. El administrador ingresa al menú de administración.	2. Despliega opciones de artículos, calendario y logística.
+3. El administrador modifica el stock, habilita nuevas fechas o gestiona servicios.	4. Valida los datos y actualiza la base de datos de manera inmediata.
+5. El administrador define nuevos costos de traslado por zona.	6. Recalcula los parámetros para futuros pedidos de clientes.
+Nota. En esta tabla se visualiza la descripción del caso de uso, cuyo objetivo es la gestión Administrativa dentro del sistema Event Planner.
+
+
+Listado de Diagramas de Actividad
+Tabla 7 
+Listado de Diagramas de Actividad
+Caso de Uso	Diagrama de Actividad
+Gestión de Usuarios	D-A Gestión de Usuarios
+Gestión de Servicios	D-A Gestión de Servicios
+Gestión de Pedidos	D-A Gestión de Pedidos
+Gestión de Contratos y Pagos	D-A Gestión de Contratos y Pagos
+Gestión del Evento	D-A Gestión del Evento
+Post-Evento	D-A Post-Evento
+Gestión Administrativa	D-A Gestión Administrativa
+Nota. Listado de diagramas de actividades relacionadas a sus respectivos casos de uso.
+Figura 7 
+Diagrama de Actividad - Gestión de Usuarios
+ 
+
+Figura 8 
+Diagrama de Actividad - Gestión de Servicios
+
+ 
+
+
+
+
+Figura 10 
+Diagrama de Actividad - Gestión Evento y Post-Evento
+
+Figura 11 
+Diagrama de Actividad - Gestión Administrativa
+
+Listado de Diagramas de Secuencia
+Tabla 8  
+Listado de Diagramas de Secuencia
+Caso de Uso	Diagrama de Secuencia
+Gestión de Usuarios	D-S Gestión de Usuarios
+Gestión de Servicios	D-S Gestión de Servicios
+Gestión de Pedidos	D-S Gestión de Pedidos
+Gestión de Contratos y Pagos	D-S Gestión de Contratos y Pagos
+Gestión del Evento	D-S Gestión del Evento
+Post-Evento	D-S Post-Evento
+Nota. Listado de diagramas de secuencias relacionadas a sus respectivos casos de uso.
+Figura 12 
+Diagramas de Secuencia – Gestión de Usuarios
+
+Figura 13  
+Diagrama de Secuencia - Gestión de Servicios
+
+
+
+Figura 14 
+Diagrama de Secuencia - Gestión de Pedidos y Gestión de Contrato, Pagos
+
+
+
+Figura 15 
+Diagrama de Secuencia - Gestión Evento y Post-Evento
+
+
+
+Figura 16 
+Diagrama de Secuencia - Gestión Administrativa
+
+
+
+
+
+
+
+
+
+
+Recursos Tecnológicos
+Para la implementación del proyecto es necesario los siguientes recursos tecnológicos.
+Requerimiento de Hardware
+Procesador: Mínimo de 2 GHz, se recomienda procesador de múltiples núcleos para mejorar el rendimiento en la gestión de reservas y operaciones concurrentes.
+Memoria RAM: Mínimo de 8 GB (recomendado 16 GB en caso de manejar múltiples usuarios simultáneamente).
+Disco duro: Mínimo de 2 GB de espacio libre para la instalación. Se recomienda espacio adicional para la base de datos de clientes, reservas y facturación.
+Dispositivo de red: Conexión estable a internet (mínimo 10 Mbps). 
+Requerimiento de Software
+Sistema Operativo: Compatible con Windows Server, Linux o similar,
+Servidor de Aplicaciones: Apache Tomcat 9 o superior (compatible con GeneXus 18)
+Base de Datos: Microsoft SQL Server 2019 o superior.
+Navegadores Web: Compatibilidad con Google Chrome (versión 100 o superior), Mozilla Firefox y Microsoft Edge.
+Requerimientos No Funcionales
+Usabilidad
+El sistema debe ser accesible vía web y aplicación móvil, tanto para clientes como para administradores.
+Debe mostrar mensajes de alerta, error y confirmación claros y comprensibles.
+La interfaz debe ser intuitiva, adaptada a usuarios con diferentes niveles de conocimiento tecnológico.
+Confiabilidad y Capacidad
+Implementar mecanismos de respaldo y recuperación de datos.
+Asegurar la integridad y consistencia de la información en todo el ciclo de vida de las Reservas.
+Disponibilidad mínima recomendada del 99%.
+Seguridad
+Acceso restringido mediante usuarios y contraseñas encriptadas.
+Control de roles (administrador, cliente).
+Conexiones seguras vía HTTPS.
+Documentación
+Correcta ortografía en interfaces.
+Proveer un manual de usuario del sistema.
+Requerimientos de Interfaz
+Interfaz de Hardware: No aplica (sistema web).
+Interfaz de Software: Notificaciones push en móviles.
+Interfaz de Comunicación: Comunicación con la base de datos SQL Server y servicios web (GeneXus REST).
+Restricciones de Diseño
+Herramienta de desarrollo: GeneXus 18 (U3 o superior).
+Generador: Java.
+Base de datos: SQL Server.
+Requerimientos de Licencia
+Desarrollo y Mantenimiento
+GeneXus 18
+Generador Java
+Development Environment
+Generador Smart Devices
+Smart Devices Plus
+Work With Plus
+Implementación
+Implementación inicial en servidor Tomcat, con base de datos en SQL Server.
+Arquitectura del sistema
+ Diagrama de Entidad-Relación	
+Figura 17 
+Diagrama de Entidad-Relación General
+
+
+
+Figura 18 
+Diagrama de Entidad-Relación Artículos
+
+
+
+Figura 19 
+Diagrama de Entidad-Relación Pedido
+
+
+
+Figura 20 
+Diagrama de Entidad-Relación Servicio
+
+Figura 21 
+Diagrama de Entidad-Relación Disponibilidad
+
+Figura 22 
+Diagrama de Entidad-Relación Factura
+
+
+
+
+
+
+
+
+
+Figura 23 
+Diagrama de Entidad-Relación Usuario/App
+
+Figura 24 
+Diagrama de Entidad-Relación Timbrado / Zona Cobertura
+
+Diagrama de componentes
+Figura 25 
+Diagrama de componentes de Event Planner
+
+
+
+Manual del usuario 
+Accesos y funcionalidades del sistema web. 
+El acceso al sistema se realiza a través de un navegador de internet, abriendo la dirección: http:// :/paquete, donde < servidor > corresponde a la dirección IP o nombre del servidor, y al puerto del contenedor de aplicaciones.
+Figura 26 
+Inicio de Sesión
+
+http://localhost:8080/eventplannerjsql/com.eventplanner.login
+Al ingresar a dicha dirección, se debe acceder al sistema con el usuario admin y contraseña
+admin123 que se crea por defecto para su primer uso, solo es necesario presionar el botón
+Iniciar Sesión para tal efecto.
+Posteriormente, en caso de que el usuario y la contraseña sean correctas el sistema lleva a la siguiente pestaña:
+Figura 27 
+Pantalla Inicio
+
+Que corresponde al menú de opciones para el Administrador del Sistema, donde podrá efectuar sus respectivas tareas:
+Figura 28 
+Opciones del Menú
+
+Usuario Administrador. El administrador del sistema tiene acceso total, y como tal deberá encargarse de mantener los datos para el uso correcto del sistema.
+Administrar seguridad del sistema
+Se visualizan los usuarios y roles que se deberá administrar o crear según la necesidad, si presiona la opción roles, le desplegará la siguiente pantalla que brinda la funcionalidad de realizar ABM a los roles como también asignarles permisos a los objetos a los cuales el rol tendrá acceso.
+Figura 29 
+Pantalla Roles
+
+Se cuentan con las siguientes opciones: visualizar, modificar y eliminar datos. Si presiona el botón de agregar, le desplegara la siguiente pantalla para insertar un rol.
+
+Al presionar el botón permisos, se despliega la siguiente pantalla, donde se visualiza todos los objetos del sistema a los cuales puede darle permisos para que el rol tenga acceso.
+Figura 31 
+Permisos del Rol
+
+
+Al presionar el botón agregar, se despliega la siguiente pantalla, donde permite vincular al rol las funcionalidades específicas a la cuales tendrá acceso, seleccionando de acuerdo a la necesidad.	
+Figura 32
+Vincular funcionalidades al Rol
+
+Si presiona el botón de agregar, le desplegara la siguiente pantalla para insertar un nuevo usuario.
+Figura 33 
+Insertar nuevo usuario
+
+Administrar datos referenciales
+	El Administrador del sistema deberá encargarse de mantener algunos datos (Alta, Baja, Modificación) para el uso del sistema, es decir, datos esenciales usados para complementar la información de las gestiones/cargas que realizarán los usuarios. Dicho sistema cuenta con los siguientes datos referenciales, y los ejemplos de la carga de los datos. A continuación, se estarán mencionando las funcionalidades que abarca el sistema:
+En el menú Administración, submenú Artículos, se visualiza el listado de todos los artículos disponibles para alquiler por parte de la empresa, incluyendo la cantidad en stock y el precio correspondiente. Además, se dispone de funcionalidades que permiten editar o eliminar los artículos previamente registrados, facilitando su correcta gestión dentro del sistema.
+Figura 34 
+Menú Artículos
+
+Se cuenta con el botón agregar donde el administrador podrá cargar en el sistema artículos nuevos adquiridos para su empresa.
+Figura 35 
+Agregar nuevo artículo
+
+En el menú Eventos, submenú Servicios se cuentan con todos los servicios ofrecidos por la empresa, como Servicios Personalizados y Combos, se podrán editar y eliminar según necesidad.
+Figura 36 
+Menú Servicios
+
+Se cuenta con la funcionalidad de Agregar nuevos servicios.
+Figura 37 
+Agregar Nuevo Servicio
+
+Dentro de cada Tipo de Servicio Combo se pueden agregar, editar y eliminar artículos.
+Figura 38 
+Servicio Combo
+
+En el menú Eventos, submenú Zonas de Cobertura se encuentran desglosados los lugares con su respectivo costo por traslado. Tienen funciones de editar, eliminar y filtrar.
+Figura 39 
+Menú Zonas de Cobertura
+
+Cuenta con la función de agregar nueva zona de cobertura con su respectivo costo de traslado.
+Figura 40 
+Agregar Nueva Zona
+
+En el menú “Activación de Usuarios” se visualizan los datos de las personas registradas en la aplicación, donde el Administrador puede aprobar su acceso al sistema. Los usuarios permanecen en estado “Pendiente” hasta que su registro sea aceptado. 
+Figura 41 
+Activación de Usuarios
+
+Una vez aprobada la solicitud de acceso, los datos de la persona pasan a visualizarse en el menú “Clientes”. Además, el sistema dispone de una función de filtrado para facilitar la búsqueda de registros.
+Figura 42 
+Menú Clientes
+
+En el menú “Usuarios”, el Administrador tiene la posibilidad de activar o desactivar el acceso de los usuarios mediante una opción de selección (check).
+Figura 43 
+Menú Usuarios
+
+Figura 44 
+Activar/Desactivar Usuarios
+
+En el menú Administración, submenú Reservas, se visualizan todas las reservas de pedidos realizadas por los clientes. En esta sección, el usuario puede aceptar, rechazar y visualizar el detalle de cada pedido, incluyendo su estado, pagos y datos del cliente. Además, cuenta con filtros que permiten buscar y localizar registros de manera rápida y eficiente.
+Figura 45 
+Menú Reservas
+
+
+En el caso de que el cliente ingrese un lugar no registrado en el sistema, el Administrador podrá asignar manualmente un costo adicional por traslado según la zona de cobertura correspondiente.
+Figura 46 
+Acción Enviar Presupuesto de Traslado
+
+Al hacer clic en el botón de “Enviar Presupuesto”, se abrirá una pantalla donde el administrador podrá completar el costo de traslado según la zona indicada por el cliente y enviarlo como parte del presupuesto.
+Figura 47 
+Pantalla Agregar Costo de Traslado
+
+Una vez que el Administrador recibe un nuevo pedido de reserva, al hacer clic en el botón correspondiente se despliegan dos acciones disponibles: “Enviar Contrato” y “Anular”.
+
+Al hacer clic en la opción “Anular”, el pedido de reserva pasa automáticamente al estado “Cancelado”, reflejándose también este cambio en la aplicación del cliente.
+Figura 49 
+Estado Cancelado de Reserva
+
+Por otro lado, al seleccionar la opción “Enviar Contrato”, el sistema muestra la etiqueta “Contrato Enviado” junto con el estado “Pendiente”, indicando que el cliente debe aprobar el contrato y realizar el pago de la seña.
+Figura 50 
+Pantalla de Contrato enviado, Pendiente de Seña
+
+En caso de que el contrato haya sido aceptado y el cliente haya realizado el pago de la seña, el Administrador tiene la posibilidad de verificar el comprobante correspondiente y editar el monto registrado en el sistema, con el fin de validar que coincida con el importe efectivamente transferido. El registro de este monto permite mantener un mejor control y trazabilidad de los pagos relacionados a cada evento.
+Figura 51 
+Pantalla de Contrato Aceptado, Pendiente de revisión de Seña
+
+Figura 52 
+Pantalla de Revisión de Seña
+
+Una vez verificado el monto ingresado por el cliente y se haya confirmado, el pedido de reserva pasa automáticamente al estado “Activo”.
+
+Posteriormente, una vez realizado el pago total del saldo pendiente y ejecutado el evento, se habilita la opción “Entregar Evento”, donde el Administrador puede verificar y registrar artículos faltantes, indicando la cantidad correspondiente y el monto a cobrar al cliente.
+Figura 54 
+Acción de Entregar Evento
+
+Una vez registrados todos estos datos, al hacer clic en el botón “Cerrar Entrega”, el evento pasa automáticamente al estado “Finalizado”, quedando así concluido el proceso del evento.
+Figura 55 
+Pestaña de Revisión de artículos faltantes, Cerrar Evento
+
+
+Figura 56 
+Resumen Revisión de Artículos faltantes
+
+En el menú Administración, submenú Facturas, el sistema genera automáticamente las facturas de los clientes una vez finalizado el evento. En esta pantalla se visualiza el listado de facturas correspondientes a cada evento realizado, junto con sus respectivos detalles.
+Figura 57 
+Menú Facturas
+
+Al hacer clic en el botón de impresión, el sistema muestra la factura en formato listo para imprimir.
+Figura 58 
+Factura
+
+
+
+
+
+
+
+
+Manual de la Aplicación móvil para el Cliente
+Al iniciar la aplicación Event Planner, la persona se puede registrar como cliente haciendo clic en la opción “Registrarme” 
+Figura 59 
+Inicio de Sesión Cliente
+
+
+
+Al seleccionar la opción, se abre una nueva pantalla donde el usuario debe ingresar sus datos. Una vez completados y guardados, el registro queda en estado pendiente.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Una vez que el Administrador aprueba el registro, el cliente recibe un correo de confirmación con sus credenciales de acceso. A partir de ese momento, puede ingresar al sistema con dichas credenciales.
+
+
+
+
+
+
+
+
+
+
+Una vez iniciada la sesión, se visualizan los datos de acceso del usuario, con la posibilidad de modificarlos según sea necesario.
+
+
+En la pantalla principal se visualizan los servicios disponibles para la organización de eventos, permitiendo al usuario consultar la información detallada de cada servicio, como descripción, artículos incluidos y costos correspondientes.
+
+En la parte superior izquierda se dispone de un menú de opciones para acceder a funcionalidades adicionales.  Que son los siguientes:
+
+
+
+Menú principal
+En el menú Principal al entrar en un servicio tipo Personalizado, se muestran los detalles de todos los artículos disponibles que tiene la empresa para que el cliente elija a su gusto y necesidad con la cantidad que requiere según stock disponible.
+Figura 65 
+Servicio Personalizado
+
+
+Al realizar la selección de los artículos y agregar la cantidad requerida, el usuario avanzará a la siguiente pantalla, donde podrá visualizar el detalle completo de la reserva, las políticas del evento y completar la información necesaria, como fecha, hora, dirección del evento (seleccionando una ya registrada o ingresando una nueva) y comentarios adicionales. Finalmente, podrá confirmar la reserva mediante el botón “Reservar”.
+Figura 66 
+Pantalla de Carga de Datos para Reserva
+
+
+ En el menú Principal al entrar en un servicio tipo Combo, se muestran los artículos que contiene el combo donde podrá visualizar el detalle completo de la reserva, las políticas del evento y completar la información necesaria, como fecha, hora, dirección del evento (seleccionando una ya registrada o ingresando una nueva) y comentarios adicionales. Finalmente, podrá confirmar la reserva mediante el botón “Reservar”.
+
+
+
+
+
+Al hacer doble clic sobre un artículo, se despliega una ventana con la información detallada correspondiente al artículo seleccionado, como se visualiza en la siguiente imagen.
+Figura 68 
+Pantalla de Información de Artículo
+
+
+Una vez confirmado el pedido, este podrá visualizarse en el menú “Mis Reservas”, el cual dirige a una pantalla donde se muestran los datos relevantes del evento junto con el estado “Contrato Pendiente”.
+
+Posteriormente al envío de la reserva, el administrador remitirá el contrato correspondiente al cliente, quien recibirá una notificación informando la disponibilidad del documento para su revisión y confirmación.
+Figura 70 
+Notificación de Contrato recibido
+
+
+Al hacer clic en la notificación, el cliente es dirigido directamente al contrato, donde puede revisarlo y seleccionar la opción de aceptar o rechazar el acuerdo. El contrato es dinámico, ya que se completa automáticamente con los datos correspondientes al evento solicitado.
+Figura 71 
+Formato de Contrato recibido
+
+
+En caso de que el cliente rechace el contrato, el estado del evento pasará automáticamente a “Anulado”.
+Figura 72 
+Contrato Rechazado, Reserva Anulada
+
+
+
+Caso contrario, se mostrará la pantalla correspondiente para realizar el pago de la seña y continuar con la confirmación de la reserva.
+Figura 73 
+Pantalla de Registrar Pago
+
+
+
+
+En caso de que el lugar agregado por el cliente no se encuentre registrado en el sistema, el Administrador envía el costo correspondiente al traslado para dicha ubicación, y el cliente recibe una notificación informándole sobre este monto.
+Figura 74 
+Notificación de Costo final del evento
+
+Luego de realizarse el pago de la seña del 50%, el cliente recibe una notificación informándole que su reserva ha sido confirmada.
+Figura 75 
+Notificación de Reserva Confirmada
+
+
+
+
+
+
+En el menú Mis Reservas aparecen todas las reservas realizadas que están en espera de la realización del evento. 
+Figura 76 
+Reservas en estado Activo
+
+
+Al hacer clic en el ícono de visualización, el cliente podrá consultar los detalles completos del evento correspondiente a la reserva realizada.
+Figura 77 
+Pantalla de Detalles de Reserva
+
+Posteriormente, el cliente deberá cancelar el saldo restante con un mínimo de 48 horas de anticipación a la fecha de realización del evento.
+
+Luego de finalizar la ejecución del evento, el cliente recibe una notificación informándole que su reserva ha sido finalizada.
+Figura 79 
+Notificación de Reserva Finalizada
+
+En el Menu mis eventos se podrá visualizar todos los eventos finalizados con sus respetivos detalles.
+Figura 80 
+Pantalla de Menú Mis Eventos, Eventos Finalizados
+
+En el menú Calendario se pueden observar todas las fechas disponibles y ya ocupadas. Las fechas disponibles son marcadas en verde y las no disponibles en rojo, de igual forma al dar clic en una fecha marcada en rojo sale un mensaje de Fecha No Disponible.
+
+
+En el menú Políticas se visualizan todas las bases y condiciones con las que cuenta la empresa Alejandro Jara Wedding | Event Planner
+Figura 82 
+Menú Políticas de la Empresa
+
+
+
+Manual de la Aplicación móvil para el Administrador
+La aplicación móvil para el Administrador funciona como una herramienta informativa, permitiéndole recibir notificaciones en tiempo real y realizar la verificación de artículos en el post-evento, registrando de manera rápida y cómoda posibles faltantes o daños.
+En la pantalla de inicio de sesión, el Administrador debe ingresar sus credenciales de acceso para ingresar a la aplicación administrativa.
+Una vez que accede a la aplicación, se visualizan las opciones para consultar nuevos usuarios y registros, realizar la entrega del evento y podrá recibir notificaciones en tiempo real.
+
+Cada vez que el Administrador recibe un nuevo pedido de reserva se genera una notificación en la aplicación administrativa, permitiéndole conocer en tiempo real que existe una nueva reserva pendiente de verificación.
+Figura 85 
+Notificación de Nuevo Evento Registrado
+
+Al acceder al menú "Nuevas", se visualizan todas las solicitudes de reservas recientemente registradas en el sistema.
+Figura 86 
+Pantalla de Lista de Eventos
+
+Cada vez que el Administrador recibe un nuevo registro de usuario se genera una notificación en la aplicación administrativa, permitiéndole conocer en tiempo real que existe un nuevo registro pendiente de verificación.
+
+
+Al acceder al menú "Nuevos Usuarios", se despliega el listado de todos los nuevos registros de usuarios pendientes de verificación.
+Figura 88 
+Pantalla de Visualización de Nuevos Registros
+
+En la sección “Entregar Evento” se visualizan todos los eventos próximos a finalizar, los cuales deben ser verificados para controlar si los artículos utilizados se encuentran completos o presentan faltantes o daños.
+
+
+
+Capítulo V: Conclusiones y recomendaciones
+Conclusiones
+	El desarrollo de un sistema web para la gestión de eventos sociales ubicada en la ciudad de Paraguarí representa una solución concreta y pertinente a las limitaciones que enfrentan este tipo de empresas al administrar sus procesos de manera manual o fragmentada. A lo largo de este trabajo se identificó que la falta de un sistema centralizado genera problemas como en la gestión de inventarios, retrasos en la confirmación de reservas y dificultades en la gestión de servicios, lo cual repercute directamente en la experiencia del cliente y en la eficiencia de la administración.
+	En relación al primer objetivo específico, se logró implementar una funcionalidad en la aplicación móvil que permite a los clientes realizar pedidos de manera rápida y sencilla, facilitando el acceso a los servicios de la empresa Alejandro Jara Wedding | Event Planner.
+	Respecto al segundo objetivo específico, se desarrolló un módulo de reservas que permite a los clientes programar sus pedidos con antelación, asegurando la disponibilidad de servicios para fechas específicas y mejorando la planificación de eventos.
+	En cuanto al tercer objetivo específico, se incorporó un sistema de notificaciones que mantiene informados a los clientes sobre el estado de sus pedidos, mejorando la comunicación y la experiencia del usuario.
+	Para el cuarto objetivo específico, se implementó un calendario de disponibilidad en la aplicación móvil que permite verificar y asegurar la disponibilidad del Event Planner, junto con un módulo de gestión de servicios donde se puede consultar el stock disponible de los artículos. Esto contribuye a una mejor planificación y a una organización más eficiente de los eventos.
+	En relación al quinto objetivo específico, se estableció un apartado donde se detallan las condiciones y criterios de los estados de los pedidos, permitiendo a los clientes comprender claramente las políticas de la empresa y el proceso de gestión de solicitudes.
+	Finalmente, en base al objetivo general, se concluye que se desarrolló con éxito un sistema informático que permite gestionar la planificación y organización de eventos sociales de la empresa Alejandro Jara Wedding | Event Planner, cumpliendo con los requerimientos establecidos y optimizando los procesos de gestión de eventos.
+Recomendaciones 
+	De acuerdo con las conclusiones obtenidas en este trabajo, se presentan las siguientes recomendaciones para la empresa Alejandro Jara Wedding | Event Planner y el sistema desarrollado:
+	Que se realice una capacitación al personal administrativo en el uso del sistema, con el fin de asegurar un manejo adecuado de las funcionalidades y optimizar la gestión de eventos y pedidos. 
+	Que se implementen copias de seguridad automáticas de la información, a fin de proteger los datos de clientes, eventos y transacciones ante posibles fallos o pérdidas del sistema.  
+	Que se mantenga una interfaz intuitiva y amigable, facilitando la experiencia tanto para los clientes que utilizan la aplicación móvil como para el personal que administra el sistema. 
+	Que se contemple la escalabilidad del sistema, permitiendo futuras mejoras e incorporación de nuevos módulos según las necesidades de la empresa, como reportes avanzados o gestión ampliada de inventario.  
+	Que se realice un monitoreo constante del sistema mediante indicadores de uso y rendimiento, con el fin de evaluar su eficacia y aplicar mejoras cuando sea necesario. 	
+
+
+
+
+
+Partes complementarias 
+Glosario 
+Android: Es un sistema operativo basado en el núcleo Linux. diseñado principalmente para dispositivos móviles con pantalla táctil. 
+Aplicación informática: Una aplicación es un tipo de programa informático diseñado como herramienta para permitir a un usuario realizar uno o diversos tipos de trabajos. 
+Base de datos: Estructura para almacenar datos en un computador, y acceder a ellos por medio de una búsqueda lógica. 
+Casos de usos: es una descripción de los pasos o las actividades que deberán realizarse para llevar a cabo algún proceso. Los personajes o entidades que participarán en un caso de uso se denominan actores. 
+Diagrama de actividad: muestra un proceso de negocio o un proceso de software como un flujo de trabajo a través de una serie de acciones. Las personas, los componentes de software o los equipos pueden realizar estas acciones. 
+Diagrama de componentes: es un diagrama tipo del Lenguaje Unificado de Modelado. Un diagrama de componentes representa cómo un sistema de software es dividido en componentes y muestra las dependencias entre estos componentes. 
+Diagrama de secuencia UML: es una representación gráfica que muestra la interacción de objetos en un sistema a lo largo del tiempo. Estos diagramas capturan la secuencia de mensajes intercambiados entre objetos y el orden en que ocurren estas interacciones, presentándolos como líneas de vida verticales y flechas horizontales.
+Event Planner: Profesional encargado de planificar, organizar, coordinar y supervisar eventos, asegurando su correcta ejecución.
+Lenguaje de modelado unificado (UML):es un estándar para la representación visual de objetos, estados y procesos dentro de un sistema. Por un lado, el lenguaje de modelado puede servir de modelo para un proyecto y garantizar así una arquitectura de información estructurada; por el otro, ayuda a los desarrolladores a presentar la descripción del sistema de una manera que sea comprensible para quienes están fuera del campo. 
+Notificaciones push: Mensajes enviados por una aplicación a un dispositivo móvil para informar o recordar acciones al usuario.
+Organización de eventos: Proceso de planificación, diseño y ejecución de actividades relacionadas con la realización de un evento.
+Software: Se conoce como software al equipo lógico o soporte lógico de un sistema informático, que comprende el conjunto de los componentes lógicos necesarios que hacen posible la realización de tareas específicas, en contraposición a los componentes físicos que son llamados hardware. 
+Abreviaturas 
+APP: Aplicación
+BIOS: Sistema Básico de Entrada/Salida
+GUI: Interfaz Gráfica de Usuario
+HDD: Disco Duro
+RAM: Memoria de Acceso Aleatorio
+SO: Sistema Operativo
+SPA: Aplicación de Página Única
+
+
+Referencias bibliográficas
+ACTUALIZATEC. (02 de 2021). Notificación Push. Obtenido de Notificaciones Push.Definición: https://actualizatec.com/blog/notificaciones-push/
+appdesign.dev. (04 de Enero de 2022). Principales tipos de aplicaciones y ejemplos - App Design. Obtenido de https://appdesign.dev/principales-tipos-de-aplicaciones-y-ejemplos-por-sectores/#principales-tipos-de-apps
+Betania. (2022 de mayo de 2024). Servidor Web. Obtenido de Qué es un servidor web y cómo funciona?: https://www.hostinger.es/tutoriales/que-es-un-servidor-web
+Betania. (22 de 05 de 2024). Servidor Web. Obtenido de ¿Qué es un servidor web y cómo funciona?: https://www.hostinger.es/tutoriales/que-es-un-servidor-web
+CEUPE. (2011). ¿Qué es la organización de eventos y qué se necesita para realizar uno? Obtenido de https://www.ceupe.com/blog/organizacion-de-eventos.html
+Contreras, L. (2022). Ejemplos de eventos sociales: clasificación y características de todos los tipos de eventos sociales (bodas, cumpleaños..). Obtenido de https://www.cinconoticias.com/ejemplos-de-eventos-sociales/
+Dimensiona. (09 de 12 de 2020). 10 beneficios de las aplicaciones móviles para las empresas`. Obtenido de https://www.dimensiona.com/es/beneficios-de-las-aplicaciones-moviles-para-las-empresas/
+Doclrs. (2012). Que es UML? Obtenido de El lenguaje de modelado unificado: https://www.docirs.cl/uml.asp
+Eras, E. (2024). Materiales Esenciales que Necesita una Organización de Eventos. Obtenido de https://deeventosquito.com/que-materiales-necesita-una-organizacion-de-eventos/?expand_article=1
+ESIC. (07 de 2024). Aplicaciones web: qué son, tipos y ventajas. Obtenido de https://www.esic.edu/rethink/tecnologia/que-son-las-aplicaciones-web-c
+Etecé, E. (19 de 11 de 2025). Programa Informático. Obtenido de https://concepto.de/programa-informatico/
+Euskadi.eus. (s.f.). Navegadores web definicion. Obtenido de https://www.euskadi.eus/navegadores-web/web01-ejeduki/es/
+Lucidchart. (2012). UML. Obtenido de Tipos de UML: https://www.lucidchart.com/pages/es/que-es-el-lenguaje-unificado-de-modelado-uml#:~:text=un%20diagrama%20UML-,%C2%BFQu%C3%A9%20es%20UML%3F,en%20estructura%20como%20en%20comportamiento.
+Ocampos García de Quevedo, G. (2008). Obtenido de https://campus.divulgaciondinamica.es/manuales/738.202013md.pdf
+Platziteam. (23 de 10 de 2025). ¿Qué son las aplicaciones web? Características y ejemplos. Obtenido de https://platzi.com/blog/que-son-aplicaciones-web/
+Rosario , J. (2003). Eventos. Cómo organizarlos con éxito. Obtenido de https://www.protocoloimep.com/articulos/que-es-un-evento-y-clasificacion/
+Shone, A., & Parry, B. (2010). Successful Event Management. Obtenido de ¿Qué es un evento y cómo se puede clasificar?: https://www.protocoloimep.com/articulos/que-es-un-evento-y-clasificacion/
+Softcorp. (2019). Definición y como funcionan las aplicaciones móviles. Obtenido de https://servisoftcorp.com/definicion-y-como-funcionan-las-aplicaciones-moviles/
+UNAD. (2012). Beneficios del UML. Obtenido de Beneficios de esta tecnologia: https://unadzsurlab.com/UML/U1/beneficios_de_esta_tecnologa.html
+Wikipedia. (2025). Obtenido de https://es.wikipedia.org/wiki/Sistema_operativo
+Wikipedia. (2025). Sistema Operativo. Obtenido de https://es.wikipedia.org/wiki/Sistema_operativo
+Eventika. (2026). Eventika. Obtenido de Eventika: https://eventika.app/
+eventplanner. (s.f). Event Planner. Obtenido de Event Planner: https://www.eventplanner.es/
+Mario Tamayo, T. (2004). El proceso de la Investigación.
+Roberto Hernández, C. F. (2024). Metodología de la Investigación. booksmedicos.org. Obtenido de https://www.esup.edu.pe/wp-content/uploads/2020/12/2.%20Hernandez,%20Fernandez%20y%20Baptista-metodolog%C3%ADa%20Investigacion%20Cientifica%206ta%20ed.pdf
+Solutions, R. (2024). RV Solutions & Events. Obtenido de rvsolutionsapp.com
+Wedify. (2025). Wedify. Obtenido de https://wedify.es/
+
+
+
+
+
+
+Anexo A. 
+Instrumento de recolección de datos para el diagnóstico inicial. 
+
+
+
+Anexo B.
+Entrevista de satisfacción del usuario.
+Universidad Católica «Nuestra Señora de la Asunción»
+Unidad Pedagógica Carapeguá
+Carrera de Análisis de Sistemas
+Estimado usuario: Le presentamos esta entrevista que tiene por objetivo conocer el nivel de satisfacción del usuario luego de la implementación del sistema web para la gestión de reservas de eventos. 
+1.¿Qué tan fácil le resultó realizar pedidos mediante la aplicación móvil?
+Fácil. La aplicación cuenta con una interfaz sencilla y ordenada, lo que permitió realizar los pedidos de manera rápida y sin dificultades. 
+2.¿Qué tan satisfecho está con la opción de reservas anticipadas?
+Muy satisfecho. La opción de reservas anticipadas me pareció muy ágil y práctica, ya que permitió planificar mejor el evento y asegurar la disponibilidad de los servicios necesarios.
+3.¿La reserva anticipada le ayudó a organizar mejor su evento?
+Sí, mucho. La reserva anticipada me permitió conocer con mayor claridad las necesidades y preferencias de los clientes, facilitando una mejor organización y planificación del evento. 
+4.¿Las notificaciones y el correo electrónico fueron claros y fáciles de entender?
+Las notificaciones y los correos electrónicos fueron claros e interactivos, permitiendo comprender fácilmente la información tanto para el administrador como para el cliente. 
+5.¿Qué tan conforme está con la verificación de disponibilidad de servicios y del Event Planner?
+Muy conforme. La verificación de disponibilidad mostró información precisa y organizada, lo cual ayudó a gestionar mejor las fechas y servicios para los eventos. 
+6.¿La aplicación mostró correctamente la disponibilidad para las fechas seleccionadas?
+Siempre. La aplicación reflejó correctamente las fechas disponibles, evitando confusiones y facilitando la programación de los eventos. 
+7.¿La información sobre los estados de los pedidos fue clara y comprensible?
+Muy claro. Los estados de los pedidos fueron fáciles de comprender y permitieron realizar un seguimiento adecuado del proceso de cada solicitud. 
+8.¿Volvería a utilizar la aplicación para futuros eventos?
+Definitivamente sí. La aplicación facilitó la organización y gestión de los eventos, brindando una experiencia cómoda y eficiente. 
+9.¿Recomendaría la aplicación móvil a otras personas?
+Sí. Considero que la aplicación es práctica, funcional y útil para la organización de eventos de manera rápida y segura. 
+10.¿Está conforme con las políticas de la empresa y el contrato para el evento?
+Sí, estoy conforme. Las políticas de la empresa y las condiciones establecidas en el contrato fueron claras, comprensibles y brindaron confianza durante todo el proceso de organización del evento. 
+

@@ -13,6 +13,7 @@ const getCajaContextForCobro = async (conn, { cobradorId }) => {
          ca.saldo_actual           AS apertura_saldo_actual,
          ca.fecha_operacion,
          ca.estado                 AS apertura_estado,
+         c.empresa_id              AS empresa_id,
          c.nombre                  AS caja_nombre,
          c.estado                  AS caja_estado,
          c.saldo_actual            AS caja_saldo_actual,

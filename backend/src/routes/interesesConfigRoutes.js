@@ -1,5 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middlewares/authMiddleware');
+const { requirePermission } = require('../middlewares/permissionMiddleware');
 const {
   getConfiguracion,
   updateConfiguracion,
@@ -13,13 +14,13 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get('/', getConfiguracion);
-router.put('/', updateConfiguracion);
+router.get('/', requirePermission('configuracion', 'ver'), getConfiguracion);
+router.put('/', requirePermission('configuracion', 'editar'), updateConfiguracion);
 
-router.post('/feriados', createFeriado);
-router.put('/feriados/:id', updateFeriado);
-router.delete('/feriados/:id', deleteFeriado);
+router.post('/feriados', requirePermission('configuracion', 'intereses'), createFeriado);
+router.put('/feriados/:id', requirePermission('configuracion', 'intereses'), updateFeriado);
+router.delete('/feriados/:id', requirePermission('configuracion', 'intereses'), deleteFeriado);
 
-router.post('/recalcular', recalcular);
+router.post('/recalcular', requirePermission('configuracion', 'intereses'), recalcular);
 
 module.exports = router;

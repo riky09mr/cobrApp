@@ -14,6 +14,7 @@
 1. [Sistemas de Información](#1-sistemas-de-información)
 2. [Gestión de Cobranzas](#2-gestión-de-cobranzas)
 3. [Arquitectura de Software](#3-arquitectura-de-software)
+   - [3.3 Patrón Arquitectónico: Transaction Script y Service Layer](#33-patrón-arquitectónico-transaction-script-y-service-layer)
 4. [Arquitectura Multiempresa (Multi-Tenant)](#4-arquitectura-multiempresa-multi-tenant)
 5. [Tecnologías de Desarrollo Web](#5-tecnologías-de-desarrollo-web)
 6. [Desarrollo de Aplicaciones Móviles](#6-desarrollo-de-aplicaciones-móviles)
@@ -154,13 +155,26 @@ cobrApp implementa una **arquitectura cliente-servidor en tres capas**, que es u
 4. **Reutilización:** La capa de negocio puede servir a múltiples clientes (web y móvil).
 5. **Seguridad:** La capa de datos no es accesible directamente desde los clientes.
 
-### 3.3 Patrón MVC (Modelo-Vista-Controlador)
+### 3.3 Patrón Arquitectónico: Transaction Script y Service Layer
 
-El backend de cobrApp adapta el patrón **MVC (Model-View-Controller)** al contexto de APIs REST (Gamma et al., 1994):
+El backend de cobrApp implementa una **API REST por capas simplificada**, combinando dos patrones de Martin Fowler (en *Patterns of Enterprise Application Architecture*, 2002). No se utiliza el patrón MVC clásico, sino una organización por capas adaptada al contexto de APIs REST.
 
-- **Modelo (M):** Representa los datos y la lógica de negocio. En cobrApp, las tablas de MySQL gestionadas mediante consultas SQL parametrizadas.
-- **Vista (V):** En una API REST, la "vista" es la representación JSON que se envía al cliente. La vista real está en los frontends web y móvil.
-- **Controlador (C):** Archivos en `controllers/` que manejan las peticiones HTTP, ejecutan la lógica de negocio y devuelven respuestas.
+#### Transaction Script (patrón dominante)
+
+La mayor parte de los módulos (autenticación, empresas, clientes, usuarios, zonas, mensajes, reportes) organiza la lógica de negocio en **controladores con acceso directo a datos**, donde cada operación del sistema se implementa como un *script*: el controlador recibe la petición HTTP, ejecuta las consultas SQL parametrizadas sobre el pool de MySQL2 y devuelve el resultado.
+
+Esta elección es apropiada para la complejidad actual del dominio: operaciones mayoritariamente CRUD con reglas de negocio simples, donde un modelo de dominio completo (Domain Model) añadiría fricción sin beneficio. El directorio `models/` existe en el proyecto pero no se utiliza; el acceso a datos se realiza directamente desde los controladores mediante el pool de conexiones.
+
+#### Service Layer parcial (módulo de cobranzas)
+
+Las reglas de negocio complejas del módulo de cobranzas (V12) —apertura/cierre de caja, generación de recibos con numeradores, cálculo de intereses por mora, feriados anuales con algoritmo de Computus— están encapsuladas en una **capa de servicios de dominio** dentro de `services/cobranzas/`, reutilizable por los controladores de panel, cobrador y configuración.
+
+#### Estructura por capas
+
+- **Controladores** (`controllers/`): orquestan la petición HTTP, validan la entrada y ejecutan consultas parametrizadas directas (Transaction Script) o delegan en la capa de servicios (módulo cobranzas).
+- **Servicios de dominio** (`services/cobranzas/`): encapsulan las reglas de negocio del módulo de cobranzas V12 (caja, recibos, numeradores, intereses, feriados).
+- **Rutas** (`routes/`): mapean URLs a controladores y aplican los middlewares de autenticación y de control de rol.
+- **Middlewares** (`middlewares/`): `authenticateToken` para validar el JWT y control de rol por ruta (`soloGestor` / `soloCobrador`).
 
 ### 3.4 Principios SOLID en cobrApp
 
@@ -1033,7 +1047,7 @@ El ciclo de vida del desarrollo sigue el modelo de **Arquitectura Dirigida por P
 
 La población objetivo de esta investigación está conformada por:
 
-1. **Empresas de cobranzas** que operan en la región de Carapeguá y áreas circundantes del Departamento de Paraguarí, Paraguay. Se estima que existen aproximadamente 30 empresas que realizan actividades de gestión de cobranzas (formalmente constituidas) en la zona de influencia del estudio.
+1. **Empresas de cobranzas** que operan en la región de Carapeguá y áreas circundantes del Departamento de Paraguarí, Paraguay. Se estima que existen aproximadamente 30 empresas que realizan actividades de gestión de cobranzas (formalmente con stituidas) en la zona de influencia del estudio.
 2. **Usuarios del sistema**, clasificados en:
    - Administradores/gerentes de empresas de cobranzas.
    - Supervisores de campo.
@@ -1155,11 +1169,11 @@ El propio sistema cobrApp genera datos que son utilizados como fuente de informa
 
 ## 7. Procedimiento de Investigación
 
-El estudio se desarrolla en las siguientes fases secuenciales:
-
+El estudio se desarrolla en las siguientes fases secuenciales:E
+ha
 ### Fase 1: Diagnóstico (Semanas 1-3)
 
-- Revisión bibliográfica y análisis del estado del arte.
+- Revisión bibliográfica y análisis del estado del arte. todos 
 - Entrevistas iniciales con administradores y supervisores.
 - Observación directa de procesos actuales.
 - Análisis documental de registros existentes.

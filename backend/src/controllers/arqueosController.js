@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-const { toMysqlLocal } = require('../services/cobranzas/time');
+const { toMysqlLocal, toDateLocal, todayLocal } = require('../services/cobranzas/time');
 const { registrarAuditoriaSegura } = require('../services/cobranzas/auditoriaService');
 const {
   abrirCajaV12IfConfigured,
@@ -123,6 +123,10 @@ const getCajaActiva = async (req, res, next) => {
       Number(totales.total_efectivo) -
       Number(gastos.total_gastos);
 
+    // Indica si la caja abierta es de un día anterior (para alertar al cobrador
+    // de que debe cerrarla y abrir una nueva antes de seguir cobrando).
+    const es_de_otro_dia = toDateLocal(arqueo.fecha_apertura) !== todayLocal();
+
     return res.json({
       data: {
         ...arqueo,
@@ -131,6 +135,7 @@ const getCajaActiva = async (req, res, next) => {
         cantidad_cobros: Number(totales.cantidad_cobros),
         total_gastos:    Number(gastos.total_gastos),
         saldo_esperado,
+        es_de_otro_dia,
       },
     });
   } catch (error) {

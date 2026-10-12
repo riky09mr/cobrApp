@@ -5,6 +5,7 @@ const fs = require('fs');
 const { registrarAuditoriaSegura } = require('../services/cobranzas/auditoriaService');
 const { getCajaContextForCobro } = require('../services/cobranzas/cajaService');
 const { maybeCreateRecibo } = require('../services/cobranzas/reciboService');
+// const { detectarSobrepago, crearSaldoAFavor } = require('../services/cobranzas/notaCreditoService');
 
 const getIpCliente = (req) => req.ip || req.headers['x-forwarded-for'] || null;
 
@@ -213,7 +214,7 @@ const registrarCobro = async (req, res, next) => {
     const hoy = new Date().toLocaleString('sv-SE', { timeZone: 'America/Asuncion' }).split(' ')[0];
 
     const [[cuota]] = await conn.query(
-      `SELECT q.id, q.estado, q.monto_cuota, cr.empresa_id
+      `SELECT q.id, q.estado, q.monto_cuota, q.saldo_cuota, cr.empresa_id
        FROM cuotas q
        INNER JOIN creditos cr ON cr.id = q.credito_id
        WHERE q.id = ?`,
@@ -278,8 +279,11 @@ const registrarCobro = async (req, res, next) => {
     // 3. Registrar visita_cobro si hay asignacion y medio de pago
     let visitaId = null;
     let montoFinal = 0;
+    let sobrepagoInfo = { sobrepago: false, excedente: 0 };
     if (asignacion && medio_pago_id) {
-      montoFinal = Number(monto_cobrado) || Number(cuota.monto_cuota);
+      montoFinal = Number(monto_cobrado) || Number(cuota.saldo_cuota ?? cuota.monto_cuota);
+      // Detectar sobrepago: si el cliente paga más del saldo de la cuota (DESACTIVADO)
+      // sobrepagoInfo = detectarSobrepago(montoFinal, cuota.saldo_cuota ?? cuota.monto_cuota);
       const [visitaResult] = await conn.query(
         `INSERT INTO visitas_cobro
            (asignacion_id, cobrador_id, resultado, monto_cobrado,
@@ -303,6 +307,8 @@ const registrarCobro = async (req, res, next) => {
           cobradorId: usuarioActual.id,
           monto: montoFinal,
           fechaHora: new Date(),
+          // montoSobrepago: sobrepagoInfo.excedente,
+          // saldoAFavor: sobrepagoInfo.excedente,
         });
       } catch (reciboError) {
         // Si no hay caja v12 configurada, se registra el cobro sin comprobante.
@@ -313,6 +319,17 @@ const registrarCobro = async (req, res, next) => {
         }
       }
     }
+
+    // 5. Si hay sobrepago, registrar saldo a favor del cliente (DESACTIVADO)
+    // if (sobrepagoInfo.sobrepago && recibo && recibo.reciboId) {
+    //   await crearSaldoAFavor(conn, {
+    //     empresaId: asignacion.empresa_id,
+    //     clienteId: asignacion.cliente_id,
+    //     reciboId: recibo.reciboId,
+    //     monto: sobrepagoInfo.excedente,
+    //     usuarioId: usuarioActual.id,
+    //   });
+    // }
 
     await conn.commit();
 
@@ -379,20 +396,118 @@ const getUsuarios = async (req, res, next) => {
 const getCobradores = async (req, res, next) => {
   try {
     const { empresaId, rol } = req.user;
-    const params = [];
+    const empId = rol === 'ADMIN' ? (req.query.empresa_id || empresaId) : empresaId;
+    const params = [empId];
     let query = `SELECT u.id, u.nombre, u.apellido
        FROM usuarios u
        INNER JOIN roles r ON r.id = u.rol_id
-       WHERE r.nombre = 'COBRADOR' AND u.estado = 1`;
-
-    if (rol !== 'ADMIN') {
-      query += ' AND u.empresa_id = ?';
-      params.push(empresaId);
-    }
+       WHERE r.nombre = 'COBRADOR' AND u.estado = 1 AND u.empresa_id = ?`;
     query += ' ORDER BY u.nombre ASC';
 
     const [rows] = await pool.query(query, params);
     return res.json({ data: rows });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────────
+// GET /api/panel/cobradores/:id/asignaciones
+// Devuelve todas las asignaciones (clientes + cuotas + zonas)
+// de un cobrador específico, para que ADMIN/SUPERVISOR pueda
+// ver qué tiene asignado cada cobrador.
+// ─────────────────────────────────────────────────────────────
+const getAsignacionesCobrador = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { empresaId, rol } = req.user;
+
+    // Validar que el cobrador existe y es rol COBRADOR
+    const [[cobrador]] = await pool.query(
+      `SELECT u.id, u.nombre, u.apellido, u.empresa_id
+       FROM usuarios u
+       INNER JOIN roles r ON r.id = u.rol_id
+       WHERE u.id = ? AND r.nombre = 'COBRADOR'`,
+      [id]
+    );
+    if (!cobrador) {
+      return res.status(404).json({ message: 'Cobrador no encontrado' });
+    }
+    if (rol !== 'ADMIN' && cobrador.empresa_id !== empresaId) {
+      return res.status(403).json({ message: 'Sin permisos para ver este cobrador' });
+    }
+
+    const params = [id];
+    let whereEmpresa = '';
+    if (rol !== 'ADMIN') {
+      whereEmpresa = ' AND cr.empresa_id = ?';
+      params.push(empresaId);
+    }
+
+    const [rows] = await pool.query(
+      `SELECT
+         a.id              AS asignacion_id,
+         a.fecha_asignacion,
+         a.fecha_limite,
+         a.estado          AS asignacion_estado,
+         q.id              AS cuota_id,
+         q.numero_cuota,
+         q.fecha_vencimiento,
+         q.monto_cuota,
+         q.saldo_cuota,
+         q.estado          AS cuota_estado,
+         q.fecha_pago,
+         cr.id             AS credito_id,
+         cr.numero_credito,
+         cr.descripcion,
+         cl.id             AS cliente_id,
+         cl.cedula,
+         cl.nombre,
+         cl.apellido,
+         cl.telefono,
+         ce.direccion,
+         ce.latitud,
+         ce.longitud,
+         z.id              AS zona_id,
+         z.nombre          AS zona_nombre,
+         z.color           AS zona_color,
+         (SELECT vc.resultado
+          FROM visitas_cobro vc
+          WHERE vc.asignacion_id = a.id
+          ORDER BY vc.fecha_hora DESC LIMIT 1) AS ultimo_resultado,
+         (SELECT vc.fecha_hora
+          FROM visitas_cobro vc
+          WHERE vc.asignacion_id = a.id
+          ORDER BY vc.fecha_hora DESC LIMIT 1) AS ultima_visita
+       FROM asignaciones a
+       INNER JOIN cuotas q              ON q.id  = a.cuota_id
+       INNER JOIN creditos cr           ON cr.id = q.credito_id
+       INNER JOIN clientes cl           ON cl.id = cr.cliente_id
+       INNER JOIN clientes_empresas ce  ON ce.cliente_id = cl.id
+                                       AND ce.empresa_id = cr.empresa_id
+       LEFT JOIN zonas z                ON z.id  = ce.zona_id
+       WHERE a.usuario_id = ?${whereEmpresa}
+       ORDER BY a.estado ASC, q.fecha_vencimiento ASC, cl.nombre ASC
+       LIMIT 1000`,
+      params
+    );
+
+    // Resumen por cobrador
+    const resumen = {
+      total_asignaciones: rows.length,
+      pendientes: rows.filter((r) => r.asignacion_estado === 'PENDIENTE').length,
+      completadas: rows.filter((r) => r.asignacion_estado === 'COMPLETADO').length,
+      cuotas_pagadas: rows.filter((r) => r.cuota_estado === 'PAGADO').length,
+      monto_pendiente: rows
+        .filter((r) => r.cuota_estado !== 'PAGADO')
+        .reduce((acc, r) => acc + Number(r.saldo_cuota || 0), 0),
+      monto_cobrado: rows
+        .filter((r) => r.cuota_estado === 'PAGADO')
+        .reduce((acc, r) => acc + Number(r.monto_cuota || 0), 0),
+      zonas: [...new Set(rows.map((r) => r.zona_nombre).filter(Boolean))],
+    };
+
+    return res.json({ data: rows, resumen, cobrador: { id: cobrador.id, nombre: cobrador.nombre, apellido: cobrador.apellido } });
   } catch (error) {
     return next(error);
   }
@@ -527,6 +642,121 @@ const updateFechaVencimiento = async (req, res, next) => {
     return res.json({ message: 'Fecha actualizada', estado: nuevoEstado });
   } catch (error) {
     return next(error);
+  }
+};
+
+// POST /api/panel/cobranzas/:id/asignar
+// Body: { cobrador_id, fecha_limite? }
+// Asigna (o reasigna) una cuota puntual a un cobrador específico,
+// para cuotas que quedaron sin cobrador (cliente nuevo, zona sin asignar, etc).
+const asignarCobranza = async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    const { id } = req.params;
+    const { cobrador_id, fecha_limite } = req.body ?? {};
+    const usuarioActual = req.user;
+
+    if (!cobrador_id) {
+      conn.release(); return res.status(400).json({ message: 'cobrador_id es obligatorio' });
+    }
+    if (fecha_limite && !/^\d{4}-\d{2}-\d{2}$/.test(fecha_limite)) {
+      conn.release(); return res.status(400).json({ message: 'fecha_limite inválida (YYYY-MM-DD)' });
+    }
+    if (usuarioActual.rol !== 'SUPERVISOR' && usuarioActual.rol !== 'ADMIN') {
+      conn.release(); return res.status(403).json({ message: 'Solo el supervisor o administrador puede asignar cobranzas' });
+    }
+
+    // 1. Verificar la cuota
+    const [[cuota]] = await conn.query(
+      `SELECT q.id, q.estado, cr.empresa_id
+       FROM cuotas q
+       INNER JOIN creditos cr ON cr.id = q.credito_id
+       WHERE q.id = ?`,
+      [id]
+    );
+    if (!cuota) { conn.release(); return res.status(404).json({ message: 'Cuota no encontrada' }); }
+    if (cuota.estado === 'PAGADO') {
+      conn.release(); return res.status(400).json({ message: 'No se puede asignar una cuota ya pagada' });
+    }
+    if (usuarioActual.rol !== 'ADMIN' && cuota.empresa_id !== usuarioActual.empresaId) {
+      conn.release(); return res.status(403).json({ message: 'Sin permisos' });
+    }
+
+    // 2. Verificar el cobrador destino
+    const [[cobrador]] = await conn.query(
+      `SELECT u.id, u.empresa_id
+       FROM usuarios u
+       INNER JOIN roles r ON r.id = u.rol_id
+       WHERE u.id = ? AND r.nombre = 'COBRADOR' AND u.estado = 1`,
+      [cobrador_id]
+    );
+    if (!cobrador) {
+      conn.release(); return res.status(404).json({ message: 'Cobrador no encontrado o inactivo' });
+    }
+    if (usuarioActual.rol !== 'ADMIN' && cobrador.empresa_id !== cuota.empresa_id) {
+      conn.release(); return res.status(403).json({ message: 'El cobrador debe pertenecer a la misma empresa' });
+    }
+
+    await conn.beginTransaction();
+
+    // 3. Revisar asignación PENDIENTE existente de la cuota
+    const [[asignacionActual]] = await conn.query(
+      `SELECT id, usuario_id FROM asignaciones
+       WHERE cuota_id = ? AND estado = 'PENDIENTE'
+       ORDER BY id DESC LIMIT 1`,
+      [id]
+    );
+
+    let asignacionId;
+    if (asignacionActual) {
+      if (Number(asignacionActual.usuario_id) === Number(cobrador_id)) {
+        // Ya está asignada al mismo cobrador: solo actualizar fecha límite si vino
+        if (fecha_limite) {
+          await conn.query(
+            'UPDATE asignaciones SET fecha_limite = ? WHERE id = ?',
+            [fecha_limite, asignacionActual.id]
+          );
+        }
+        asignacionId = asignacionActual.id;
+      } else {
+        // Reasignar a otro cobrador
+        await conn.query(
+          `UPDATE asignaciones
+           SET usuario_id = ?, supervisor_id = ?, fecha_asignacion = NOW(), fecha_limite = ?
+           WHERE id = ?`,
+          [cobrador_id, usuarioActual.id, fecha_limite || null, asignacionActual.id]
+        );
+        asignacionId = asignacionActual.id;
+      }
+    } else {
+      const [result] = await conn.query(
+        'INSERT INTO asignaciones (cuota_id, usuario_id, supervisor_id, fecha_limite) VALUES (?, ?, ?, ?)',
+        [id, cobrador_id, usuarioActual.id, fecha_limite || null]
+      );
+      asignacionId = result.insertId;
+    }
+
+    await conn.commit();
+
+    // Auditoría (mismo patrón que el resto del controlador)
+    await registrarAuditoriaSegura({
+      empresaId: cuota.empresa_id,
+      usuarioId: usuarioActual.id,
+      ip: getIpCliente(req),
+      accion: asignacionActual ? 'UPDATE' : 'CREATE',
+      tabla: 'asignaciones',
+      registroId: asignacionId,
+      antes: asignacionActual ? { usuario_id: asignacionActual.usuario_id } : null,
+      despues: { cuota_id: id, usuario_id: cobrador_id, fecha_limite: fecha_limite || null },
+      observaciones: 'Asignación puntual de cobranza',
+    });
+
+    return res.json({ message: 'Cobranza asignada', asignacion_id: asignacionId });
+  } catch (error) {
+    await conn.rollback();
+    return next(error);
+  } finally {
+    conn.release();
   }
 };
 
@@ -701,118 +931,379 @@ const getTimbradoHistorial = async (req, res, next) => {
 /**
  * GET /api/cobrador/cobros/:id/comprobante
  * Genera el PDF del comprobante de pago (recibo de cobranza) asociado a una visita de cobro.
- * Busca el recibo por visita_cobro_id y arma el PDF con los datos del emisor, timbrado y detalle.
+ * Es un comprobante simple de cobranza (no fiscal): muestra datos del cliente, cuota,
+ * monto, fecha, hora, medio de pago y cobrador.
  */
 const generarComprobante = async (req, res, next) => {
   try {
     const { id } = req.params;
     const usuarioActual = req.user;
 
-    const [[recibo]] = await pool.query(
-      `SELECT r.id, r.empresa_id, r.numero_recibo, r.fecha_emision, r.total_recibo,
-              r.moneda, r.tipo_emision, r.estado,
-              t.numero_timbrado, t.fecha_inicio AS timbrado_fecha_inicio, t.fecha_fin AS timbrado_fecha_fin,
-              e.codigo AS establecimiento_codigo, e.descripcion AS establecimiento_descripcion,
-              pe.codigo AS punto_codigo,
-              c.nombre AS caja_nombre,
-              cl.nombre AS cliente_nombre, cl.apellido AS cliente_apellido, cl.cedula AS cliente_cedula,
-              cl.direccion AS cliente_direccion, cl.telefono AS cliente_telefono,
-              em.razon_social AS emisor_razon_social, em.ruc AS emisor_ruc,
-              em.direccion AS emisor_direccion, em.actividad_economica AS emisor_actividad,
-              vc.monto_cobrado, vc.fecha_hora AS visita_fecha_hora,
-              mp.nombre AS medio_pago_nombre
-       FROM recibos r
-       INNER JOIN visitas_cobro vc ON vc.id = r.visita_cobro_id
-       INNER JOIN timbrados t        ON t.id = r.timbrado_id
-       INNER JOIN establecimientos e ON e.id = r.establecimiento_id
-       INNER JOIN puntos_expedicion pe ON pe.id = r.punto_expedicion_id
-       INNER JOIN cajas c            ON c.id = r.caja_id
-       INNER JOIN clientes cl        ON cl.id = r.cliente_id
-       INNER JOIN empresas em        ON em.id = r.empresa_id
-       LEFT JOIN medios_pago mp      ON mp.id = vc.medio_pago_id
-       WHERE r.visita_cobro_id = ? AND r.deleted_at IS NULL`,
+    const [[cobro]] = await pool.query(
+      `SELECT
+         vc.id               AS visita_id,
+         vc.fecha_hora,
+         vc.monto_cobrado,
+         vc.nro_comprobante,
+         u.empresa_id,
+         mp.nombre           AS medio_pago_nombre,
+         cl.nombre           AS cliente_nombre,
+         cl.apellido         AS cliente_apellido,
+         cl.cedula           AS cliente_cedula,
+         cl.telefono         AS cliente_telefono,
+         ce.direccion        AS cliente_direccion,
+         q.numero_cuota,
+         cr.numero_credito,
+         u.nombre            AS cobrador_nombre,
+         u.apellido          AS cobrador_apellido,
+         e.razon_social      AS empresa_nombre,
+         e.ruc               AS empresa_ruc,
+         e.direccion         AS empresa_direccion,
+         e.telefono          AS empresa_telefono,
+         r.numero_recibo     AS numero_recibo,
+         r.aplico_nota_credito,
+         r.estado            AS recibo_estado,
+         r.monto_sobrepago,
+         r.saldo_a_favor
+       FROM visitas_cobro vc
+       INNER JOIN asignaciones a ON a.id = vc.asignacion_id
+       INNER JOIN cuotas q       ON q.id  = a.cuota_id
+       INNER JOIN creditos cr    ON cr.id = q.credito_id
+       INNER JOIN clientes cl    ON cl.id = cr.cliente_id
+       LEFT JOIN usuarios u      ON u.id  = vc.cobrador_id
+       LEFT JOIN empresas e      ON e.id  = u.empresa_id
+       LEFT JOIN clientes_empresas ce ON ce.cliente_id = cl.id AND ce.empresa_id = u.empresa_id
+       LEFT JOIN medios_pago mp  ON mp.id = vc.medio_pago_id
+       LEFT JOIN recibos r       ON r.visita_cobro_id = vc.id
+       WHERE vc.id = ? AND vc.resultado = 'cobrado'`,
       [id]
     );
 
-    if (!recibo) {
+    if (!cobro) {
       return res.status(404).json({ message: 'Comprobante no encontrado para esta visita' });
     }
 
     // Verificar permisos: el cobrador solo ve sus propios comprobantes
-    if (usuarioActual.rol === 'COBRADOR' && recibo.empresa_id !== usuarioActual.empresaId) {
+    if (usuarioActual.rol === 'COBRADOR' && cobro.empresa_id !== usuarioActual.empresaId) {
       return res.status(403).json({ message: 'Sin permisos' });
     }
 
-    // ── Generar PDF ──
-    const doc = new PDFDocument({ size: 'A4', margin: 40 });
+    // ── Generar PDF (ticket térmico 80mm) ──
+    const doc = new PDFDocument({ size: [226, 800], margin: 12 });
     const chunks = [];
     doc.on('data', (chunk) => chunks.push(chunk));
     doc.on('end', () => {
       const pdfBuffer = Buffer.concat(chunks);
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `inline; filename="comprobante_${recibo.numero_recibo}.pdf"`);
+      res.setHeader('Content-Disposition', `inline; filename="comprobante_${cobro.visita_id}.pdf"`);
       res.send(pdfBuffer);
     });
 
-    // Encabezado
-    doc.fontSize(16).font('Helvetica-Bold').text('COMPROBANTE DE PAGO', { align: 'center' });
-    doc.moveDown(0.5);
-    doc.fontSize(10).font('Helvetica').text(recibo.emisor_razon_social || '', { align: 'center' });
-    doc.text(`RUC: ${recibo.emisor_ruc || ''}`, { align: 'center' });
-    doc.text(recibo.emisor_direccion || '', { align: 'center' });
-    if (recibo.emisor_actividad) doc.text(recibo.emisor_actividad, { align: 'center' });
-    doc.moveDown(0.5);
+    const fechaHora = cobro.fecha_hora ? new Date(cobro.fecha_hora) : null;
+    const fechaStr = fechaHora ? fechaHora.toLocaleDateString('es-PY') : '';
+    const horaStr = fechaHora ? fechaHora.toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit' }) : '';
+    const montoNum = Number(cobro.monto_cobrado || 0);
+    // Solo mostrar decimales si el monto no es un número entero (evita ",00")
+    const montoStr = Number.isInteger(montoNum)
+      ? montoNum.toLocaleString('es-PY')
+      : montoNum.toLocaleString('es-PY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // Datos del timbrado
-    doc.fontSize(9).font('Helvetica-Bold').text('DATOS DEL TIMBRADO');
-    doc.font('Helvetica').text(`N. Timbrado: ${recibo.numero_timbrado || ''}`);
-    doc.text(`Establecimiento: ${recibo.establecimiento_codigo || ''} - ${recibo.establecimiento_descripcion || ''}`);
-    doc.text(`Punto de Expedición: ${recibo.punto_codigo || ''}`);
-    doc.text(`Vigencia: ${recibo.timbrado_fecha_inicio ? new Date(recibo.timbrado_fecha_inicio).toLocaleDateString('es-PY') : ''} al ${recibo.timbrado_fecha_fin ? new Date(recibo.timbrado_fecha_fin).toLocaleDateString('es-PY') : ''}`);
-    doc.moveDown(0.5);
+    const line = () => doc.text('------------------------------------', { align: 'center' });
 
-    // Datos del comprobante
-    doc.fontSize(9).font('Helvetica-Bold').text('DATOS DEL COMPROBANTE');
-    doc.font('Helvetica').text(`N. Comprobante: ${recibo.numero_recibo || ''}`);
-    doc.text(`Fecha de Emisión: ${recibo.fecha_emision ? new Date(recibo.fecha_emision).toLocaleString('es-PY') : ''}`);
-    doc.text(`Caja: ${recibo.caja_nombre || ''}`);
-    doc.text(`Medio de Pago: ${recibo.medio_pago_nombre || ''}`);
-    doc.moveDown(0.5);
+    // ── Encabezado: empresa ──
+    if (cobro.empresa_nombre) {
+      doc.fontSize(11).font('Helvetica-Bold').text(cobro.empresa_nombre, { align: 'center' });
+    }
+    if (cobro.empresa_ruc) {
+      doc.fontSize(7).font('Helvetica').text(`RUC: ${cobro.empresa_ruc}`, { align: 'center' });
+    }
+    if (cobro.empresa_direccion) {
+      doc.fontSize(7).font('Helvetica').text(cobro.empresa_direccion, { align: 'center' });
+    }
+    if (cobro.empresa_telefono) {
+      doc.fontSize(7).font('Helvetica').text(`Tel: ${cobro.empresa_telefono}`, { align: 'center' });
+    }
+    doc.moveDown(0.4);
+    line();
+    doc.moveDown(0.4);
 
-    // Datos del cliente
-    doc.fontSize(9).font('Helvetica-Bold').text('DATOS DEL CLIENTE');
-    doc.font('Helvetica').text(`Cliente: ${recibo.cliente_nombre || ''} ${recibo.cliente_apellido || ''}`);
-    doc.text(`Cédula: ${recibo.cliente_cedula || ''}`);
-    if (recibo.cliente_direccion) doc.text(`Dirección: ${recibo.cliente_direccion}`);
-    if (recibo.cliente_telefono) doc.text(`Teléfono: ${recibo.cliente_telefono}`);
-    doc.moveDown(0.5);
+    // ── Título del comprobante ──
+    doc.fontSize(13).font('Helvetica-Bold').text('COMPROBANTE DE PAGO', { align: 'center' });
+    doc.fontSize(8).font('Helvetica').text('Recibo de cobranza', { align: 'center' });
+    if (cobro.numero_recibo) {
+      doc.moveDown(0.2);
+      doc.fontSize(9).font('Helvetica-Bold').text(`Nro. Recibo: ${cobro.numero_recibo}`, { align: 'center' });
+    }
+    // Indicador de nota de crédito aplicada
+    if (Number(cobro.aplico_nota_credito) === 1) {
+      doc.moveDown(0.2);
+      doc.fontSize(9).font('Helvetica-Bold').fillColor('#CC0000')
+        .text('*** NOTA DE CRÉDITO APLICADA ***', { align: 'center' });
+      if (Number(cobro.monto_sobrepago) > 0) {
+        doc.fontSize(8).font('Helvetica').fillColor('#CC0000')
+          .text(`Sobrepago: ${Number(cobro.monto_sobrepago).toLocaleString('es-PY')} Gs.`, { align: 'center' });
+      }
+      if (Number(cobro.saldo_a_favor) > 0) {
+        doc.fontSize(8).font('Helvetica').fillColor('#CC0000')
+          .text(`Saldo a favor: ${Number(cobro.saldo_a_favor).toLocaleString('es-PY')} Gs.`, { align: 'center' });
+      }
+      doc.fillColor('#000000');
+    }
+    // Indicador de recibo anulado
+    if (cobro.recibo_estado === 'ANULADO') {
+      doc.moveDown(0.2);
+      doc.fontSize(10).font('Helvetica-Bold').fillColor('#CC0000')
+        .text('*** ANULADO ***', { align: 'center' });
+      doc.fillColor('#000000');
+    }
+    doc.moveDown(0.3);
+    line();
+    doc.moveDown(0.3);
 
-    // Detalle
-    const [detalles] = await pool.query(
-      `SELECT concepto, monto_total FROM recibo_detalles WHERE recibo_id = ? ORDER BY orden_detalle`,
-      [recibo.id]
-    );
+    // ── Datos del cobro ──
+    doc.fontSize(8).font('Helvetica');
+    doc.text(`Fecha: ${fechaStr}   Hora: ${horaStr}`);
+    doc.text(`Medio de Pago: ${cobro.medio_pago_nombre || 'N/D'}`);
+    if (cobro.nro_comprobante) doc.text(`Nro. Comprobante: ${cobro.nro_comprobante}`);
+    doc.moveDown(0.3);
+    line();
+    doc.moveDown(0.3);
 
-    doc.fontSize(9).font('Helvetica-Bold').text('DETALLE');
-    doc.moveDown(0.2);
-    const startY = doc.y;
+    // ── Datos del cliente ──
+    doc.fontSize(8).font('Helvetica-Bold').text('CLIENTE', { align: 'center' });
     doc.font('Helvetica');
-    detalles.forEach((d) => {
-      doc.text(`${d.concepto}`, { continued: true });
-      doc.text(`  ${Number(d.monto_total).toLocaleString('es-PY', { minimumFractionDigits: 2 })} Gs.`, { align: 'right' });
-    });
-    doc.moveDown(0.5);
+    doc.text(`${cobro.cliente_nombre || ''} ${cobro.cliente_apellido || ''}`);
+    if (cobro.cliente_cedula) doc.text(`C.I.: ${cobro.cliente_cedula}`);
+    if (cobro.cliente_direccion) doc.text(`${cobro.cliente_direccion}`);
+    if (cobro.cliente_telefono) doc.text(`Tel: ${cobro.cliente_telefono}`);
+    doc.moveDown(0.3);
+    line();
+    doc.moveDown(0.3);
 
-    // Total
-    doc.fontSize(11).font('Helvetica-Bold').text(
-      `TOTAL: ${Number(recibo.total_recibo).toLocaleString('es-PY', { minimumFractionDigits: 2 })} ${recibo.moneda || 'PYG'}`,
-      { align: 'right' }
+    // ── Datos de la cuota ──
+    doc.fontSize(8).font('Helvetica-Bold').text('CUOTA', { align: 'center' });
+    doc.font('Helvetica');
+    if (cobro.numero_credito) doc.text(`Crédito Nro: ${cobro.numero_credito}`);
+    if (cobro.numero_cuota) doc.text(`Cuota Nro: ${cobro.numero_cuota}`);
+    doc.moveDown(0.3);
+    line();
+    doc.moveDown(0.3);
+
+    // ── Total ──
+    doc.fontSize(12).font('Helvetica-Bold').text(
+      `TOTAL: ${montoStr} Gs.`,
+      { align: 'center' }
     );
+    doc.moveDown(0.5);
+    line();
+    doc.moveDown(0.3);
+
+    // ── Cobrador y firma ──
+    doc.fontSize(8).font('Helvetica').text(
+      `Cobrador: ${cobro.cobrador_nombre || ''} ${cobro.cobrador_apellido || ''}`.trim(),
+      { align: 'center' }
+    );
+    doc.moveDown(1.2);
+    doc.text('_____________________________', { align: 'center' });
+    doc.text('Firma del Cobrador', { align: 'center' });
+    doc.moveDown(0.5);
+    doc.text('Gracias por su pago', { align: 'center' });
+
+    doc.end();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * Genera el comprobante de pago en formato A4 (para la web).
+ * A diferencia de generarComprobante (ticket térmico 80mm para la app),
+ * este genera un PDF tamaño A4 más presentable para entregar al cliente.
+ */
+const generarComprobanteA4 = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const usuarioActual = req.user;
+
+    const [[cobro]] = await pool.query(
+      `SELECT
+         vc.id               AS visita_id,
+         vc.fecha_hora,
+         vc.monto_cobrado,
+         vc.nro_comprobante,
+         u.empresa_id,
+         mp.nombre           AS medio_pago_nombre,
+         cl.nombre           AS cliente_nombre,
+         cl.apellido         AS cliente_apellido,
+         cl.cedula           AS cliente_cedula,
+         cl.telefono         AS cliente_telefono,
+         ce.direccion        AS cliente_direccion,
+         q.numero_cuota,
+         cr.numero_credito,
+         u.nombre            AS cobrador_nombre,
+         u.apellido          AS cobrador_apellido,
+         e.razon_social      AS empresa_nombre,
+         e.ruc               AS empresa_ruc,
+         e.direccion         AS empresa_direccion,
+         e.telefono          AS empresa_telefono,
+         r.numero_recibo     AS numero_recibo,
+         r.aplico_nota_credito,
+         r.estado            AS recibo_estado,
+         r.monto_sobrepago,
+         r.saldo_a_favor
+       FROM visitas_cobro vc
+       INNER JOIN asignaciones a ON a.id = vc.asignacion_id
+       INNER JOIN cuotas q       ON q.id  = a.cuota_id
+       INNER JOIN creditos cr    ON cr.id = q.credito_id
+       INNER JOIN clientes cl    ON cl.id = cr.cliente_id
+       LEFT JOIN usuarios u      ON u.id  = vc.cobrador_id
+       LEFT JOIN empresas e      ON e.id  = u.empresa_id
+       LEFT JOIN clientes_empresas ce ON ce.cliente_id = cl.id AND ce.empresa_id = u.empresa_id
+       LEFT JOIN medios_pago mp  ON mp.id = vc.medio_pago_id
+       LEFT JOIN recibos r       ON r.visita_cobro_id = vc.id
+       WHERE vc.id = ? AND vc.resultado = 'cobrado'`,
+      [id]
+    );
+
+    if (!cobro) {
+      return res.status(404).json({ message: 'Comprobante no encontrado para esta visita' });
+    }
+
+    // Verificar permisos: el cobrador solo ve sus propios comprobantes
+    if (usuarioActual.rol === 'COBRADOR' && cobro.empresa_id !== usuarioActual.empresaId) {
+      return res.status(403).json({ message: 'Sin permisos' });
+    }
+
+    // ── Generar PDF (formato A4) ──
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+    const chunks = [];
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => {
+      const pdfBuffer = Buffer.concat(chunks);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="comprobante_${cobro.visita_id}.pdf"`);
+      res.send(pdfBuffer);
+    });
+
+    const fechaHora = cobro.fecha_hora ? new Date(cobro.fecha_hora) : null;
+    const fechaStr = fechaHora ? fechaHora.toLocaleDateString('es-PY') : '';
+    const horaStr = fechaHora ? fechaHora.toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit' }) : '';
+    const montoNum = Number(cobro.monto_cobrado || 0);
+    const montoStr = Number.isInteger(montoNum)
+      ? montoNum.toLocaleString('es-PY')
+      : montoNum.toLocaleString('es-PY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+
+    // ── Encabezado: empresa ──
+    if (cobro.empresa_nombre) {
+      doc.fontSize(18).font('Helvetica-Bold').text(cobro.empresa_nombre, { align: 'center' });
+    }
+    if (cobro.empresa_ruc) {
+      doc.fontSize(10).font('Helvetica').text(`RUC: ${cobro.empresa_ruc}`, { align: 'center' });
+    }
+    if (cobro.empresa_direccion) {
+      doc.fontSize(10).font('Helvetica').text(cobro.empresa_direccion, { align: 'center' });
+    }
+    if (cobro.empresa_telefono) {
+      doc.fontSize(10).font('Helvetica').text(`Tel: ${cobro.empresa_telefono}`, { align: 'center' });
+    }
+    doc.moveDown(0.8);
+
+    // ── Título ──
+    doc.fontSize(16).font('Helvetica-Bold').text('COMPROBANTE DE PAGO', { align: 'center' });
+    doc.fontSize(11).font('Helvetica').text('Recibo de cobranza', { align: 'center' });
+    if (cobro.numero_recibo) {
+      doc.moveDown(0.3);
+      doc.fontSize(12).font('Helvetica-Bold').text(`Nro. Recibo: ${cobro.numero_recibo}`, { align: 'center' });
+    }
+    // Indicador de nota de crédito aplicada
+    if (Number(cobro.aplico_nota_credito) === 1) {
+      doc.moveDown(0.4);
+      doc.fontSize(12).font('Helvetica-Bold').fillColor('#CC0000')
+        .text('*** NOTA DE CRÉDITO APLICADA ***', { align: 'center' });
+      if (Number(cobro.monto_sobrepago) > 0) {
+        doc.fontSize(10).font('Helvetica').fillColor('#CC0000')
+          .text(`Sobrepago: ${Number(cobro.monto_sobrepago).toLocaleString('es-PY')} Gs.`, { align: 'center' });
+      }
+      if (Number(cobro.saldo_a_favor) > 0) {
+        doc.fontSize(10).font('Helvetica').fillColor('#CC0000')
+          .text(`Saldo a favor: ${Number(cobro.saldo_a_favor).toLocaleString('es-PY')} Gs.`, { align: 'center' });
+      }
+      doc.fillColor('#000000');
+    }
+    // Indicador de recibo anulado
+    if (cobro.recibo_estado === 'ANULADO') {
+      doc.moveDown(0.4);
+      doc.fontSize(14).font('Helvetica-Bold').fillColor('#CC0000')
+        .text('*** ANULADO ***', { align: 'center' });
+      doc.fillColor('#000000');
+    }
+    doc.moveDown(0.8);
+
+    // ── Línea separadora ──
+    doc.moveTo(doc.page.margins.left, doc.y)
+       .lineTo(doc.page.margins.left + pageWidth, doc.y)
+       .lineWidth(1)
+       .strokeColor('#999999')
+       .stroke();
+    doc.moveDown(0.8);
+
+    // ── Datos del cobro ──
+    doc.fontSize(11).font('Helvetica');
+    doc.text(`Fecha: ${fechaStr}`, { continued: true });
+    doc.text(`   Hora: ${horaStr}`);
+    doc.text(`Medio de Pago: ${cobro.medio_pago_nombre || 'N/D'}`);
+    if (cobro.nro_comprobante) doc.text(`Nro. Comprobante: ${cobro.nro_comprobante}`);
+    doc.moveDown(0.8);
+
+    // ── Datos del cliente ──
+    doc.fontSize(12).font('Helvetica-Bold').text('DATOS DEL CLIENTE', { underline: true });
+    doc.moveDown(0.3);
+    doc.fontSize(11).font('Helvetica');
+    doc.text(`Nombre: ${cobro.cliente_nombre || ''} ${cobro.cliente_apellido || ''}`);
+    if (cobro.cliente_cedula) doc.text(`C.I.: ${cobro.cliente_cedula}`);
+    if (cobro.cliente_direccion) doc.text(`Dirección: ${cobro.cliente_direccion}`);
+    if (cobro.cliente_telefono) doc.text(`Teléfono: ${cobro.cliente_telefono}`);
+    doc.moveDown(0.8);
+
+    // ── Datos de la cuota ──
+    doc.fontSize(12).font('Helvetica-Bold').text('DATOS DE LA CUOTA', { underline: true });
+    doc.moveDown(0.3);
+    doc.fontSize(11).font('Helvetica');
+    if (cobro.numero_credito) doc.text(`Crédito Nro: ${cobro.numero_credito}`);
+    if (cobro.numero_cuota) doc.text(`Cuota Nro: ${cobro.numero_cuota}`);
+    doc.moveDown(0.8);
+
+    // ── Total ──
+    doc.moveTo(doc.page.margins.left, doc.y)
+       .lineTo(doc.page.margins.left + pageWidth, doc.y)
+       .lineWidth(1)
+       .strokeColor('#999999')
+       .stroke();
+    doc.moveDown(0.6);
+    doc.fontSize(18).font('Helvetica-Bold').text(
+      `TOTAL: ${montoStr} Gs.`,
+      { align: 'center' }
+    );
+    doc.moveDown(0.6);
+    doc.moveTo(doc.page.margins.left, doc.y)
+       .lineTo(doc.page.margins.left + pageWidth, doc.y)
+       .lineWidth(1)
+       .strokeColor('#999999')
+       .stroke();
     doc.moveDown(1);
 
-    // Firma
-    doc.fontSize(9).font('Helvetica').text('_____________________________', { align: 'center' });
+    // ── Cobrador y firma ──
+    doc.fontSize(11).font('Helvetica').text(
+      `Cobrador: ${cobro.cobrador_nombre || ''} ${cobro.cobrador_apellido || ''}`.trim(),
+      { align: 'center' }
+    );
+    doc.moveDown(1.5);
+    doc.text('_____________________________', { align: 'center' });
     doc.text('Firma del Cobrador', { align: 'center' });
+    doc.moveDown(0.8);
+    doc.fontSize(10).font('Helvetica-Oblique').text('Gracias por su pago', { align: 'center' });
 
     doc.end();
   } catch (error) {
@@ -827,12 +1318,15 @@ module.exports = {
   getCobranzas,
   registrarCobro,
   updateFechaVencimiento,
+  asignarCobranza,
   getGestiones,
   getUsuarios,
   getCobradores,
+  getAsignacionesCobrador,
   getRoles,
   getFacturaConfig,
   updateFacturaConfig,
   getTimbradoHistorial,
   generarComprobante,
+  generarComprobanteA4,
 }; 

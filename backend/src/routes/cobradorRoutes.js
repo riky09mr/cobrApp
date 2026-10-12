@@ -5,9 +5,11 @@ const fs = require('fs');
 const { authenticateToken } = require('../middlewares/authMiddleware');
 const {
   getAgenda,
+  getCuotasPendientesCredito,
   registrarCobro,
   registrarVisita,
   subirFotoVisita,
+  getCobrosDelDia,
 } = require('../controllers/cobradorController');
 const { generarComprobante } = require('../controllers/panelController');
 const {
@@ -61,6 +63,8 @@ const router = express.Router();
 router.use(authenticateToken, soloCobrador);
 
 router.get('/agenda',              getAgenda);
+router.get('/creditos/:creditoId/cuotas-pendientes', getCuotasPendientesCredito);
+router.get('/cobros',              getCobrosDelDia);
 router.post('/cobros',             registrarCobro);
 router.get('/cobros/:id/comprobante', generarComprobante);
 router.post('/visitas',            registrarVisita);

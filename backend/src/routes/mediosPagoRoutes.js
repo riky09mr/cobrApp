@@ -1,20 +1,13 @@
 const express = require('express');
 const { authenticateToken } = require('../middlewares/authMiddleware');
+const { requirePermission } = require('../middlewares/permissionMiddleware');
 const { getMediosPago, crearMedioPago, actualizarMedioPago } = require('../controllers/mediosPagoController');
 
 const router = express.Router();
 router.use(authenticateToken);
 
-// Solo SUPERVISOR y ADMIN pueden crear/editar
-const soloGestor = (req, res, next) => {
-  if (req.user.rol === 'COBRADOR') {
-    return res.status(403).json({ message: 'Sin permisos' });
-  }
-  return next();
-};
-
-router.get('/',     getMediosPago);
-router.post('/',    soloGestor, crearMedioPago);
-router.put('/:id',  soloGestor, actualizarMedioPago);
+router.get('/',     requirePermission('medios_pago', 'ver'), getMediosPago);
+router.post('/',    requirePermission('medios_pago', 'crear'), crearMedioPago);
+router.put('/:id',  requirePermission('medios_pago', 'editar'), actualizarMedioPago);
 
 module.exports = router;

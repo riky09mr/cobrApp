@@ -1,5 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middlewares/authMiddleware');
+const { requirePermission } = require('../middlewares/permissionMiddleware');
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.use(authenticateToken);
 // Ruta:       GET /api/reportes/cobrador/eficiencia
 // ──────────────────────────────────────────────
 const { getEficiencia } = require('../controllers/reportesCobradorController');
-router.get('/cobrador/eficiencia', getEficiencia);
+router.get('/cobrador/eficiencia', requirePermission('reportes', 'ver'), getEficiencia);
 
 // ──────────────────────────────────────────────
 // Reporte 2: Cartera vencida por antigüedad
@@ -20,7 +21,7 @@ router.get('/cobrador/eficiencia', getEficiencia);
 // Ruta:       GET /api/reportes/cartera/vencida
 // ──────────────────────────────────────────────
 const { getCarteraVencida } = require('../controllers/reportesCarteraController');
-router.get('/cartera/vencida', getCarteraVencida);
+router.get('/cartera/vencida', requirePermission('reportes', 'ver'), getCarteraVencida);
 
 // ──────────────────────────────────────────────
 // Reporte 3: Cobranza por período
@@ -28,7 +29,7 @@ router.get('/cartera/vencida', getCarteraVencida);
 // Ruta:       GET /api/reportes/periodo/cobranza
 // ──────────────────────────────────────────────
 const { getCobranzaPeriodo } = require('../controllers/reportesPeriodoController');
-router.get('/periodo/cobranza', getCobranzaPeriodo);
+router.get('/periodo/cobranza', requirePermission('reportes', 'ver'), getCobranzaPeriodo);
 
 // ──────────────────────────────────────────────
 // Reporte 7: Morosidad por cliente
@@ -36,7 +37,7 @@ router.get('/periodo/cobranza', getCobranzaPeriodo);
 // Ruta:       GET /api/reportes/cliente/morosidad
 // ──────────────────────────────────────────────
 const { getMorosidadCliente } = require('../controllers/reportesClienteController');
-router.get('/cliente/morosidad', getMorosidadCliente);
+router.get('/cliente/morosidad', requirePermission('reportes', 'ver'), getMorosidadCliente);
 
 // ──────────────────────────────────────────────
 // Reporte 8: Cobradores del día
@@ -44,7 +45,7 @@ router.get('/cliente/morosidad', getMorosidadCliente);
 // Ruta:       GET /api/reportes/cobradores/dia
 // ──────────────────────────────────────────────
 const { getCobradoresDia } = require('../controllers/reportesCobradorController');
-router.get('/cobradores/dia', getCobradoresDia);
+router.get('/cobradores/dia', requirePermission('reportes', 'ver'), getCobradoresDia);
 
 // ──────────────────────────────────────────────
 // Reporte 9: Ranking de cobradores
@@ -52,7 +53,7 @@ router.get('/cobradores/dia', getCobradoresDia);
 // Ruta:       GET /api/reportes/cobrador/ranking
 // ──────────────────────────────────────────────
 const { getRankingCobradores } = require('../controllers/reportesCobradorController');
-router.get('/cobrador/ranking', getRankingCobradores);
+router.get('/cobrador/ranking', requirePermission('reportes', 'ver'), getRankingCobradores);
 
 // ──────────────────────────────────────────────
 // KPIs del marco teórico (Cárdenas, 2021)
@@ -67,10 +68,10 @@ const {
   getKpisResumen,
 } = require('../controllers/reportesKpisController');
 
-router.get('/kpis/rotacion', getRotacionCartera);
-router.get('/kpis/cobertura', getCoberturaCobro);
-router.get('/kpis/reagendamiento', getTasaReagendamiento);
-router.get('/kpis/costo', getCostoGestion);
-router.get('/kpis/resumen', getKpisResumen);
+router.get('/kpis/rotacion', requirePermission('reportes', 'ver'), getRotacionCartera);
+router.get('/kpis/cobertura', requirePermission('reportes', 'ver'), getCoberturaCobro);
+router.get('/kpis/reagendamiento', requirePermission('reportes', 'ver'), getTasaReagendamiento);
+router.get('/kpis/costo', requirePermission('reportes', 'ver'), getCostoGestion);
+router.get('/kpis/resumen', requirePermission('reportes', 'ver'), getKpisResumen);
 
 module.exports = router;

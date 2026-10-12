@@ -697,9 +697,10 @@ const descargarDuplicados = (req, res) => {
 // Crear cliente manualmente (global + relaci�n con empresa)
 //                                                              
 const crearCliente = async (req, res, next) => {
+  const conn = await pool.getConnection();
   try {
     const usuarioActual = req.user;
-    const { cedula, nombre, apellido, telefono, email, direccion } = req.body;
+    const { cedula, nombre, apellido, telefono, email, direccion, latitud, longitud, credito } = req.body;
 
     let empresa_id = usuarioActual.empresaId;
     if (usuarioActual.rol === 'ADMIN' && req.body.empresa_id) {
@@ -719,9 +720,11 @@ const crearCliente = async (req, res, next) => {
     const cedulaStr = String(cedula).trim();
     const nombreStr = String(nombre).trim();
 
+    await conn.beginTransaction();
+
     // Buscar o crear cliente global por CI
     let clienteId;
-    const [[clienteExistente]] = await pool.query(
+    const [[clienteExistente]] = await conn.query(
       'SELECT id FROM clientes WHERE cedula = ? LIMIT 1',
       [cedulaStr]
     );
@@ -729,7 +732,7 @@ const crearCliente = async (req, res, next) => {
     if (clienteExistente) {
       clienteId = clienteExistente.id;
     } else {
-      const [ins] = await pool.query(
+      const [ins] = await conn.query(
         'INSERT INTO clientes (cedula, nombre, apellido, telefono, email) VALUES (?, ?, ?, ?, ?)',
         [cedulaStr, nombreStr, apellido || null, telefono || null, email || null]
       );
@@ -737,23 +740,136 @@ const crearCliente = async (req, res, next) => {
     }
 
     // Verificar si ya existe la relaci�n con esta empresa
-    const [[relExistente]] = await pool.query(
+    const [[relExistente]] = await conn.query(
       'SELECT id FROM clientes_empresas WHERE cliente_id = ? AND empresa_id = ? LIMIT 1',
       [clienteId, empresa_id]
     );
 
     if (relExistente) {
+      await conn.rollback();
       return res.status(409).json({ message: 'El cliente ya est� registrado en esta empresa' });
     }
 
-    await pool.query(
-      'INSERT INTO clientes_empresas (cliente_id, empresa_id, direccion) VALUES (?, ?, ?)',
-      [clienteId, empresa_id, direccion || null]
+    let lat = latitud !== undefined && latitud !== '' ? parseFloat(latitud) : null;
+    let lng = longitud !== undefined && longitud !== '' ? parseFloat(longitud) : null;
+
+    await conn.query(
+      'INSERT INTO clientes_empresas (cliente_id, empresa_id, direccion, latitud, longitud) VALUES (?, ?, ?, ?, ?)',
+      [clienteId, empresa_id, direccion || null, lat, lng]
     );
 
-    return res.status(201).json({ message: 'Cliente creado correctamente', data: { id: clienteId } });
+    // ── Datos del cr�dito (opcionales) ──
+    let creditoId = null;
+    const cuotaIds = [];
+    if (credito && typeof credito === 'object') {
+      const c = credito;
+      const numCredito       = c.numero_credito ? String(c.numero_credito).trim() : null;
+      const descripcion      = c.descripcion ? String(c.descripcion).trim() : null;
+      const montoTotalRaw    = c.monto_total;
+      const cantCuotasRaw    = c.cantidad_cuotas;
+      const cuotasPagadasRaw = c.cuotas_pagadas ?? 0;
+      const montoCuotaRaw    = c.monto_cuota;
+      const diaPagoRaw       = c.dia_pago;
+      const precioContadoRaw = c.precio_contado;
+      const entregaRaw       = c.entrega_inicial;
+      const periodicidadRaw  = c.periodicidad || 'MENSUAL';
+      const tasaInteresRaw   = c.tasa_interes ?? 0;
+      const fechaOtorgRaw    = c.fecha_otorgamiento;
+
+      if (!montoTotalRaw || !cantCuotasRaw) {
+        await conn.rollback();
+        return res.status(400).json({ message: 'Crédito con datos incompletos: se requieren monto_total y cantidad_cuotas' });
+      }
+
+      const monto = parseFloat(String(montoTotalRaw).replace(/\./g, '').replace(',', '.'));
+      const cuotas = parseInt(cantCuotasRaw, 10);
+      const cuotasPagadas = Math.max(0, parseInt(cuotasPagadasRaw, 10) || 0);
+
+      if (isNaN(monto) || monto <= 0) {
+        await conn.rollback();
+        return res.status(400).json({ message: `monto_total inv�lido: "${montoTotalRaw}"` });
+      }
+      if (isNaN(cuotas) || cuotas <= 0 || cuotas > 1000) {
+        await conn.rollback();
+        return res.status(400).json({ message: `cantidad_cuotas inv�lida: "${cantCuotasRaw}"` });
+      }
+      if (cuotasPagadas > cuotas) {
+        await conn.rollback();
+        return res.status(400).json({ message: `cuotas_pagadas (${cuotasPagadas}) no puede superar cantidad_cuotas (${cuotas})` });
+      }
+
+      // N�mero de cr�dito �nico por empresa
+      if (numCredito) {
+        const [[credExistente]] = await conn.query(
+          'SELECT id FROM creditos WHERE numero_credito = ? AND empresa_id = ? LIMIT 1',
+          [numCredito, empresa_id]
+        );
+        if (credExistente) {
+          await conn.rollback();
+          return res.status(409).json({ message: `N�mero de cr�dito ya registrado: ${numCredito}` });
+        }
+      }
+
+      const PERIODICIDADES = ['SEMANAL', 'QUINCENAL', 'MENSUAL'];
+      const periodicidad = PERIODICIDADES.includes(periodicidadRaw.toUpperCase())
+        ? periodicidadRaw.toUpperCase() : 'MENSUAL';
+
+      const tasa          = Math.max(0, parseFloat(tasaInteresRaw) || 0);
+      const precioContado = precioContadoRaw ? parseFloat(String(precioContadoRaw).replace(/\./g, '').replace(',', '.')) || null : null;
+      const entrega       = entregaRaw ? parseFloat(String(entregaRaw).replace(/\./g, '').replace(',', '.')) || 0 : 0;
+      const diaPago       = diaPagoRaw ? parseInt(diaPagoRaw, 10) || null : null;
+      const fechaOtorg    = parseFecha(fechaOtorgRaw) || new Date();
+      const fechaOtorgStr = fechaOtorg.toISOString().split('T')[0];
+
+      const montoCuotaCalculado = parseFloat((monto / cuotas).toFixed(2));
+      const montoCuotaFinal = montoCuotaRaw
+        ? parseFloat(String(montoCuotaRaw).replace(/\./g, '').replace(',', '.')) || montoCuotaCalculado
+        : montoCuotaCalculado;
+
+      const saldoActual = parseFloat((monto - montoCuotaFinal * cuotasPagadas).toFixed(2));
+
+      const [credResult] = await conn.query(
+        `INSERT INTO creditos
+           (empresa_id, cliente_id, numero_credito, descripcion, precio_contado, entrega_inicial,
+            monto_total, saldo_actual, cantidad_cuotas, cuotas_pagadas, monto_cuota,
+            dia_pago, tasa_interes, periodicidad, fecha_otorgamiento, estado)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVO')`,
+        [empresa_id, clienteId, numCredito, descripcion, precioContado, entrega,
+         monto, saldoActual, cuotas, cuotasPagadas, montoCuotaFinal,
+         diaPago, tasa, periodicidad, fechaOtorgStr]
+      );
+      creditoId = credResult.insertId;
+
+      for (let c = 1; c <= cuotas; c++) {
+        const fechaVenc = calcularFechaVencimiento(fechaOtorg, c, periodicidad, diaPago);
+        const montoEsta = c === cuotas
+          ? parseFloat((monto - montoCuotaFinal * (cuotas - 1)).toFixed(2))
+          : montoCuotaFinal;
+        const estadoCuota = c <= cuotasPagadas ? 'PAGADO' : 'PENDIENTE';
+        const fechaPago   = c <= cuotasPagadas ? fechaOtorgStr : null;
+
+        const [cuotaRes] = await conn.query(
+          `INSERT INTO cuotas (credito_id, numero_cuota, fecha_vencimiento, monto_cuota, saldo_cuota, estado, fecha_pago)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [creditoId, c, fechaVenc.toISOString().split('T')[0],
+           montoEsta, c <= cuotasPagadas ? 0 : montoEsta,
+           estadoCuota, fechaPago]
+        );
+        cuotaIds.push(cuotaRes.insertId);
+      }
+    }
+
+    await conn.commit();
+
+    return res.status(201).json({
+      message: creditoId ? 'Cliente y crédito creados correctamente' : 'Cliente creado correctamente',
+      data: { id: clienteId, credito_id: creditoId, cuota_ids: cuotaIds },
+    });
   } catch (error) {
+    await conn.rollback();
     return next(error);
+  } finally {
+    conn.release();
   }
 };
 

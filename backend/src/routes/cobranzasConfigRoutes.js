@@ -1,5 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middlewares/authMiddleware');
+const { requirePermission } = require('../middlewares/permissionMiddleware');
 const {
   listTimbrados,
   createTimbrado,
@@ -22,24 +23,24 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get('/timbrados', listTimbrados);
-router.post('/timbrados', createTimbrado);
-router.put('/timbrados/:id', updateTimbrado);
+router.get('/timbrados', requirePermission('configuracion', 'ver'), listTimbrados);
+router.post('/timbrados', requirePermission('configuracion', 'editar'), createTimbrado);
+router.put('/timbrados/:id', requirePermission('configuracion', 'editar'), updateTimbrado);
 
-router.get('/establecimientos', listEstablecimientos);
-router.post('/establecimientos', createEstablecimiento);
-router.put('/establecimientos/:id', updateEstablecimiento);
+router.get('/establecimientos', requirePermission('configuracion', 'ver'), listEstablecimientos);
+router.post('/establecimientos', requirePermission('configuracion', 'editar'), createEstablecimiento);
+router.put('/establecimientos/:id', requirePermission('configuracion', 'editar'), updateEstablecimiento);
 
-router.get('/puntos-expedicion', listPuntosExpedicion);
-router.post('/puntos-expedicion', createPuntoExpedicion);
-router.put('/puntos-expedicion/:id', updatePuntoExpedicion);
+router.get('/puntos-expedicion', requirePermission('configuracion', 'ver'), listPuntosExpedicion);
+router.post('/puntos-expedicion', requirePermission('configuracion', 'editar'), createPuntoExpedicion);
+router.put('/puntos-expedicion/:id', requirePermission('configuracion', 'editar'), updatePuntoExpedicion);
 
-router.get('/cajas', listCajas);
-router.post('/cajas', createCaja);
-router.put('/cajas/:id', updateCaja);
+router.get('/cajas', requirePermission('configuracion', 'ver'), listCajas);
+router.post('/cajas', requirePermission('configuracion', 'editar'), createCaja);
+router.put('/cajas/:id', requirePermission('configuracion', 'editar'), updateCaja);
 
-router.get('/numeradores', listNumeradores);
-router.post('/numeradores', createNumerador);
-router.put('/numeradores/:id', updateNumerador);
+router.get('/numeradores', requirePermission('configuracion', 'ver'), listNumeradores);
+router.post('/numeradores', requirePermission('configuracion', 'editar'), createNumerador);
+router.put('/numeradores/:id', requirePermission('configuracion', 'editar'), updateNumerador);
 
 module.exports = router;

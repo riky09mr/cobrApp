@@ -15,6 +15,8 @@ const cobranzasConfigRoutes = require('./routes/cobranzasConfigRoutes');
 const interesesConfigRoutes = require('./routes/interesesConfigRoutes');
 const reportesRoutes = require('./routes/reportesRoutes');
 const pushRoutes = require('./routes/pushRoutes');
+const permisosRoutes = require('./routes/permisosRoutes');
+const rutaRoutes = require('./routes/rutaRoutes');
 const cron = require('node-cron');
 const { activarAlmuerzosAutomaticos } = require('./services/descansoCron');
 const { sincronizarTodasEmpresas } = require('./services/cobranzas/feriadosAnualService');
@@ -46,6 +48,8 @@ app.use('/api/configuracion/cobranzas', cobranzasConfigRoutes);
 app.use('/api/configuracion/intereses', interesesConfigRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/push', pushRoutes);
+app.use('/api/permisos', permisosRoutes);
+app.use('/api', rutaRoutes); // POST /api/ruta (ruta por calles para el mapa)
 
 app.use((error, req, res, next) => {
     console.error(error);

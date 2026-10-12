@@ -1,0 +1,923 @@
+# Capítulo III: Marco Metodológico
+
+> **Autor:** Rivaldo Andrés Zarate Samaniego
+> **Tutor:** Ing. Aldo Federico Ávalos
+> **Institución:** Universidad Católica Nuestra Señora de la Asunción — Unidad Pedagógica Carapeguá
+> **Carrera:** Ingeniería Informática
+> **Año:** 2026
+
+---
+
+## Tabla de Contenidos
+
+- [3.1. Enfoque de Investigación](#31-enfoque-de-investigación)
+- [3.2. Tipo de Investigación](#32-tipo-de-investigación)
+- [3.3. Diseño de Investigación](#33-diseño-de-investigación)
+- [3.4. Metodología de Desarrollo de Software](#34-metodología-de-desarrollo-de-software)
+- [3.5. Población y Muestra](#35-población-y-muestra)
+- [3.6. Técnicas e Instrumentos de Recolección de Datos](#36-técnicas-e-instrumentos-de-recolección-de-datos)
+- [3.7. Procedimiento de Investigación](#37-procedimiento-de-investigación)
+- [3.8. Técnicas de Análisis de Datos](#38-técnicas-de-análisis-de-datos)
+- [3.9. Aspectos Éticos](#39-aspectos-éticos)
+- [3.10. Limitaciones del Estudio](#310-limitaciones-del-estudio)
+- [3.11. Cronograma de Actividades](#311-cronograma-de-actividades)
+- [3.12. Matriz de Operacionalización de Variables](#312-matriz-de-operacionalización-de-variables)
+- [3.13. Recursos del Proyecto](#313-recursos-del-proyecto)
+- [3.14. Presupuesto Estimado](#314-presupuesto-estimado)
+- [Referencias del Marco Metodológico](#referencias-del-marco-metodológico)
+
+---
+
+## 3.1. Enfoque de Investigación
+
+El presente trabajo adopta un **enfoque mixto**, que combina componentes cuantitativos y cualitativos de manera complementaria para abordar la complejidad del fenómeno estudiado (Hernández, Fernández y Baptista, 2018; Creswell y Creswell, 2018). La combinación de ambos enfoques responde al principio de **triangulación metodológica**, que permite contrastar los hallazgos desde distintas perspectivas y aumentar la validez y confiabilidad de los resultados (Denzin, 2017).
+
+Es preciso aclarar el alcance del objeto de estudio: **cobrApp no es un sistema desarrollado a medida para una empresa específica, sino un producto de software** concebido para ser ofrecido posteriormente a múltiples empresas del sector de cobranzas. En consecuencia, no se definen empresas piloto, no se realiza una implementación en producción y no se mide un impacto "antes/después" sobre indicadores reales de gestión. El estudio se orienta, en cambio, a tres propósitos: (a) caracterizar el estado actual de la gestión de cobranzas en el sector; (b) relevar los requisitos funcionales y no funcionales que debe satisfacer el producto; y (c) evaluar la percepción de usabilidad, satisfacción y calidad técnica de un prototipo funcional mediante su validación con usuarios potenciales. Por ello, la secuencia metodológica es de tipo **exploratorio-secuencial**: la fase cualitativa inicial (diagnóstico y relevamiento) nutre la definición de los instrumentos cuantitativos aplicados en la fase de validación y evaluación (Creswell y Creswell, 2018).
+
+### 3.1.1. Componente Cuantitativo
+
+El componente cuantitativo se manifiesta en la recolección y el análisis de datos numéricos provenientes de tres fuentes:
+
+- **Estudio de mercado del sector:** caracterización cuantitativa de las empresas de cobranzas de la zona de influencia, mediante frecuencias y porcentajes sobre variables como tamaño de cartera, cantidad de cobradores, herramientas utilizadas para el registro de cobros y nivel de digitalización de los procesos.
+- **Métricas de rendimiento del prototipo:** mediciones objetivas capturadas por el propio sistema durante las pruebas, tales como tiempos de respuesta de la API, tasa de errores, disponibilidad del servicio y tiempo promedio requerido para completar tareas representativas (por ejemplo, el registro de un cobro o la asignación de una cartera).
+- **Encuestas estructuradas a usuarios potenciales:** aplicación de cuestionarios estandarizados, con escalas Likert y la Escala de Usabilidad del Sistema (SUS), para medir la satisfacción, la usabilidad percibida y la intención de uso del producto (Brooke, 1996).
+
+El componente cuantitativo permite objetivar los resultados mediante estadística descriptiva y fundamentar las conclusiones en datos medibles (Creswell y Creswell, 2018).
+
+### 3.1.2. Componente Cualitativo
+
+El componente cualitativo se orienta a la comprensión profunda de los procesos, prácticas y necesidades de los actores del sector de cobranzas, mediante:
+
+- **Entrevistas semiestructuradas** a administradores, supervisores y cobradores de empresas del sector, orientadas a comprender sus flujos de trabajo, las dificultades de los procesos manuales o semiautomatizados y sus expectativas respecto a una herramienta digital.
+- **Observación directa** de los procesos de cobranza en su contexto natural, con el fin de identificar puntos de dolor, tiempos muertos y oportunidades de mejora.
+- **Análisis documental** de planillas, registros y reportes típicos del sector (debidamente anonimizados), que permite reconstruir el estado actual de la gestión sin interferir en las operaciones de las empresas.
+
+Los datos cualitativos aportan el contexto interpretativo necesario para comprender el significado de los resultados cuantitativos y para traducir las necesidades reales del sector en requisitos de software (Hernández, Fernández y Baptista, 2018).
+
+---
+
+## 3.2. Tipo de Investigación
+
+### 3.2.1. Investigación Aplicada
+
+La investigación es de tipo **aplicada**, también denominada tecnológica o práctica, pues busca resolver un problema concreto del mundo real: la ineficiencia de la gestión de cobranzas derivada de la falta de herramientas digitales integradas y multiempresa en el sector (Lozada, 2014). A diferencia de la investigación básica, que persigue la generación de conocimiento por sí mismo, la investigación aplicada en ingeniería informática se orienta a la creación de productos tecnológicos que atiendan necesidades específicas de la industria. En este caso, el producto es cobrApp, un sistema de gestión de cobranzas multiempresa compuesto por un panel web administrativo, una API REST y una aplicación móvil para cobradores en campo.
+
+### 3.2.2. Investigación Descriptiva
+
+Se emplea la **investigación descriptiva** para caracterizar el estado actual de la gestión de cobranzas en las empresas del sector. Según Hernández, Fernández y Baptista (2018), los estudios descriptivos buscan especificar propiedades, características y rasgos importantes del fenómeno analizado. En este contexto, la investigación descriptiva permite:
+
+- Describir los procesos manuales o semiautomatizados que utilizan actualmente las empresas de cobranzas en la zona de influencia.
+- Identificar las funcionalidades mínimas que debe ofrecer un producto de gestión de cobranzas para ser viable en el mercado local.
+- Caracterizar el perfil tecnológico de los cobradores de campo (acceso a internet, tipo de dispositivo móvil y familiaridad con aplicaciones).
+- Describir la percepción de usabilidad, satisfacción y calidad técnica del prototipo por parte de los usuarios potenciales.
+
+### 3.2.3. Investigación Documental y de Campo
+
+La investigación se sustenta simultáneamente en fuentes secundarias y primarias:
+
+| Tipo | Descripción | Instrumentos |
+|---|---|---|
+| **Documental** | Revisión de literatura académica, manuales técnicos, documentación de frameworks y normativas legales aplicables (Ley N° 1682/01, GDPR) | Fichas bibliográficas, matrices de análisis documental |
+| **De campo** | Recolección de datos primarios directamente de la realidad de las empresas del sector de cobranzas | Entrevistas semiestructuradas, encuestas, observación directa, registros del sistema |
+
+---
+
+## 3.3. Diseño de Investigación
+
+### 3.3.1. Diseño No Experimental
+
+El diseño de esta investigación es **no experimental**, puesto que no se manipulan deliberadamente las variables independientes: los fenómenos se observan en su contexto natural y los datos se analizan tal como se presentan en la realidad (Kerlinger y Lee, 2002). Esta decisión se justifica por la naturaleza del objeto de estudio, ya que cobrApp se desarrolla como producto de software y su evaluación se realiza mediante la validación de un prototipo con usuarios potenciales, sin alterar los procesos operativos de ninguna empresa en producción.
+
+### 3.3.2. Diseño Transversal
+
+El estudio es de tipo **transversal**, porque la recolección de datos se realiza en un momento único del tiempo. Esto permite obtener una "fotografía" del estado actual de la gestión de cobranzas en el sector y, posteriormente, medir la percepción de los usuarios potenciales sobre el prototipo en un período acotado (Hernández, Fernández y Baptista, 2018). Al no realizarse una implementación en producción, no corresponde la comparación de indicadores antes y después; en su lugar, el corte transversal describe la situación del sector y evalúa el producto en el contexto de su fase de desarrollo.
+
+### 3.3.3. Investigación-Acción
+
+Para el proceso de construcción del software se adopta un enfoque de **investigación-acción** (Lewin, 1946; Avison, Lau, Myers y Nielsen, 1999), en el cual el investigador no es un observador externo sino un participante activo en la construcción de la solución. El proceso se desarrolla en ciclos iterativos de **planificar → actuar → observar → reflexionar**:
+
+1. **Planificar:** identificación de los requisitos funcionales y no funcionales a partir de las necesidades relevadas en el sector.
+2. **Actuar:** implementación de los módulos del sistema correspondientes al ciclo.
+3. **Observar:** evaluación del funcionamiento del incremento mediante pruebas funcionales y retroalimentación de los usuarios potenciales.
+4. **Reflexionar:** análisis de los resultados y ajuste de los requisitos para el siguiente ciclo.
+
+Esta dinámica permite que el producto evolucione de forma incremental, incorporando en cada iteración las correcciones detectadas, y que cada ciclo genere aprendizaje tanto sobre el dominio del problema como sobre la efectividad de las soluciones implementadas.
+
+---
+
+## 3.4. Metodología de Desarrollo de Software
+
+### 3.4.1. Enfoque Ágil sin Metodología Formal
+
+El desarrollo de cobrApp se rige por un **enfoque ágil liviano que no adopta formalmente una metodología específica** (Scrum, XP o Kanban), sino que aplica sus principios y prácticas esenciales de manera adaptada al contexto del proyecto, en el cual el investigador cumple simultáneamente los roles de analista, desarrollador y evaluador (Beck et al., 2001). Esta decisión responde a tres motivos: (a) los requisitos del sector de cobranzas son evolutivos y se precisan ciclos cortos que permitan incorporar retroalimentación; (b) la entrega incremental de funcionalidades posibilita validar tempranamente las decisiones de diseño con usuarios potenciales; y (c) la estructura del proyecto no justifica la carga administrativa de ceremonias y roles formales, por lo que se conservan únicamente los elementos que aportan valor: iteraciones cortas, priorización del trabajo, revisión periódica y mejora continua.
+
+### 3.4.2. Iteraciones de Dos Semanas
+
+El trabajo se organiza en **iteraciones de dos semanas de duración**, cada una con una estructura simplificada de planificación, desarrollo, revisión y retrospectiva:
+
+| Momento | Actividad |
+|---|---|
+| Inicio de la iteración | Planificación: definición del objetivo de la iteración y selección de las funcionalidades a implementar |
+| Durante la iteración | Desarrollo de las funcionalidades, pruebas unitarias y de integración, y control de versiones |
+| Fin de la iteración | Revisión del incremento: demostración funcional y recolección de retroalimentación de usuarios potenciales |
+| Cierre | Retrospectiva: análisis de lo ocurrido y definición de mejoras para la siguiente iteración |
+
+La duración fija de dos semanas impone un ritmo sostenible, limita el alcance de cada incremento y reduce el riesgo de desviaciones, al tiempo que permite completar las ocho iteraciones previstas dentro del período de desarrollo (semanas 7 a 16).
+
+### 3.4.3. Prácticas de Calidad
+
+Complementariamente, se incorporan prácticas de calidad del software orientadas a garantizar la robustez y mantenibilidad del producto (Sommerville, 2011):
+
+- **Pruebas unitarias y de integración:** validación automatizada de los componentes críticos de la lógica de negocio (cálculo de saldos e intereses, registro de cobros, arqueos de caja) antes de cada entrega.
+- **Control de versiones:** uso de Git para el seguimiento de cambios, la trazabilidad del código y la recuperación ante errores.
+- **Refactorización continua:** mejora permanente de la estructura interna del código sin alterar su comportamiento externo, para reducir la deuda técnica (Fowler, 2018).
+- **Estándares de codificación:** aplicación de guías de estilo consistentes (ESLint y Prettier para JavaScript/TypeScript) y de convenciones de nomenclatura en la base de datos y la API.
+
+---
+
+## 3.5. Población y Muestra
+
+### 3.5.1. Población Objetivo
+
+La población objetivo está conformada por las **empresas dedicadas a la gestión de cobranzas y al otorgamiento de créditos** que operan en el Departamento de Paraguarí y sus zonas aledañas, junto con sus administradores, supervisores y cobradores. Se estima que existen **aproximadamente 30 empresas** con actividad formal de cobranzas en la zona de influencia del estudio (casas comerciales, financieras, cooperativas y agencias de cobranza).
+
+### 3.5.2. Muestra por Conveniencia
+
+Dado que el proyecto corresponde al desarrollo de un producto de software y que no se requiere representatividad estadística para sus fines (diagnóstico, relevamiento de requisitos y validación de percepción), se utiliza un **muestreo no probabilístico por conveniencia** (Otzen y Manterola, 2017). La muestra está integrada por:
+
+| Estrato | Cantidad | Criterio de selección |
+|---|---|---|
+| Empresas del sector | 2 a 3 | Empresas de cobranzas de la zona con procesos activos y disposición a participar en entrevistas y sesiones de prueba |
+| Administradores | 2 a 3 | Dueños o gerentes de las empresas seleccionadas |
+| Supervisores | 3 a 4 | Encargados de coordinar equipos de cobradores |
+| Cobradores | 6 a 8 | Cobradores de campo activos, con experiencia mínima de seis meses |
+
+La selección por conveniencia se justifica porque el estudio no pretende generalizar resultados a toda la población, sino comprender el sector, derivar requisitos de producto y validar la percepción del prototipo en un grupo accesible de informantes calificados.
+
+### 3.5.3. Criterios de Inclusión y Exclusión
+
+**Criterios de inclusión:**
+
+- Empresas del rubro de cobranzas o de otorgamiento de créditos con procesos de cobro activos, ubicadas en Paraguarí y zonas aledañas.
+- Empresas que gestionan sus cobranzas de forma manual o con herramientas básicas (planillas electrónicas, cuadernos de registro).
+- Participantes con un rol definido dentro del proceso de cobranzas (administrador, supervisor o cobrador).
+- Cobradores con experiencia mínima de seis meses en el puesto y manejo habitual de un teléfono inteligente.
+- Participantes con disponibilidad para asistir a entrevistas y a sesiones de prueba del prototipo.
+
+**Criterios de exclusión:**
+
+- Empresas fuera del área geográfica delimitada por el estudio.
+- Empresas que ya utilizan un sistema comercial integral de gestión de cobranzas.
+- Personas sin experiencia previa en el uso de aplicaciones móviles.
+- Participantes que no acepten firmar el consentimiento informado.
+
+### 3.5.4. Perfil de los Participantes
+
+- **Administradores:** de 30 a 55 años, con formación universitaria o técnica, responsables de la gestión de la cartera, el control financiero y la toma de decisiones.
+- **Supervisores:** de 25 a 45 años, con más de tres años de experiencia en cobranzas, encargados de la asignación de cuotas, el seguimiento diario y la rendición de cuentas de los equipos de campo.
+- **Cobradores:** de 22 a 50 años, con educación secundaria o técnica, entre seis meses y diez años de experiencia en gestión de cobro presencial y usuarios habituales de teléfonos inteligentes Android.
+- **Empresas:** de tamaño pequeño o mediano, con carteras de entre 200 y 2.000 cuotas activas, procesos manuales o semiautomatizados y equipos de tres a ocho cobradores.
+
+---
+
+## 3.6. Técnicas e Instrumentos de Recolección de Datos
+
+### 3.6.1. Entrevista Semiestructurada
+
+Se aplica una **entrevista semiestructurada** a administradores y supervisores de las empresas seleccionadas. Este instrumento permite explorar en profundidad las necesidades del negocio, los procesos actuales y las expectativas respecto al producto. Las entrevistas se guían por los siguientes ejes:
+
+**Guía de entrevista para administradores:**
+
+1. ¿Cómo gestionan actualmente las cobranzas en su empresa?
+2. ¿Qué herramientas utilizan para el registro de pagos y el control de la cartera?
+3. ¿Cuáles son los principales problemas que enfrentan en la gestión diaria?
+4. ¿Qué información considera indispensable en un reporte de cobranzas?
+5. ¿Cómo miden la eficiencia de sus cobradores actualmente?
+6. ¿Qué funcionalidades esperaría de un sistema de gestión de cobranzas?
+
+**Guía de entrevista para supervisores:**
+
+1. ¿Cómo asignan las cuotas a los cobradores actualmente?
+2. ¿Qué información reciben sobre el desempeño diario de sus cobradores?
+3. ¿Cómo manejan las novedades (clientes ausentes, reagendamientos, descansos)?
+4. ¿Qué problemas de comunicación tienen con los cobradores en campo?
+5. ¿Cómo realizan la rendición de cuentas al final de la jornada?
+
+### 3.6.2. Encuesta de Satisfacción y Usabilidad
+
+Se aplica un **cuestionario estructurado** a los usuarios potenciales que participan en las sesiones de prueba del prototipo. El cuestionario incorpora la **Escala de Usabilidad del Sistema (SUS)** (Brooke, 1996), compuesta por diez ítems con escala Likert de cinco puntos cuyo puntaje resultante se expresa en una escala de 0 a 100, complementada con secciones específicas del dominio:
+
+| Sección | Ítems | Escala |
+|---|---|---|
+| Datos del participante y rol | 4 preguntas | Opción múltiple |
+| Experiencia previa con tecnología | 3 preguntas | Likert (1-5) |
+| Usabilidad del sistema (SUS) | 10 preguntas | Likert (1-5) |
+| Utilidad percibida | 6 preguntas | Likert (1-5) |
+| Satisfacción general | 3 preguntas | Likert (1-5) |
+| Comentarios abiertos | 3 preguntas | Texto libre |
+
+La interpretación de los puntajes SUS se realiza conforme a los valores de referencia publicados por Sauro y Lewis (2016), considerando que un puntaje promedio superior a 68 indica un nivel de usabilidad aceptable.
+
+### 3.6.3. Observación Directa No Participante
+
+Se realiza **observación directa no participante** de los procesos de cobranza en su contexto natural, sin intervenir en las actividades de las empresas. Las sesiones de observación se concentran en:
+
+- Jornada de trabajo de un cobrador de campo (desde la salida hasta la rendición de cuentas).
+- Proceso de asignación de cuotas por parte del supervisor.
+- Cierre de caja y arqueo al final de la jornada.
+
+Las observaciones se registran en un **diario de campo** estructurado con los siguientes campos: fecha, hora, actividad observada, participantes, descripción detallada, problemas identificados y notas del investigador.
+
+### 3.6.4. Análisis Documental
+
+Se revisan y analizan **planillas y registros típicos** del sector, proporcionados voluntariamente por las empresas participantes y **anonimizados** antes de su tratamiento:
+
+- Registros de cobranza (planillas, cuadernos o archivos electrónicos de pagos).
+- Reportes de morosidad y cuotas vencidas.
+- Liquidaciones y rendiciones de cobradores.
+- Registros de clientes (anonimizados).
+
+Este análisis permite reconstruir las prácticas actuales de registro, identificar la información mínima que debe manejar el sistema y validar el modelo de datos de cobrApp.
+
+### 3.6.5. Registros del Sistema
+
+El propio prototipo genera datos que se utilizan como fuente de información durante las sesiones de prueba:
+
+- **Logs de acceso:** registro de inicios de sesión, horas de actividad y sesiones concurrentes.
+- **Métricas de uso:** frecuencia de utilización de cada funcionalidad y tiempo promedio por tarea.
+- **Métricas de rendimiento:** tiempos de respuesta de la API y tasa de errores.
+- **Datos de gestión simulada:** cantidad de cobros registrados y visitas gestionadas durante las pruebas.
+
+---
+
+## 3.7. Procedimiento de Investigación
+
+El estudio se desarrolla en cinco fases secuenciales, con una duración total de veinte semanas:
+
+### 3.7.1. Fase 1: Diagnóstico y Relevamiento (Semanas 1-3)
+
+- Revisión bibliográfica y análisis del estado del arte.
+- Entrevistas semiestructuradas con administradores y supervisores.
+- Observación directa de los procesos actuales.
+- Análisis documental de planillas y registros típicos anonimizados.
+- Identificación de requisitos funcionales y no funcionales del producto.
+
+**Entregable:** Documento de Requisitos del Sistema (DRS).
+
+### 3.7.2. Fase 2: Diseño (Semanas 4-6)
+
+- Diseño de la arquitectura del sistema (cliente-servidor en tres capas).
+- Modelado de la base de datos multiempresa (diagrama entidad-relación).
+- Diseño de la API REST (definición de endpoints y contratos).
+- Diseño de las interfaces de usuario (wireframes y prototipos navegables).
+- Validación de los prototipos con usuarios potenciales.
+
+**Entregables:** Documento de Arquitectura y Diseño del Sistema (DADS) y prototipos navegables.
+
+### 3.7.3. Fase 3: Desarrollo (Semanas 7-16)
+
+La construcción del prototipo funcional se organiza en ocho iteraciones:
+
+| Iteración | Funcionalidad |
+|---|---|
+| 1 | Autenticación y control de acceso basado en roles (RBAC) |
+| 2 | Gestión de empresas, clientes y créditos |
+| 3 | Asignaciones de cuotas y agenda del cobrador |
+| 4 | Cobranzas en campo (registro de pagos, visitas y evidencias) |
+| 5 | Reportes y panel de supervisión |
+| 6 | Mensajería interna y comunicación supervisor-cobrador |
+| 7 | Caja diaria y arqueos |
+| 8 | Pruebas integrales y correcciones |
+
+**Entregable:** prototipo funcional.
+
+### 3.7.4. Fase 4: Pruebas y Validación (Semanas 17-18)
+
+- Sesiones de prueba del prototipo con usuarios potenciales (administradores, supervisores y cobradores).
+- Ejecución de tareas guiadas representativas de los procesos de cobranza.
+- Registro de observaciones e incidencias en el diario de campo.
+- Ajustes correctivos sobre el prototipo.
+- Validación final de las funcionalidades críticas.
+
+**Entregable:** prototipo validado.
+
+### 3.7.5. Fase 5: Evaluación (Semanas 19-20)
+
+- Aplicación de la encuesta de usabilidad (SUS) y satisfacción.
+- Entrevistas de cierre con administradores y supervisores.
+- Análisis de la percepción de los usuarios potenciales.
+- Elaboración de conclusiones y recomendaciones.
+
+**Entregable:** informe de evaluación.
+
+---
+
+## 3.8. Técnicas de Análisis de Datos
+
+### 3.8.1. Análisis Cuantitativo
+
+Los datos cuantitativos (encuestas, métricas del sistema y datos del estudio de mercado) se procesan mediante **estadística descriptiva**, que permite resumir y describir las características de los datos recolectados (Hernández, Fernández y Baptista, 2018):
+
+- **Medidas de tendencia central:** media, mediana y moda para resumir los puntajes de usabilidad y satisfacción.
+- **Medidas de dispersión:** desviación estándar para evaluar la variabilidad de las respuestas.
+- **Distribución de frecuencias:** tabulación de las respuestas por ítem y por rol de los participantes.
+- **Puntaje SUS:** cálculo del puntaje global de usabilidad por participante y del promedio del grupo.
+
+El procesamiento se realiza con **Microsoft Excel**, herramienta de uso generalizado que permite tabular, graficar y calcular los estadísticos descriptivos sin requerir software especializado.
+
+### 3.8.2. Análisis Cualitativo
+
+Los datos cualitativos (entrevistas, observaciones y comentarios abiertos) se analizan mediante la técnica de **análisis de contenido** (Krippendorff, 2018), siguiendo estos pasos:
+
+1. **Transcripción:** digitalización de las entrevistas y las notas de campo.
+2. **Codificación abierta:** identificación de conceptos y categorías emergentes en los textos.
+3. **Codificación axial:** establecimiento de relaciones entre las categorías identificadas.
+4. **Codificación selectiva:** integración de las categorías en temas centrales (por ejemplo, "registro manual", "falta de control en campo", "necesidad de reportes").
+5. **Interpretación:** construcción de significados a partir de los patrones identificados y su vinculación con los requisitos del producto.
+
+### 3.8.3. Triangulación Metodológica
+
+Para garantizar la validez de los hallazgos se aplica **triangulación metodológica** (Denzin, 2017), contrastando:
+
+- Los resultados cuantitativos de las encuestas con los hallazgos cualitativos de las entrevistas.
+- La percepción declarada por los participantes con las métricas objetivas capturadas por el sistema.
+- La información documental (planillas y registros) con lo observado directamente en campo.
+
+---
+
+## 3.9. Aspectos Éticos
+
+### 3.9.1. Consentimiento Informado
+
+Todos los participantes firman un **consentimiento informado** antes de incorporarse al estudio, documento que especifica: el propósito de la investigación, el carácter voluntario de la participación, la confidencialidad de los datos proporcionados, el derecho a retirarse en cualquier momento sin consecuencias y el uso exclusivo de la información para fines académicos y de investigación.
+
+### 3.9.2. Confidencialidad y Anonimización
+
+Se garantiza la confidencialidad de los datos de las empresas y de los participantes mediante:
+
+- Anonimización de los nombres comerciales en los reportes de la investigación.
+- Omisión de datos personales de clientes (nombres, números de cédula, direcciones) en cualquier análisis o publicación.
+- Almacenamiento seguro de los datos recolectados en repositorios con acceso restringido.
+- Eliminación de los datos personales una vez concluida la investigación.
+
+### 3.9.3. Protección de Datos Personales
+
+El tratamiento de los datos personales se alinea con la **Ley N° 1682/01 "De Protección de Datos de Carácter Personal"** de la República del Paraguay y con los principios del Reglamento General de Protección de Datos (GDPR) de la Unión Europea: finalidad, proporcionalidad, calidad y seguridad de los datos. En particular, los datos utilizados para validar el prototipo son ficticios o anonimizados, de modo que el sistema no procesa información personal real de deudores durante su fase de pruebas.
+
+---
+
+## 3.10. Limitaciones del Estudio
+
+- **Muestra reducida:** el tamaño de la muestra (2 a 3 empresas y 11 a 15 participantes) limita la posibilidad de generalizar los resultados a todo el sector de cobranzas del país.
+- **Período de pruebas acotado:** las sesiones de validación se concentran en dos semanas (semanas 17-18), lo que puede no capturar la totalidad de las situaciones que enfrentaría el sistema en un uso prolongado.
+- **Sin medición de impacto real en producción:** al tratarse de un producto en fase de prototipo, no se dispone de indicadores pre y post implementación que permitan cuantificar el efecto del sistema sobre la eficiencia operativa real de las empresas.
+- **Sin integración con sistemas contables externos:** la validación no incluye la integración de cobrApp con software contable o de facturación de terceros, lo que deberá abordarse en fases posteriores del ciclo de vida del producto.
+
+---
+
+## 3.11. Cronograma de Actividades
+
+| Fase | Actividad | S1-3 | S4-6 | S7-10 | S11-14 | S15-16 | S17-18 | S19-20 |
+|---|---|---|---|---|---|---|---|---|
+| **1** | Diagnóstico y relevamiento | ███ | | | | | | |
+| **1** | Especificación de requisitos (DRS) | ███ | ██ | | | | | |
+| **2** | Diseño de arquitectura, BD y API (DADS) | | ███ | | | | | |
+| **2** | Prototipos navegables y validación | | ███ | ██ | | | | |
+| **3** | Iteraciones 1-2 (autenticación; empresas, clientes y créditos) | | | ███ | | | | |
+| **3** | Iteraciones 3-4 (asignaciones; cobranzas en campo) | | | | ███ | | | |
+| **3** | Iteraciones 5-6 (reportes; mensajería) | | | | ███ | ██ | | |
+| **3** | Iteraciones 7-8 (caja; pruebas integrales) | | | | | ███ | | |
+| **4** | Pruebas con usuarios potenciales | | | | | | ███ | |
+| **4** | Ajustes y validación final | | | | | | ███ | |
+| **5** | Evaluación (encuestas, entrevistas de cierre) | | | | | | | ███ |
+| **5** | Informe de evaluación y conclusiones | | | | | | | ███ |
+
+---
+
+## 3.12. Matriz de Operacionalización de Variables
+
+| Variable | Definición Conceptual | Dimensión | Indicador | Instrumento | Escala |
+|---|---|---|---|---|---|
+| **Usabilidad del sistema** | Grado en que el producto puede ser utilizado por usuarios potenciales para lograr objetivos con efectividad, eficiencia y satisfacción (ISO/IEC 25010) | Efectividad | Tasa de finalización de tareas en las sesiones de prueba | Observación directa y registros del sistema | Porcentaje |
+| | | Eficiencia | Tiempo promedio por tarea representativa (p. ej., registro de un cobro) | Registros del sistema | Razón (segundos) |
+| | | Satisfacción | Puntaje SUS promedio | Encuesta SUS | Intervalo (0-100) |
+| **Satisfacción del usuario** | Percepción positiva del usuario potencial respecto al producto | Utilidad percibida | Promedio de los ítems de utilidad | Encuesta | Likert (1-5) |
+| | | Facilidad de uso | Promedio de los ítems de facilidad | Encuesta | Likert (1-5) |
+| | | Intención de uso | Porcentaje de participantes que usarían o recomendarían el sistema | Encuesta | Porcentaje |
+| **Calidad técnica del sistema** | Nivel en que el prototipo cumple atributos técnicos de rendimiento y confiabilidad | Rendimiento | Tiempo de respuesta de la API (percentil 95) | Registros del sistema | Razón (milisegundos) |
+| | | Confiabilidad | Tasa de errores y disponibilidad durante las pruebas | Registros del sistema | Porcentaje |
+
+---
+
+## 3.13. Recursos del Proyecto
+
+### 3.13.1. Recursos Humanos
+
+| Rol | Cantidad | Dedicación |
+|---|---|---|
+| Investigador / Desarrollador | 1 | Tiempo completo (20 semanas) |
+| Tutor / Asesor metodológico | 1 | 4 horas semanales |
+| Administradores (informantes clave) | 2 a 3 | 2 horas semanales durante el relevamiento |
+| Supervisores | 3 a 4 | 1 hora semanal durante el relevamiento y las pruebas |
+| Cobradores | 6 a 8 | 30 minutos semanales durante el relevamiento y las pruebas |
+
+### 3.13.2. Recursos Tecnológicos
+
+| Recurso | Especificación | Propósito |
+|---|---|---|
+| Laptop de desarrollo | 16 GB RAM, SSD 512 GB | Desarrollo, pruebas y documentación |
+| Entorno de pruebas (opcional) | Servidor virtual o VPS de baja capacidad | Despliegue del prototipo para las sesiones de validación |
+| Dispositivos móviles (opcional) | Smartphones Android (2 a 3 unidades, propios o prestados) | Pruebas de la aplicación móvil para cobradores |
+| Conexión a internet | Banda ancha (fibra o 4G) | Desarrollo, despliegue y sesiones de prueba |
+| Software de desarrollo | VS Code, Node.js, React Native, Next.js, MySQL | Entorno de desarrollo del producto |
+
+### 3.13.3. Recursos Bibliográficos
+
+| Tipo | Cantidad | Fuente |
+|---|---|---|
+| Libros académicos | 20 | Biblioteca física y digital |
+| Artículos científicos | 12 | IEEE Xplore, ACM, SciELO |
+| Documentación técnica | 10 | Documentación oficial de frameworks |
+| Normativas legales | 2 | Ley N° 1682/01 y GDPR |
+
+---
+
+## 3.14. Presupuesto Estimado
+
+| Rubro | Escenario 1 (sin dispositivos) | Escenario 2 (con dispositivos) |
+|---|---|---|
+| Entorno de pruebas (opcional) | $30 | $30 |
+| Dispositivos móviles (opcional) | — | $300 |
+| Materiales y suministros | $20 | $20 |
+| Equipamiento de desarrollo (amortización de laptop) | $300 | $300 |
+| **Subtotal** | **$350** | **$650** |
+| Imprevistos (10 %) | $35 | $35 |
+| **Total** | **$385** | **$685** |
+
+> **Nota:** el porcentaje de imprevistos (10 %) se calcula sobre el subtotal base de $350 (sin dispositivos), por lo que asciende a $35 en ambos escenarios. Los rubros señalados como opcionales pueden cubrirse con equipos propios o prestados, reduciendo el presupuesto efectivo a los materiales ($20) y su correspondiente 10 % de imprevistos ($2), es decir, **$22**.
+
+---
+
+## Referencias del Marco Metodológico
+
+Arias, F. G. (2012). *El proyecto de investigación: Introducción a la metodología científica* (6a ed.). Editorial Episteme.
+
+Avison, D., Lau, F., Myers, M., & Nielsen, P. A. (1999). Action research. *Communications of the ACM*, 42(1), 94-97.
+
+Beck, K. (2004). *Extreme programming explained: Embrace change* (2nd ed.). Addison-Wesley.
+
+Beck, K., Beedle, M., van Bennekum, A., Cockburn, A., Cunningham, W., Fowler, M., … Thomas, D. (2001). *Manifesto for agile software development*. https://agilemanifesto.org/
+
+Brooke, J. (1996). SUS: A "quick and dirty" usability scale. En P. W. Jordan, B. Thomas, B. A. Weerdmeester, & I. L. McClelland (Eds.), *Usability evaluation in industry* (pp. 189-194). Taylor & Francis.
+
+Creswell, J. W., & Creswell, J. D. (2018). *Research design: Qualitative, quantitative, and mixed methods approaches* (5th ed.). SAGE Publications.
+
+Denzin, N. K. (2017). *The research act: A theoretical introduction to sociological methods*. Routledge.
+
+Fowler, M. (2018). *Refactoring: Improving the design of existing code* (2nd ed.). Addison-Wesley.
+
+Hernández, R., Fernández, C., & Baptista, P. (2018). *Metodología de la investigación* (6a ed.). McGraw-Hill.
+
+International Organization for Standardization. (2011). *ISO/IEC 25010:2011: Systems and software engineering — Systems and software Quality Requirements and Evaluation (SQuaRE) — System and software quality models*. ISO.
+
+Kerlinger, F. N., & Lee, H. B. (2002). *Investigación del comportamiento* (4a ed.). McGraw-Hill.
+
+Krippendorff, K. (2018). *Content analysis: An introduction to its methodology* (4th ed.). SAGE Publications.
+
+Lewin, K. (1946). Action research and minority problems. *Journal of Social Issues*, 2(4), 34-46.
+
+Ley N° 1682/01. (2001). *De protección de datos de carácter personal*. Congreso de la Nación Paraguaya.
+
+Lozada, J. (2014). Investigación aplicada: Definición, propiedad intelectual e industria. *CienciAmérica*, 3(1), 34-39.
+
+Otzen, T., & Manterola, C. (2017). Técnicas de muestreo sobre una población a estudio. *International Journal of Morphology*, 35(1), 227-232.
+
+Reglamento (UE) 2016/679. (2016). Reglamento General de Protección de Datos. *Diario Oficial de la Unión Europea*, L119, 1-88.
+
+Sauro, J., & Lewis, J. R. (2016). *Quantifying the user experience: Practical statistics for user research* (2nd ed.). Morgan Kaufmann.
+
+Schwaber, K., & Sutherland, J. (2020). *The Scrum guide: The definitive guide to Scrum*. https://scrumguides.org/
+
+Sommerville, I. (2011). *Ingeniería de software* (9a ed.). Pearson Educación.
+
+---
+
+# Anexo A: Diagramas de Casos de Uso (PlantUML)
+
+Los siguientes diagramas modelan los casos de uso principales de **cobrApp** conforme al funcionamiento real del sistema. Los actores del sistema son:
+
+- **Administrador (ADMIN):** usuario de soporte y alta del sistema. Registra la primera empresa, crea empresas y usuarios con cualquier rol. No interviene en la operación diaria.
+- **Supervisor (SUPERVISOR):** configura la empresa (medios de pago, horarios, zonas de cobertura), gestiona clientes, créditos y cuotas, crea cobradores, asigna cobranzas y supervisa las rendiciones de caja. Opera desde el panel web.
+- **Cobrador (COBRADOR):** ejecuta la cobranza en campo mediante la aplicación móvil. Registra cobros y visitas, gestiona su caja diaria y se comunica con el supervisor.
+
+---
+
+## CU-01: Iniciar Sesión
+
+Permite a administradores, supervisores y cobradores acceder al sistema (panel web o aplicación móvil) mediante email y contraseña, validando las credenciales y el estado activo del usuario. En el primer acceso —o cuando el administrador restablece la contraseña— se ingresa con una contraseña provisional y el sistema exige el cambio obligatorio de contraseña.
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Administrador" as ADMIN
+actor "Supervisor" as SUP
+actor "Cobrador" as COB
+
+rectangle "Iniciar Sesión" {
+  usecase "Iniciar Sesión" as UC
+  usecase "Validar Credenciales" as VAL
+  usecase "Verificar Estado del Usuario" as ESTADO
+  usecase "Ingresar con Contraseña Provisional" as PROV
+  usecase "Cambiar Contraseña Obligatoria" as CAMBIO
+  usecase "Cerrar Sesión" as LOGOUT
+}
+
+ADMIN --> UC
+SUP --> UC
+COB --> UC
+UC ..> VAL : <<include>>
+UC ..> ESTADO : <<include>>
+UC ..> PROV : <<extend>>
+UC ..> CAMBIO : <<extend>>
+LOGOUT ..> UC : <<include>>
+@enduml
+```
+
+---
+
+## CU-02: Gestionar Usuarios
+
+El **Administrador** crea usuarios con cualquier rol (ADMIN, SUPERVISOR, COBRADOR). El **Supervisor** solo crea usuarios con rol SUPERVISOR o COBRADOR, dentro de su misma empresa (el sistema asigna la empresa automáticamente). El **Cobrador** no gestiona usuarios. Al crear un usuario, el sistema genera la contraseña automáticamente.
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Administrador" as ADMIN
+actor "Supervisor" as SUP
+
+rectangle "Gestionar Usuarios" {
+  usecase "Crear Usuario" as CREAR
+  usecase "Asignar Rol" as ROL
+  usecase "Asignar Empresa" as EMP
+  usecase "Editar Datos del Usuario" as EDITAR
+  usecase "Activar / Desactivar Usuario" as ESTADO
+  usecase "Restablecer Contraseña" as RESET
+  usecase "Listar / Buscar Usuarios" as LISTAR
+  usecase "Filtrar por Empresa o Rol" as FILTRO
+  usecase "Ver Detalle del Usuario" as DETALLE
+}
+
+ADMIN --> CREAR
+ADMIN --> EDITAR
+ADMIN --> ESTADO
+ADMIN --> LISTAR
+SUP --> CREAR
+SUP --> EDITAR
+SUP --> LISTAR
+
+CREAR ..> ROL : <<include>>
+CREAR ..> EMP : <<include>>
+CREAR ..> RESET : <<include>>
+LISTAR ..> FILTRO : <<include>>
+LISTAR ..> DETALLE : <<include>>
+
+note right of CREAR
+  ADMIN: crea usuarios con cualquier
+  rol (ADMIN, SUPERVISOR, COBRADOR)
+  SUPERVISOR: solo SUPERVISOR o
+  COBRADOR de su misma empresa
+end note
+@enduml
+```
+
+---
+
+## CU-03: Gestionar Empresas
+
+El **Administrador** registra el sistema (primera empresa) y gestiona las empresas del producto: datos de razón social, RUC, teléfono, dirección y logo. Una empresa activa puede operar con sus supervisores y cobradores.
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Administrador" as ADMIN
+
+rectangle "Gestionar Empresas" {
+  usecase "Registrar Sistema (Primera Empresa)" as REG
+  usecase "Crear Empresa" as CREAR
+  usecase "Editar Datos de la Empresa" as EDITAR
+  usecase "Cargar Logo" as LOGO
+  usecase "Activar / Desactivar Empresa" as ESTADO
+  usecase "Listar Empresas" as LISTAR
+  usecase "Buscar por RUC o Razón Social" as BUSCAR
+  usecase "Ver Detalle de la Empresa" as DETALLE
+  usecase "Configurar Parámetros de la Empresa" as PARAMS
+}
+
+ADMIN --> REG
+ADMIN --> CREAR
+ADMIN --> EDITAR
+ADMIN --> ESTADO
+ADMIN --> LISTAR
+
+CREAR ..> LOGO : <<include>>
+EDITAR ..> PARAMS : <<include>>
+EDITAR ..> LOGO : <<extend>>
+LISTAR ..> BUSCAR : <<include>>
+LISTAR ..> DETALLE : <<include>>
+@enduml
+```
+
+---
+
+## CU-04: Gestión de Clientes
+
+El **Supervisor** registra y mantiene la cartera de clientes deudores de su empresa: registro manual o importación masiva desde Excel, edición de datos, completado de ubicación GPS y consulta del historial del cliente.
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Supervisor" as SUP
+
+rectangle "Gestión de Clientes" {
+  usecase "Registrar Cliente" as REG
+  usecase "Importar Clientes desde Excel" as IMP
+  usecase "Editar Datos del Cliente" as EDITAR
+  usecase "Completar Ubicación GPS" as GPS
+  usecase "Buscar / Filtrar Clientes" as BUSCAR
+  usecase "Ver Historial del Cliente" as HIST
+  usecase "Ver Cuotas del Cliente" as CUOTAS
+  usecase "Asignar Cliente a una Zona" as ZONA
+  usecase "Exportar Cartera de Clientes" as EXPORT
+}
+
+SUP --> REG
+SUP --> IMP
+SUP --> EDITAR
+SUP --> GPS
+SUP --> HIST
+SUP --> EXPORT
+
+IMP ..> BUSCAR : <<include>>
+IMP ..> GPS : <<include>>
+HIST ..> CUOTAS : <<include>>
+REG ..> ZONA : <<include>>
+EDITAR ..> ZONA : <<extend>>
+@enduml
+```
+
+---
+
+## CU-05: Gestionar Créditos y Cuotas
+
+El **Supervisor** registra los créditos otorgados (manual o por importación desde Excel) y el sistema genera el plan de cuotas correspondiente, con el cálculo de intereses según la configuración de la empresa. También puede consultar, anular o ajustar créditos.
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Supervisor" as SUP
+
+rectangle "Gestionar Créditos y Cuotas" {
+  usecase "Registrar Crédito" as REG
+  usecase "Importar Créditos desde Excel" as IMP
+  usecase "Generar Plan de Cuotas" as PLAN
+  usecase "Calcular Intereses" as INTERES
+  usecase "Consultar Cuotas" as CONSULTA
+  usecase "Consultar Estado de Cuotas" as ESTADO
+  usecase "Anular Crédito" as ANULAR
+  usecase "Ajustar Crédito" as AJUSTE
+  usecase "Aplicar Nota de Crédito o Descuento" as NOTA
+  usecase "Ver Detalle del Crédito" as DETALLE
+}
+
+SUP --> REG
+SUP --> IMP
+SUP --> CONSULTA
+SUP --> ANULAR
+SUP --> AJUSTE
+
+REG ..> PLAN : <<include>>
+IMP ..> PLAN : <<include>>
+PLAN ..> INTERES : <<include>>
+CONSULTA ..> ESTADO : <<include>>
+CONSULTA ..> DETALLE : <<include>>
+AJUSTE ..> NOTA : <<extend>>
+@enduml
+```
+
+---
+
+## CU-06: Gestionar Zonas de Cobertura
+
+El **Administrador** o el **Supervisor** definen las zonas de cobertura dibujando polígonos sobre el mapa, asignan un cobrador responsable por zona y mantienen la lista de zonas de la empresa.
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Administrador" as ADMIN
+actor "Supervisor" as SUP
+
+rectangle "Gestionar Zonas de Cobertura" {
+  usecase "Crear Zona" as CREAR
+  usecase "Dibujar Polígono en el Mapa" as DIBUJAR
+  usecase "Asignar Cobrador Responsable" as RESP
+  usecase "Editar Zona" as EDITAR
+  usecase "Eliminar Zona" as ELIM
+  usecase "Listar Zonas" as LISTAR
+  usecase "Ver Clientes Dentro de la Zona" as CLIENTES
+  usecase "Reasignar Clientes de la Zona" as REASIG
+}
+
+ADMIN --> CREAR
+SUP --> CREAR
+SUP --> EDITAR
+SUP --> ELIM
+SUP --> LISTAR
+
+CREAR ..> DIBUJAR : <<include>>
+CREAR ..> RESP : <<include>>
+LISTAR ..> CLIENTES : <<include>>
+ELIM ..> REASIG : <<include>>
+@enduml
+```
+
+---
+
+## CU-07: Asignar Cobranzas
+
+El **Supervisor** asigna cuotas pendientes o vencidas a un cobrador específico con una fecha límite. El cobrador visualiza las asignaciones en su agenda de la aplicación móvil al iniciar sesión. También puede reasignar cuotas y consultar la agenda de cada cobrador.
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Supervisor" as SUP
+
+rectangle "Asignar Cobranzas" {
+  usecase "Asignar Cobranzas" as ASIG
+  usecase "Filtrar Cuotas Pendientes / Vencidas" as FILTRO
+  usecase "Seleccionar Cuotas" as SEL
+  usecase "Asignar a Cobrador con Fecha Límite" as ASIGCOB
+  usecase "Reasignar Cuotas" as REASIG
+  usecase "Ver Agenda del Cobrador" as AGENDA
+  usecase "Ver Carga de Trabajo del Cobrador" as CARGA
+  usecase "Desasignar Cuotas" as DESASIG
+  usecase "Ver Estado de las Asignaciones" as ESTADO
+}
+
+SUP --> ASIG
+SUP --> REASIG
+SUP --> AGENDA
+SUP --> DESASIG
+
+ASIG ..> FILTRO : <<include>>
+ASIG ..> SEL : <<include>>
+ASIG ..> ASIGCOB : <<include>>
+ASIGCOB ..> AGENDA : <<include>>
+AGENDA ..> CARGA : <<include>>
+AGENDA ..> ESTADO : <<include>>
+REASIG ..> DESASIG : <<include>>
+@enduml
+```
+
+---
+
+## CU-08: Registrar Cobro en Campo
+
+El **Cobrador**, con la caja diaria abierta, selecciona una asignación de su agenda, confirma el monto y el medio de pago, y el sistema registra el cobro capturando el GPS automáticamente. Puede registrar visitas con cliente ausente (con comentario y foto opcional), reagendar visitas y generar el comprobante PDF del cobro.
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Cobrador" as COB
+
+rectangle "Registrar Cobro en Campo" {
+  usecase "Ver Agenda del Día" as AGENDA
+  usecase "Registrar Cobro" as COBRO
+  usecase "Confirmar Monto y Medio de Pago" as CONFIRMA
+  usecase "Registrar Pago Parcial" as PARCIAL
+  usecase "Capturar GPS Automáticamente" as GPS
+  usecase "Registrar Visita (Cliente Ausente)" as AUSENTE
+  usecase "Reagendar Visita" as REAG
+  usecase "Capturar Evidencia Fotográfica" as FOTO
+  usecase "Registrar Comentario / Novedad" as COMENT
+  usecase "Generar Comprobante PDF" as PDF
+  usecase "Validar Caja Abierta" as CAJA
+}
+
+COB --> AGENDA
+COB --> COBRO
+COB --> AUSENTE
+COB --> REAG
+
+COBRO ..> CAJA : <<include>>
+COBRO ..> CONFIRMA : <<include>>
+COBRO ..> GPS : <<include>>
+COBRO ..> PDF : <<extend>>
+CONFIRMA ..> PARCIAL : <<extend>>
+AUSENTE ..> COMENT : <<include>>
+AUSENTE ..> FOTO : <<extend>>
+REAG ..> COMENT : <<include>>
+@enduml
+```
+
+---
+
+## CU-09: Gestionar Caja Diaria
+
+El **Cobrador** abre la caja ingresando el saldo inicial (requisito para habilitar la agenda), registra gastos y la cierra realizando el arqueo: el sistema compara el monto físico contado con lo registrado y muestra la diferencia. El **Supervisor** revisa las rendiciones del día por cobrador y fecha, y puede exportar el reporte.
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Cobrador" as COB
+actor "Supervisor" as SUP
+
+rectangle "Gestionar Caja Diaria" {
+  usecase "Abrir Caja (Saldo Inicial)" as ABRIR
+  usecase "Registrar Gastos" as GASTOS
+  usecase "Registrar Ingreso Extraordinario" as INGRESO
+  usecase "Cerrar Caja (Arqueo)" as CERRAR
+  usecase "Calcular Diferencia de Arqueo" as DIF
+  usecase "Revisar Rendiciones del Día" as REND
+  usecase "Ver Historial de Cajas" as HIST
+  usecase "Exportar Reporte" as EXPORT
+}
+
+COB --> ABRIR
+COB --> GASTOS
+COB --> CERRAR
+SUP --> REND
+SUP --> HIST
+
+CERRAR ..> DIF : <<include>>
+GASTOS ..> INGRESO : <<extend>>
+REND ..> DIF : <<include>>
+REND ..> EXPORT : <<extend>>
+REND ..> HIST : <<include>>
+@enduml
+```
+
+---
+
+## CU-10: Generar Reportes
+
+El **Administrador** y el **Supervisor** consultan los reportes gerenciales de la plataforma web (módulo de información gerencial - MIS). El sistema permite seleccionar el tipo de reporte (eficiencia de cobradores, cartera vencida, cobranza por período, morosidad por cliente, ranking de cobradores o KPIs de gestión), aplicar filtros por empresa, cobrador y rango de fechas, visualizar los resultados y exportarlos a archivos planos (CSV/Excel) para su análisis posterior.
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Administrador" as ADMIN
+actor "Supervisor" as SUP
+
+rectangle "Generar Reportes" {
+  usecase "Generar Reporte" as GEN
+  usecase "Seleccionar Tipo de Reporte" as TIPO
+  usecase "Filtrar por Empresa" as EMP
+  usecase "Filtrar por Cobrador" as COB
+  usecase "Filtrar por Rango de Fechas" as FECHA
+  usecase "Ver Reporte de Eficiencia de Cobradores" as EFIC
+  usecase "Ver Cartera Vencida por Antigüedad" as CARTERA
+  usecase "Ver Cobranza por Período" as PERIODO
+  usecase "Ver Morosidad por Cliente" as MOROS
+  usecase "Ver Ranking de Cobradores" as RANK
+  usecase "Ver KPIs de Gestión" as KPI
+  usecase "Exportar a CSV / Excel" as EXPORT
+  usecase "Imprimir Reporte" as IMPRIMIR
+}
+
+ADMIN --> GEN
+SUP --> GEN
+
+GEN ..> TIPO : <<include>>
+GEN ..> EMP : <<include>>
+GEN ..> COB : <<include>>
+GEN ..> FECHA : <<include>>
+TIPO ..> EFIC : <<extend>>
+TIPO ..> CARTERA : <<extend>>
+TIPO ..> PERIODO : <<extend>>
+TIPO ..> MOROS : <<extend>>
+TIPO ..> RANK : <<extend>>
+TIPO ..> KPI : <<extend>>
+GEN ..> EXPORT : <<extend>>
+GEN ..> IMPRIMIR : <<extend>>
+@enduml
+```

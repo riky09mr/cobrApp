@@ -1,5 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../middlewares/authMiddleware');
+const { requirePermission } = require('../middlewares/permissionMiddleware');
 const {
   getHorarios,
   guardarHorario,
@@ -9,25 +10,18 @@ const {
   eliminarExcepcion,
 } = require('../controllers/horariosController');
 
-const soloSupervisor = (req, res, next) => {
-  if (!['SUPERVISOR', 'ADMIN'].includes(req.user.rol)) {
-    return res.status(403).json({ message: 'Acceso restringido a supervisores' });
-  }
-  return next();
-};
-
 const router = express.Router();
 
-router.use(authenticateToken, soloSupervisor);
+router.use(authenticateToken);
 
 // Horario semanal
-router.get('/:cobradorId',              getHorarios);
-router.post('/',                         guardarHorario);
-router.delete('/:id',                    eliminarHorario);
+router.get('/:cobradorId',              requirePermission('horarios', 'ver'), getHorarios);
+router.post('/',                         requirePermission('horarios', 'editar'), guardarHorario);
+router.delete('/:id',                    requirePermission('horarios', 'editar'), eliminarHorario);
 
 // Excepciones
-router.get('/:cobradorId/excepciones',   getExcepciones);
-router.post('/:cobradorId/excepciones',  crearExcepcion);
-router.delete('/excepciones/:id',        eliminarExcepcion);
+router.get('/:cobradorId/excepciones',   requirePermission('horarios', 'ver'), getExcepciones);
+router.post('/:cobradorId/excepciones',  requirePermission('horarios', 'editar'), crearExcepcion);
+router.delete('/excepciones/:id',        requirePermission('horarios', 'editar'), eliminarExcepcion);
 
 module.exports = router;
